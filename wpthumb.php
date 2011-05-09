@@ -260,12 +260,21 @@ function phpthumb_post_image( $null, $id, $args ) {
 
 	if ( ( !strpos( (string) $args, '=' ) ) && !( is_array( $args ) && isset( $args[0] ) && $args[0] == $args[1] ) ) {
 		
-		if( is_string( $args ) )
+		// Convert keyword sizes to heights & widths. Will still use file wordpress saved unless you change the thumbnail dimensions. 
+		if( $args == 'thumbnail' ) 
+			$new_args = array( 'width' => get_option('thumbnail_size_w'), 'height' => get_option('thumbnail_size_h'), 'crop' => get_option('thumbnail_crop') ); 
+		elseif( $args == 'medium' ) 
+			$new_args = array( 'width' => get_option('medium_size_w'), 'height' => get_option('medium_size_h') ); 
+		elseif( $args == 'large' ) 
+			$new_args = array( 'width' => get_option('large_size_w'), 'height' => get_option('large_size_h') );
+		elseif( is_string( $args ) )
 			$new_args = apply_filters( 'phpthumb_create_args_from_size', $args );
+		elseif( is_array( $args ) )
+			$new_args = $args;
 		else
 			$new_args = null;
 
-		if( $args == $new_args || !$new_args ) {
+		if( !$new_args ) {
 		return null;
 		}
 		
