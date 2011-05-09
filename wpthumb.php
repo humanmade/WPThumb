@@ -17,7 +17,7 @@ Author URI: http://www.humanmade.co.uk/
  * @param bool $crop. (default: false)
  * @return (string) url to the image
  */
-function wpthumb_phpthumb_it( $url, $args = array() ) {
+function wpthumb( $url, $args = array() ) {
 	
 	include_once( dirname( __FILE__ ) . '/phpthumb/src/ThumbLib.inc.php' );
 
@@ -103,7 +103,7 @@ function wpthumb_phpthumb_it( $url, $args = array() ) {
 			unset( $thumb );
 
 			// Pass the new file back through the function so they are resized
-			return wpthumb_phpthumb_it( $new_filepath . '.jpg', $args );
+			return wpthumb( $new_filepath . '.jpg', $args );
 
 		endif;
 
@@ -238,7 +238,7 @@ function phpthumb_image_from_args( $image_path, $args ) {
 
 	extract( $args );
 
-	$image = wpthumb_phpthumb_it( $image_path, $args );
+	$image = wpthumb( $image_path, $args );
 
 	$crop = (bool) ( empty( $crop ) ) ? false : $crop;
 
@@ -613,7 +613,7 @@ function wm_watermark_preview_image( $position, $padding, $image_id ) {
 	$watermark['padding'] = (int) $padding;
 	$watermark['pre_resize'] = true;
 
-	return '<img src="' . wpthumb_phpthumb_it( $image, 200, 0, false, true, $watermark, false ) . '" /><a target="_blank" href="' . tw_phpthumb_it( $image, 1000, 0, false, true, $watermark, false ) . '">View Large</a>';
+	return '<img src="' . wpthumb( $image, 200, 0, false, true, $watermark, false ) . '" /><a target="_blank" href="' . tw_phpthumb_it( $image, 1000, 0, false, true, $watermark, false ) . '">View Large</a>';
 }
 
 function wm_image_has_watermark( $image_id ) {
