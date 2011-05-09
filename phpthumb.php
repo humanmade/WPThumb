@@ -1,4 +1,12 @@
 <?php
+/*
+Plugin Name: WPThumb
+Plugin URI: https://github.com/humanmade/WPThumb
+Description: PHPThumb for WordPress
+Author: humanmade limited, Joe Hoyle, Tom Wilmott, Matthew Haines-Young
+Version: 0.1
+Author URI: http://www.humanmade.co.uk/
+*/
 
 /**
  * Resizes a given image (local).
@@ -9,9 +17,9 @@
  * @param bool $crop. (default: false)
  * @return (string) url to the image
  */
-function tj_phpthumb_it( $url, $args = array() ) {
+function wpthumb_phpthumb_it( $url, $args = array() ) {
 	
-	include_once( HELPERPATH . '/phpthumb/src/ThumbLib.inc.php' );
+	include_once( dirname( __FILE__ ) . '/phpthumb/src/ThumbLib.inc.php' );
 
 	// Check if is using legacy args
 	if( is_numeric( $args ) ) {
@@ -95,7 +103,7 @@ function tj_phpthumb_it( $url, $args = array() ) {
 			unset( $thumb );
 
 			// Pass the new file back through the function so they are resized
-			return tj_phpthumb_it( $new_filepath . '.jpg', $args );
+			return wpthumb_phpthumb_it( $new_filepath . '.jpg', $args );
 
 		endif;
 
@@ -230,7 +238,7 @@ function phpthumb_image_from_args( $image_path, $args ) {
 
 	extract( $args );
 
-	$image = tj_phpthumb_it( $image_path, $args );
+	$image = wpthumb_phpthumb_it( $image_path, $args );
 
 	$crop = (bool) ( empty( $crop ) ) ? false : $crop;
 
@@ -420,7 +428,7 @@ function phpthumb_is_gif_animated( $filename ) {
  * @param string $return. (default: 'file' [file, array])
  * @return array
  */
-function tj_get_attached_images( $post = null, $return = 'file' ) {
+function wpthumb_get_attached_images( $post = null, $return = 'file' ) {
 	if ( $post === null )
 		global $post;
 
@@ -472,7 +480,7 @@ function phpthumb_delete_cache_for_file( $file ) {
 }
 add_filter( 'wp_delete_file', 'phpthumb_delete_cache_for_file' );
 
-//watermiking stuff
+//watermarking stuff
 
 
 //check for submission
@@ -605,7 +613,7 @@ function wm_watermark_preview_image( $position, $padding, $image_id ) {
 	$watermark['padding'] = (int) $padding;
 	$watermark['pre_resize'] = true;
 
-	return '<img src="' . tj_phpthumb_it( $image, 200, 0, false, true, $watermark, false ) . '" /><a target="_blank" href="' . tw_phpthumb_it( $image, 1000, 0, false, true, $watermark, false ) . '">View Large</a>';
+	return '<img src="' . wpthumb_phpthumb_it( $image, 200, 0, false, true, $watermark, false ) . '" /><a target="_blank" href="' . tw_phpthumb_it( $image, 1000, 0, false, true, $watermark, false ) . '">View Large</a>';
 }
 
 function wm_image_has_watermark( $image_id ) {
