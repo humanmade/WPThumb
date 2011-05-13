@@ -17,6 +17,7 @@ Author URI: http://www.humanmade.co.uk/
  * @param bool $crop. (default: false)
  * @return (string) url to the image
  */
+if( !function_exists('wpthumb') ) {
 function wpthumb( $url, $args = array() ) {
 	
 	if( !class_exists( 'PhpThumbFactory' ) )
@@ -681,7 +682,6 @@ function rmdirtree($dirname) {
     }
 }
 
-
 /**
  *
  * Error Messages 
@@ -696,3 +696,10 @@ function wpthumb_errors() {
 }
 
 add_action( 'admin_notices', 'wpthumb_errors' );
+
+
+} //endif function_exists('wpthumb')
+else
+{
+	die( 'Looks like you are using another plugin that includes WPThumb already activated. Deactivate that plugin first.' );
+}
