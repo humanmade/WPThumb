@@ -19,7 +19,8 @@ Author URI: http://www.humanmade.co.uk/
  */
 function wpthumb( $url, $args = array() ) {
 	
-	include_once( dirname( __FILE__ ) . '/phpthumb/src/ThumbLib.inc.php' );
+	if( !class_exists( 'PhpThumbFactory' ) )
+		include_once( dirname( __FILE__ ) . '/phpthumb/src/ThumbLib.inc.php' );
 
 	// Check if is using legacy args
 	if( is_numeric( $args ) ) {
