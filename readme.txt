@@ -3,7 +3,7 @@ Contributors: humanmade, mattheu, joehoyle, willmot
 Tags: image resize
 Requires at least: 3.0
 Tested up to: 3.1.2
-Stable tag: 0.1
+Stable tag: 0.2
 
 Gallery and Portfolio management for your WordPress site. 
 
@@ -14,9 +14,13 @@ WPThumb is a simple plugin that makes use of the PHPThumb library. It seamlessly
 = Features =
 
 * Automatic images resizing, cropping and caching. 
-
+* Ideal for when you want to change the dimensions of default image sizes.
 
 == Changelog ==
+
+=0.2=
+* Add some error messages and try to prevent some conflicts with our other plugins. 
+* Swap Joe Hoyles helper for HM Core.
 
 = 0.1 =
 * Add Joe Hoyles helper. 
