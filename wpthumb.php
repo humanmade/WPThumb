@@ -89,7 +89,8 @@ function wpthumb( $url, $args = array() ) {
 			return phpthumb_get_file_url_from_file_path( $file_path );
 		}
 
-
+		$thumb = apply_filters( 'wpthumb_image_filter', $thumb, $args );
+		
 		// Convert gif images to png before resizing
 		if ( $ext == '.gif' ) :
 
@@ -211,8 +212,11 @@ function phpthumb_calculate_image_cache_filename( $filename, $args ) {
 		$ext = 'jpg';
 	
 	$ext = '.' . $ext;
-	
-	$new_name = $width . '_' . $height . ( $crop ? '_crop' : '') . ($resize ? '_resize' : '') . ( isset($watermark_options['mask']) && $watermark_options['mask'] ? '_watermarked_' . $watermark_options['position'] : '') . $ext;
+
+	//Plugins can append custom information to the end of the filename.
+	$custom = apply_filters( 'wpthumb_filename_custom', $custom, $args ); 
+
+	$new_name = $width . '_' . $height . ( $crop ? '_crop' : '') . ($resize ? '_resize' : '') . ( isset($watermark_options['mask']) && $watermark_options['mask'] ? '_watermarked_' . $watermark_options['position'] : '') . ( $custom ? '_'. $custom : '' ) . $ext;
 
 	return $new_name;
 }
