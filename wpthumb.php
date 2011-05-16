@@ -55,8 +55,8 @@ function wpthumb( $url, $args = array() ) {
 	$width = (int) $width;
 	$height = (int) $height;
 
-	//if the file already matches (or is less than) the resize features, just return the url
-	if( function_exists( 'getimagesize' ) && strpos( $url, ABSPATH ) === 0 && file_exists( $url ) && ( $dimensions = getimagesize( $url ) ) && $dimensions[0] <= $width && $dimensions[1] <= $height ) {
+	//if the file already matches (or is less than) the resize features, just return the url	
+	if( !$args['custom'] && function_exists( 'getimagesize' ) && strpos( $url, ABSPATH ) === 0 && file_exists( $url ) && ( $dimensions = getimagesize( $url ) ) && $dimensions[0] <= $width && $dimensions[1] <= $height ) {
 		return phpthumb_get_file_url_from_file_path( $url );
 	}
 
@@ -214,6 +214,7 @@ function phpthumb_calculate_image_cache_filename( $filename, $args ) {
 	$ext = '.' . $ext;
 
 	//Plugins can append custom information to the end of the filename.
+	$custom = false;
 	$custom = apply_filters( 'wpthumb_filename_custom', $custom, $args ); 
 
 	$new_name = $width . '_' . $height . ( $crop ? '_crop' : '') . ($resize ? '_resize' : '') . ( isset($watermark_options['mask']) && $watermark_options['mask'] ? '_watermarked_' . $watermark_options['position'] : '') . ( $custom ? '_'. $custom : '' ) . $ext;
@@ -268,6 +269,7 @@ function phpthumb_post_image( $null, $id, $args ) {
 	if ( ( !strpos( (string) $args, '=' ) ) && !( is_array( $args ) && isset( $args[0] ) && $args[0] == $args[1] ) ) {
 		
 		// Convert keyword sizes to heights & widths. Will still use file wordpress saved unless you change the thumbnail dimensions. 
+		// Might be ok to delete as I think it has been duplicated.  Needs testing.
 		if( $args == 'thumbnail' ) 
 			$new_args = array( 'width' => get_option('thumbnail_size_w'), 'height' => get_option('thumbnail_size_h'), 'crop' => get_option('thumbnail_crop') ); 
 		elseif( $args == 'medium' ) 
@@ -348,10 +350,24 @@ function phpthumb_parse_args( $args ) {
 		'default'	=> null,
 		'jpeg_quality' => 80,
 		'resize_animations' => true,
-		'return' => 'url'
+		'return' => 'url',
+		'custom' => false
 	);
 	
 	$args = wp_parse_args( $args, $arg_defaults );
+	
+	if( $args['width'] == 'thumbnail' ) 
+		$new_args = array( 'width' => get_option('thumbnail_size_w'), 'height' => get_option('thumbnail_size_h'), 'crop' => get_option('thumbnail_crop') ); 
+	elseif( $args['width'] == 'medium' ) 
+		$new_args = array( 'width' => get_option('medium_size_w'), 'height' => get_option('medium_size_h') ); 
+	elseif( $args['width'] == 'large' ) 
+		$new_args = array( 'width' => get_option('large_size_w'), 'height' => get_option('large_size_h') );
+	elseif( is_string( $args['width'] ) )
+		$new_args = apply_filters( 'phpthumb_create_args_from_size', $args );
+	elseif( is_array( $args['width'] ) )
+		$new_args = $args;
+
+	$args = wp_parse_args( $new_args, $args );
 	
 	// Cast some args
 	$args['crop'] = (bool) $args['crop'];
