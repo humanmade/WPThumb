@@ -15,8 +15,12 @@ WPThumb is a simple plugin that makes use of the PHPThumb library. It seamlessly
 
 * Automatic images resizing, cropping and caching. 
 * Ideal for when you want to change the dimensions of default image sizes.
+* Can extend using filters to make use of any of the phpThumb Library functions by manipulating the image object.
 
 == Changelog ==
+
+=0.3=
+* Ability to extend functionality using filters to manipulate image object.
 
 =0.2=
 * Add some error messages and try to prevent some conflicts with our other plugins. 
