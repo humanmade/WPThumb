@@ -56,7 +56,7 @@ function wpthumb( $url, $args = array() ) {
 	$height = (int) $height;
 
 	//if the file already matches (or is less than) the resize features, just return the url	
-	if( !WPTHUMB_ALWAYS && !$args['custom'] && function_exists( 'getimagesize' ) && strpos( $url, ABSPATH ) === 0 && file_exists( $url ) && ( $dimensions = getimagesize( $url ) ) && $dimensions[0] <= $width && $dimensions[1] <= $height ) {
+	if( ( !defined('WPTHUMB_FORCE_ENABLED') || defined('WPTHUMB_FORCE_ENABLED') && !WPTHUMB_FORCE_ENABLED ) && !$args['custom'] && function_exists( 'getimagesize' ) && strpos( $url, ABSPATH ) === 0 && file_exists( $url ) && ( $dimensions = getimagesize( $url ) ) && $dimensions[0] <= $width && $dimensions[1] <= $height ) {
 		return phpthumb_get_file_url_from_file_path( $url );
 	}
 
