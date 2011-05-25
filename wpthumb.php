@@ -326,9 +326,10 @@ function phpthumb_post_image( $null, $id, $args ) {
 	if( !$path ) {
 		$path = get_attached_file( $id );
 	}
+	
 
 	if( file_exists( $path ) && !is_dir( $path ) && !$args['default'] )
-	return phpthumb_image_from_args( $path, $args );
+		return phpthumb_image_from_args( $path, $args );
 	
 	else 
 		return $null;
@@ -385,12 +386,13 @@ function phpthumb_parse_args( $args ) {
 
 
 function phpthumb_get_file_path_from_file_url( $url ) {
+	$upload_dir = wp_upload_dir();
+	
 	if( is_multisite() && !is_main_site() ) {
-		$upload_dir = wp_upload_dir();
 		
 		return str_replace( get_bloginfo('wpurl') . '/files', $upload_dir['basedir'], $url );
 	} else {
-		return str_replace( get_bloginfo('wpurl') . '/', ABSPATH, $url );
+		return str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $url );
 	}
 }
 
