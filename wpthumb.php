@@ -276,15 +276,15 @@ function phpthumb_post_image( $null, $id, $args ) {
 			$new_args = array( 'width' => get_option('medium_size_w'), 'height' => get_option('medium_size_h') ); 
 		elseif( $args == 'large' ) 
 			$new_args = array( 'width' => get_option('large_size_w'), 'height' => get_option('large_size_h') );
-		elseif( is_string( $args ) )
-			$new_args = apply_filters( 'phpthumb_create_args_from_size', $args );
+		elseif( is_string( $args ) && ( $args != ( $new_filter_args = apply_filters( 'phpthumb_create_args_from_size', $args ) ) ) )
+			$new_args = $new_filter_args;
 		elseif( is_array( $args ) )
 			$new_args = $args;
 		else
 			$new_args = null;
-
+		
 		if( !$new_args ) {
-		return null;
+		return $null;
 		}
 		
 		$args = $new_args;
