@@ -8,6 +8,8 @@ Version: 0.1
 Author URI: http://www.humanmade.co.uk/
 */
 
+if( !function_exists('wpthumb') ) {
+
 /**
  * Resizes a given image (local).
  *
@@ -17,7 +19,6 @@ Author URI: http://www.humanmade.co.uk/
  * @param bool $crop. (default: false)
  * @return (string) url to the image
  */
-if( !function_exists('wpthumb') ) {
 function wpthumb( $url, $args = array() ) {
 	
 	if( !class_exists( 'PhpThumbFactory' ) )
@@ -54,8 +55,8 @@ function wpthumb( $url, $args = array() ) {
 	$width = (int) $width;
 	$height = (int) $height;
 
-	//if the file already matches (or is less than) the resize features, just return the url
-	if( function_exists( 'getimagesize' ) && strpos( $url, ABSPATH ) === 0 && file_exists( $url ) && ( $dimensions = getimagesize( $url ) ) && $dimensions[0] <= $width && $dimensions[1] <= $height ) {
+	//if the file already matches (or is less than) the resize features, just return the url	
+	if( ( !defined('WPTHUMB_FORCE_ENABLED') || defined('WPTHUMB_FORCE_ENABLED') && !WPTHUMB_FORCE_ENABLED ) && !$args['custom'] && function_exists( 'getimagesize' ) && strpos( $url, ABSPATH ) === 0 && file_exists( $url ) && ( $dimensions = getimagesize( $url ) ) && $dimensions[0] <= $width && $dimensions[1] <= $height ) {
 		return phpthumb_get_file_url_from_file_path( $url );
 	}
 
@@ -88,7 +89,8 @@ function wpthumb( $url, $args = array() ) {
 			return phpthumb_get_file_url_from_file_path( $file_path );
 		}
 
-
+		$thumb = apply_filters( 'wpthumb_image_filter', $thumb, $args );
+		
 		// Convert gif images to png before resizing
 		if ( $ext == '.gif' ) :
 
@@ -210,8 +212,12 @@ function phpthumb_calculate_image_cache_filename( $filename, $args ) {
 		$ext = 'jpg';
 	
 	$ext = '.' . $ext;
-	
-	$new_name = $width . '_' . $height . ( $crop ? '_crop' : '') . ($resize ? '_resize' : '') . ( isset($watermark_options['mask']) && $watermark_options['mask'] ? '_watermarked_' . $watermark_options['position'] : '') . $ext;
+
+	//Plugins can append custom information to the end of the filename.
+	$custom = false;
+	$custom = apply_filters( 'wpthumb_filename_custom', $custom, $args ); 
+
+	$new_name = $width . '_' . $height . ( $crop ? '_crop' : '') . ($resize ? '_resize' : '') . ( isset($watermark_options['mask']) && $watermark_options['mask'] ? '_watermarked_' . $watermark_options['position'] : '') . ( $custom ? '_'. $custom : '' ) . $ext;
 
 	return $new_name;
 }
@@ -260,7 +266,7 @@ function phpthumb_image_from_args( $image_path, $args ) {
 
 function phpthumb_post_image( $null, $id, $args ) {
 
-		if ( ( !strpos( (string) $args, '=' ) ) && !( is_array( $args ) && isset( $args[0] ) && $args[0] == $args[1] ) ) {
+	if ( ( !strpos( (string) $args, '=' ) ) && !( is_array( $args ) && isset( $args[0] ) && $args[0] == $args[1] ) ) {
 		
 		// Convert keyword sizes to heights & widths. Will still use file wordpress saved unless you change the thumbnail dimensions. 
 		// Might be ok to delete as I think it has been duplicated.  Needs testing.
@@ -270,15 +276,15 @@ function phpthumb_post_image( $null, $id, $args ) {
 			$new_args = array( 'width' => get_option('medium_size_w'), 'height' => get_option('medium_size_h') ); 
 		elseif( $args == 'large' ) 
 			$new_args = array( 'width' => get_option('large_size_w'), 'height' => get_option('large_size_h') );
-		elseif( is_string( $args ) && ( $args != ( $new_filter_args = apply_filters( 'phpthumb_create_args_from_size', $args ) ) ) )
-			$new_args = $new_filter_args;
+		elseif( is_string( $args ) )
+			$new_args = apply_filters( 'phpthumb_create_args_from_size', $args );
 		elseif( is_array( $args ) )
 			$new_args = $args;
 		else
 			$new_args = null;
-		
+
 		if( !$new_args ) {
-		return $null;
+		return null;
 		}
 		
 		$args = $new_args;
@@ -320,9 +326,10 @@ function phpthumb_post_image( $null, $id, $args ) {
 	if( !$path ) {
 		$path = get_attached_file( $id );
 	}
+	
 
 	if( file_exists( $path ) && !is_dir( $path ) && !$args['default'] )
-	return phpthumb_image_from_args( $path, $args );
+		return phpthumb_image_from_args( $path, $args );
 	
 	else 
 		return $null;
@@ -344,10 +351,24 @@ function phpthumb_parse_args( $args ) {
 		'default'	=> null,
 		'jpeg_quality' => 80,
 		'resize_animations' => true,
-		'return' => 'url'
+		'return' => 'url',
+		'custom' => false
 	);
 	
 	$args = wp_parse_args( $args, $arg_defaults );
+	
+	if( $args['width'] == 'thumbnail' ) 
+		$new_args = array( 'width' => get_option('thumbnail_size_w'), 'height' => get_option('thumbnail_size_h'), 'crop' => get_option('thumbnail_crop') ); 
+	elseif( $args['width'] == 'medium' ) 
+		$new_args = array( 'width' => get_option('medium_size_w'), 'height' => get_option('medium_size_h') ); 
+	elseif( $args['width'] == 'large' ) 
+		$new_args = array( 'width' => get_option('large_size_w'), 'height' => get_option('large_size_h') );
+	elseif( is_string( $args['width'] ) )
+		$new_args = apply_filters( 'phpthumb_create_args_from_size', $args );
+	elseif( is_array( $args['width'] ) )
+		$new_args = $args;
+
+	$args = wp_parse_args( $new_args, $args );
 	
 	// Cast some args
 	$args['crop'] = (bool) $args['crop'];
@@ -365,12 +386,13 @@ function phpthumb_parse_args( $args ) {
 
 
 function phpthumb_get_file_path_from_file_url( $url ) {
+	$upload_dir = wp_upload_dir();
+	
 	if( is_multisite() && !is_main_site() ) {
-		$upload_dir = wp_upload_dir();
 		
 		return str_replace( get_bloginfo('wpurl') . '/files', $upload_dir['basedir'], $url );
 	} else {
-		return str_replace( get_bloginfo('wpurl') . '/', ABSPATH, $url );
+		return str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $url );
 	}
 }
 
@@ -700,7 +722,6 @@ add_action( 'admin_notices', 'wpthumb_errors' );
 
 
 } //endif function_exists('wpthumb')
-else
-{
+else {
 	die( 'Looks like you are using another plugin that includes WPThumb already activated. Deactivate that plugin first.' );
 }
