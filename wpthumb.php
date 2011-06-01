@@ -713,7 +713,9 @@ function rmdirtree($dirname) {
 
 function wpthumb_errors() {
     
-   	$dir_upload = ABSPATH . 'wp-content/uploads/';	
+   	$dir_upload = wp_upload_dir();
+   	$dir_upload = $dir_upload['path'];
+   	
     if ( file_exists( $dir_upload ) && !is_writable( $dir_upload ) )
 		echo '<div id="wpthumb-warning" class="updated fade"><p><strong>' . __( 'WPThumb has detected a problem.', 'wpthumb' ) . '</strong> ' . sprintf( __( 'The directory <code>%s</code> is not writable.', 'wpthumb' ), $dir_upload ) . '</p></div>';    
 }
