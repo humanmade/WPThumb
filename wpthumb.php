@@ -10,6 +10,67 @@ Author URI: http://www.humanmade.co.uk/
 
 if( !function_exists('wpthumb') ) {
 
+
+/**
+ * wpthumb_media_form_crop_position function.
+ * 
+ * Adds a back end for selecting the crop position of images.
+ *
+ * @access public
+ * @param array $fields
+ * @param array $post
+ * @return $post
+ */
+function wpthumb_media_form_crop_position( $fields, $post ) {
+	
+	$current_position = get_post_meta( $post->ID, 'wpthumb_crop_pos', true );
+	if( !$current_position ) 
+		$current_position = 'center,center';
+		
+	$html = '<style>#wpthumb_crop_pos input { margin: 5px; }</style>';
+	$html .= '<div id="wpthumb_crop_pos">';
+	$html .= '<input type="radio" name="attachments[' . $post->ID . '][wpthumb_crop_pos]" value="left,top" ' . checked( 'left,top', $current_position, false ) . '/>';
+	$html .= '<input type="radio" name="attachments[' . $post->ID . '][wpthumb_crop_pos]" value="center,top" ' . checked( 'center,top', $current_position, false ) . '/>';
+	$html .= '<input type="radio" name="attachments[' . $post->ID . '][wpthumb_crop_pos]" value="right,top" ' . checked( 'right,top', $current_position, false ) . '/><br/>';
+	$html .= '<input type="radio" name="attachments[' . $post->ID . '][wpthumb_crop_pos]" value="left,center" ' . checked( 'left,center', $current_position, false ) . '/>';
+	$html .= '<input type="radio" name="attachments[' . $post->ID . '][wpthumb_crop_pos]" value="center,center" ' . checked( 'center,center', $current_position, false ) . '/>';
+	$html .= '<input type="radio" name="attachments[' . $post->ID . '][wpthumb_crop_pos]" value="right,center" ' . checked( 'right,center', $current_position, false ) . '/><br/>';
+	$html .= '<input type="radio" name="attachments[' . $post->ID . '][wpthumb_crop_pos]" value="left,bottom" ' . checked( 'left,bottom', $current_position, false ) . '/>';
+	$html .= '<input type="radio" name="attachments[' . $post->ID . '][wpthumb_crop_pos]" value="center,bottom" ' . checked( 'center,bottom', $current_position, false ) . '/>';
+	$html .= '<input type="radio" name="attachments[' . $post->ID . '][wpthumb_crop_pos]" value="right,bottom" ' . checked( 'right,bottom', $current_position, false ) . '/>';
+	$html .= '</div>';
+	
+	$fields[] = array(
+		'label' => __('Crop Position', 'wpthumb'),
+		'input' => 'html',
+		'html' => $html
+	);
+	return $fields; 
+}
+add_filter( 'attachment_fields_to_edit', 'wpthumb_media_form_crop_position', 10, 2 );
+
+
+/**
+ * wpthumb_media_form_crop_position_save function.
+ * 
+ * Saves crop position in post meta.
+ *
+ * @access public
+ * @param array $post
+ * @param array $attachment
+ * @return $post
+ */
+function wpthumb_media_form_crop_position_save( $post, $attachment ){
+	
+	if( $attachment['wpthumb_crop_pos'] == 'center,center' )
+		delete_post_meta( $post['ID'], 'wpthumb_crop_pos' );	
+	else		
+		update_post_meta( $post['ID'], 'wpthumb_crop_pos', $attachment['wpthumb_crop_pos'] );
+	
+	return $post;
+}
+add_filter( 'attachment_fields_to_save', 'wpthumb_media_form_crop_position_save', 10, 2);
+
 /**
  * Resizes a given image (local).
  *
