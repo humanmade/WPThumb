@@ -81,7 +81,7 @@ add_filter( 'attachment_fields_to_save', 'wpthumb_media_form_crop_position_save'
  * @return (string) url to the image
  */
 function wpthumb( $url, $args = array() ) {
-	
+		
 	if( !class_exists( 'PhpThumbFactory' ) )
 		include_once( dirname( __FILE__ ) . '/phpthumb/src/ThumbLib.inc.php' );
 
@@ -151,7 +151,7 @@ function wpthumb( $url, $args = array() ) {
 		}
 
 		$thumb = apply_filters( 'wpthumb_image_filter', $thumb, $args );
-		
+				
 		// Convert gif images to png before resizing
 		if ( $ext == '.gif' ) :
 
@@ -177,12 +177,12 @@ function wpthumb( $url, $args = array() ) {
 			$thumb->resize( 99999, 99999 );
 			$thumb->createWatermark( $watermark_options['mask'], $watermark_options['position'], $watermark_options['padding'] );
 		}
-
 		if ( $crop === true && $resize === true ) {
-			if( $crop_from_position && count( $crop_from_position ) == 2 && method_exists( $thumb, 'adaptiveResizeFromPoint' ) )
+			if( $crop_from_position && count( $crop_from_position ) == 2 && method_exists( $thumb, 'adaptiveResizeFromPoint' ) ) {
 				$thumb->adaptiveResizeFromPoint( $width, $height, $crop_from_position[0], $crop_from_position[1] );
-			else
+			} else {
 			$thumb->adaptiveResize( $width, $height );
+			}
 		}
 
 		elseif( $crop === true && $resize === false )
@@ -372,6 +372,9 @@ function phpthumb_post_image( $null, $id, $args ) {
 		$args['height'] = null;
 
 	$args['original_size'] = ( isset( $args['original_size'] ) && $args['original_size'] ) ? $args['original_size'] : 'thumbnail';
+
+	if( empty( $args['crop_from_position'] ) ) 
+		 $args['crop_from_position'] = get_post_meta( $id, 'wpthumb_crop_pos', true );
 
 	$args = phpthumb_parse_args( $args );
 	
