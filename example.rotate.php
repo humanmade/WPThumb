@@ -18,7 +18,7 @@ add_filter( 'wpthumb_image_filter', 'rotator_action', 10, 2 );
 
 function rotator_action( $thumb, $args ) {
 
-	if( $args['custom'] == 'rotator' ) {
+	if ( $args['custom'] == 'rotator' ) {
 		$thumb->rotateImage('CCW');	
 		$thumb->rotateImage('CCW');
 		$thumb->createReflection( 40, 40, 80, false, '#FFF' );
