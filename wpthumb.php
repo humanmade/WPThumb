@@ -309,9 +309,8 @@ function wpthumb_create_dir_for_file( $path ) {
 
     $filename = end( explode( '/', $path ) );
     $dir = str_replace( $filename, '', $path );
-
-    if ( !is_dir( $dir ) )
-    	mkdir( $dir, 0755, true );
+	
+	wp_mkdir_p( $dir );
 
     return;
 }
