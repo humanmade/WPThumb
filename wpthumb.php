@@ -167,20 +167,29 @@ function wpthumb( $url, $args = array() ) {
     	}
 
     	// Cropping
+    	
     	if ( $crop === true && $resize === true ) :
 
-    		if ( $crop_from_position && count( $crop_from_position ) == 2 && method_exists( $thumb, 'adaptiveResizeFromPoint' ) )
-    			$thumb->adaptiveResizeFromPoint( $width, $height, $crop_from_position[0], $crop_from_position[1] );
-
-    		else
-    			$thumb->adaptiveResize( $width, $height );
-
+    	  if ( $crop_from_position && count( $crop_from_position ) == 2 && method_exists( $thumb, 'adaptiveResizeFromPoint' ) && 1 == 2) {
+    	  	$thumb->adaptiveResizeFromPoint( $width, $height, $crop_from_position[0], $crop_from_position[1] );
+		
+    	  }
+    	  
+    	  elseif( $background_fill == 'solid' && $thumb->canBackgroundFillSolidColorWithResize( $width, $height ) ) {
+			$thumb->resize( $width, $height );
+    	  	$thumb->backgroundFillColorAuto( $width, $height );
+    	  }
+			
+		  else {
+		  	$thumb->adaptiveResize( $width, $height );
+		  }
+		  	
     	elseif ( $crop === true && $resize === false ) :
-    		$thumb->cropFromCenter( $width, $height );
-
+    	  $thumb->cropFromCenter( $width, $height );
+		
     	else :
-    		$thumb->resize( $width, $height );
-
+    	  $thumb->resize( $width, $height );
+		
     	endif;
 
     	// Watermarking (post resizing)
@@ -292,6 +301,9 @@ function wpthumb_calculate_image_cache_filename( $filename, $args ) {
 
     if ( !empty( $custom ) )
     	$new_name .= '_' . $custom;
+    
+    if( !empty( $background_fill ) )
+    	$new_name .= '_backgorund_fill_' . $background_fill;
 
     $new_name .= $ext;
 
@@ -450,7 +462,8 @@ function wpthumb_parse_args( $args ) {
     	'jpeg_quality' 			=> 80,
     	'resize_animations' 	=> true,
     	'return' 				=> 'url',
-    	'custom' 				=> false
+    	'custom' 				=> false,
+    	'background_fill'		=> null
     );
 
     $args = wp_parse_args( $args, $arg_defaults );
