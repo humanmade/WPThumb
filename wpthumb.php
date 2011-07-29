@@ -169,13 +169,12 @@ function wpthumb( $url, $args = array() ) {
     	// Cropping
     	
     	if ( $crop === true && $resize === true ) :
-
-    	  if ( $crop_from_position && count( $crop_from_position ) == 2 && method_exists( $thumb, 'adaptiveResizeFromPoint' ) && 1 == 2) {
+    	  if ( $crop_from_position && count( $crop_from_position ) == 2 && method_exists( $thumb, 'adaptiveResizeFromPoint' ) && empty( $background_fill ) ) {
     	  	$thumb->adaptiveResizeFromPoint( $width, $height, $crop_from_position[0], $crop_from_position[1] );
 		
     	  }
     	  
-    	  elseif( $background_fill == 'solid' && method_exists( $thumb, 'canBackgroundFillSolidColorWithResize' ) && $thumb->canBackgroundFillSolidColorWithResize( $width, $height ) ) {
+    	  elseif( $background_fill == 'solid' && $thumb->canBackgroundFillSolidColorWithResize( $width, $height ) ) {
 			$thumb->resize( $width, $height );
     	  	$thumb->backgroundFillColorAuto( $width, $height );
     	  }
