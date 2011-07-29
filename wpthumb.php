@@ -85,10 +85,10 @@ function wpthumb( $url, $args = array() ) {
 
     if ( !class_exists( 'phpThumbFactory' ) && error_log( 'phpThumbFactory class not found.' ) )
         return $url;
-
+	
     // Check if is using legacy args
     if ( is_numeric( $args ) )
-    	$legacy_args = array_combine( array_slice( array( 'width', 'height', 'crop', 'resize' ), 0, count(  array_slice( func_get_args(), 1 ) ) ), $legacy_args );
+    	$legacy_args = array_combine( array_slice( array( 'width', 'height', 'crop', 'resize' ), 0, count( array_slice( func_get_args(), 1 ) ) ), array_slice( func_get_args(), 1 ) );
 
     if ( isset( $legacy_args ) && $legacy_args )
     	$args = wpthumb_parse_args( $legacy_args );
@@ -303,7 +303,7 @@ function wpthumb_calculate_image_cache_filename( $filename, $args ) {
     	$new_name .= '_' . $custom;
     
     if( !empty( $background_fill ) )
-    	$new_name .= '_backgorund_fill_' . $background_fill;
+    	$new_name .= '_background_fill_' . $background_fill;
 
     $new_name .= $ext;
 
