@@ -175,7 +175,7 @@ function wpthumb( $url, $args = array() ) {
 		
     	  }
     	  
-    	  elseif( $background_fill == 'solid' && $thumb->canBackgroundFillSolidColorWithResize( $width, $height ) ) {
+    	  elseif( $background_fill == 'solid' && method_exists( $thumb, 'canBackgroundFillSolidColorWithResize' ) && $thumb->canBackgroundFillSolidColorWithResize( $width, $height ) ) {
 			$thumb->resize( $width, $height );
     	  	$thumb->backgroundFillColorAuto( $width, $height );
     	  }
