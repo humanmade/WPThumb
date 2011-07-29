@@ -937,3 +937,86 @@ function wpthumb_errors() {
     	echo '<div id="wpthumb-warning" class="updated fade"><p><strong>' . __( 'WPThumb has detected a problem.', 'wpthumb' ) . '</strong> ' . sprintf( __( 'The directory <code>%s</code> is not writable.', 'wpthumb' ), $dir_upload ) . '</p></div>';
 }
 add_action( 'admin_notices', 'wpthumb_errors' );
+
+function wpthumb_test() {
+	
+	$test_images_dir = dirname( __FILE__ ) . '/test-images';
+
+	?>
+	<style>
+		body{ background: pink }
+	</style>
+	
+	<h2>Auto Background Fill</h2>
+	<table>
+	
+		<thead>
+			<th>Original Image</th>
+			<th>Non-Padded Adaptive Resize</th>
+			<th>Padded Resize</th>
+			<th>Arguments</th>
+		</thead>
+		
+		<tr>
+			<td>
+				<?php $memory_usage = memory_get_usage(); ?>
+				<img src="<?php echo wpthumb( $test_images_dir . '/white.jpeg', 'width=500&height=200&cache=0' ) ?>" /><br />
+				Memory Usage: <?php echo number_format( ( memory_get_peak_usage() - $memory_usage ) / 1024 / 1024, 2 ) ?>MB
+			</td>
+			<td>
+				<?php $memory_usage = memory_get_usage(); ?>
+				<img src="<?php echo wpthumb( $test_images_dir . '/white.jpeg', 'width=500&height=200&crop=1&cache=0' ) ?>"><br />
+				Memory Usage: <?php echo number_format( ( memory_get_peak_usage() - $memory_usage ) / 1024 / 1024, 2 ) ?>MB
+			</td>		
+				
+			<td>
+				<?php $memory_usage = memory_get_usage(); ?>
+				<img src="<?php echo wpthumb( $test_images_dir . '/white.jpeg', 'width=500&height=200&crop=1&background_fill=solid&cache=0' ) ?>"><br />
+				Memory Usage: <?php echo number_format( ( memory_get_peak_usage() - $memory_usage ) / 1024 / 1024, 2 ) ?>MB
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+				<?php $memory_usage = memory_get_usage(); ?>
+				<img src="<?php echo wpthumb( $test_images_dir . '/google.png', 'width=100&height=100&cache=0' ) ?>" /><br />
+				Memory Usage: <?php echo number_format( ( memory_get_peak_usage() - $memory_usage ) / 1024 / 1024, 2 ) ?>MB
+			</td>
+			<td>
+				<?php $memory_usage = memory_get_usage(); ?>
+				<img src="<?php echo wpthumb( $test_images_dir . '/google.png', 'width=100&height=100&crop=1&cache=0' ) ?>"><br />
+				Memory Usage: <?php echo number_format( ( memory_get_peak_usage() - $memory_usage ) / 1024 / 1024, 2 ) ?>MB
+			</td>		
+				
+			<td>
+				<?php $memory_usage = memory_get_usage(); ?>
+				<img src="<?php echo wpthumb( $test_images_dir . '/google.png', 'width=100&height=100&crop=1&background_fill=solid&cache=0' ) ?>"><br />
+				Memory Usage: <?php echo number_format( ( memory_get_peak_usage() - $memory_usage ) / 1024 / 1024, 2 ) ?>MB
+			</td>
+		</tr>
+		
+		<tr>
+			<td><img src="<?php echo wpthumb( $test_images_dir . '/gradient-horizontal.jpg', 'width=0&height=100&cache=0' ) ?>"></td>
+			<td><img src="<?php echo wpthumb( $test_images_dir . '/gradient-horizontal.jpg', 'width=500&height=100&crop=1&cache=0' ) ?>"></td>			
+			<td><img src="<?php echo wpthumb( $test_images_dir . '/gradient-horizontal.jpg', 'width=500&height=100&crop=1&background_fill=solid&cache=0' ) ?>"></td>
+		</tr>
+		
+		<tr>
+			<td><img src="<?php echo wpthumb( $test_images_dir . '/gradient-vertical.jpg', 'width=100&height=500&cache=0' ) ?>"></td>
+			<td><img src="<?php echo wpthumb( $test_images_dir . '/gradient-vertical.jpg', 'width=100&height=500&crop=1&cache=0' ) ?>"></td>			
+			<td><img src="<?php echo wpthumb( $test_images_dir . '/gradient-vertical.jpg', 'width=100&height=500&crop=1&background_fill=solid&cache=0' ) ?>"></td>
+		</tr>
+		
+		<tr>
+			<td><img src="<?php echo wpthumb( $test_images_dir . '/photo.png', 'width=100&height=0&crop=1&cache=0' ) ?>"></td>
+			<td><img src="<?php echo wpthumb( $test_images_dir . '/photo.png', 'width=500&height=100&crop=1&cache=0' ) ?>"></td>			
+			<td><img src="<?php echo wpthumb( $test_images_dir . '/photo.png', 'width=500&height=100&crop=1&background_fill=solid&cache=0' ) ?>"></td>
+		</tr>
+	</table>	
+
+	<?php
+	exit;
+}
+
+if( isset( $_GET['wpthumb_test'] ) )
+	add_action( 'init', 'wpthumb_test' );
