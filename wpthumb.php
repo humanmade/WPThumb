@@ -237,16 +237,16 @@ function wpthumb_calculate_image_cache_dir( $path, $args = null ) {
     // If the image was remote, we want to store them in the remote images folder, not it's name
     if ( strpos( $original_filename, '0_0_resize' ) === 0 )
     	$original_filename = end( explode( '/', str_replace( '/' . $original_filename, '', $path ) ) );
-
+	
+	$parts = explode( '.', $original_filename );
+	array_pop($parts);
+	$filename_nice = implode( '_', $parts );
+	
     $upload_dir = wp_upload_dir();
     $upload_dir_base = $upload_dir['basedir'];
-
-    if ( strpos( $path, ABSPATH ) !== 0 ) :
-    	$new_dir = $upload_dir_base . '/cache';
-
-    elseif ( strpos( $path, $upload_dir_base ) === 0 ) :
-    	$new_path = str_replace( $upload_dir_base, $upload_dir_base . '/cache', $path );
-    	$new_dir = str_replace( '/' . $original_filename, '', $new_path );
+    
+    if ( strpos( $path, $upload_dir_base ) === 0 ) :
+    	$new_dir = $upload_dir_base . '/cache' . $upload_dir['subdir'] . '/' . $filename_nice;
 
     else :
     	$new_dir = $upload_dir_base . '/cache';
@@ -254,9 +254,6 @@ function wpthumb_calculate_image_cache_dir( $path, $args = null ) {
     endif;
 
     $new_dir = str_replace( '/cache/cache', '/cache', $new_dir );
-
-    // Append filename as a folder to keep track of cached files
-    $new_dir .= '/' . sanitize_file_name( $original_filename );
 
     return $new_dir;
 }
@@ -270,43 +267,9 @@ function wpthumb_calculate_image_cache_dir( $path, $args = null ) {
  */
 function wpthumb_calculate_image_cache_filename( $filename, $args ) {
 
-    extract( $args );
-
     $ext = strtolower( end( explode( '.', $filename ) ) );
-
-    // Some files are converted to jpg by phpthumb
-    if ( in_array( $ext, array( 'bmp', 'tif', 'tiff' ) ) )
-    	$ext = 'jpg';
-
-    $ext = '.' . $ext;
-
-    // Plugins can append custom information to the end of the filename.
-    $custom = false;
-    $custom = apply_filters( 'wpthumb_filename_custom', $custom, $args );
-
-    $new_name = $width . '_' . $height;
-
-    if ( !empty( $crop ) )
-    	$new_name .= '_crop';
-
-    if ( !empty( $crop_from_position ) && !empty( $crop_from_position[0] ) )
-    	$new_name .= '_' . reset( $crop_from_position ) . '_' . end( $crop_from_position );
-
-    if ( !empty( $resize ) )
-    	$new_name .= '_resize';
-
-    if ( isset( $watermark_options['mask'] ) && $watermark_options['mask'] )
-    	$new_name .= '_watermarked_' . $watermark_options['position'];
-
-    if ( !empty( $custom ) )
-    	$new_name .= '_' . $custom;
     
-    if( !empty( $background_fill ) )
-    	$new_name .= '_background_fill_' . $background_fill;
-
-    $new_name .= $ext;
-
-    return $new_name;
+    return crc32( serialize( $args ) ) . '.' . $ext;
 }
 
 /**
