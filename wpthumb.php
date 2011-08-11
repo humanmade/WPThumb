@@ -249,7 +249,8 @@ function wpthumb_calculate_image_cache_dir( $path, $args = null ) {
     	$new_dir = $upload_dir_base . '/cache' . $upload_dir['subdir'] . '/' . $filename_nice;
 
     else :
-    	$new_dir = $upload_dir_base . '/cache';
+    	$parts = parse_url( $path );
+    	$new_dir = $upload_dir_base . '/cache/remote/' . $parts['host'];
 
     endif;
 
@@ -266,9 +267,17 @@ function wpthumb_calculate_image_cache_dir( $path, $args = null ) {
  * @return string - filename
  */
 function wpthumb_calculate_image_cache_filename( $filename, $args ) {
-
+	
     $ext = strtolower( end( explode( '.', $filename ) ) );
     
+    if( strlen( $ext > 4 ) ) {
+    	//seems like we dont have an ext, lets guess at JPG
+    	// TODO this is very nice
+		$ext = 'jpg';
+    }
+    
+    $args['path'] = $filename;
+
     return crc32( serialize( $args ) ) . '.' . $ext;
 }
 
@@ -920,6 +929,11 @@ add_action( 'admin_notices', 'wpthumb_errors' );
 
 function wpthumb_test() {
 	
+	$remote_image_src = 'http://selfridgesretaillimited.scene7.com/is/image/SelfridgesRetailLimited/432-3000609-M1112318_GILLIGANRUSTMULTI?$PDP_M$';
+	
+	?>
+	<img src="<?php echo wpthumb( $remote_image_src, 'width=100&height=100&crop=1' ) ?>" />
+	<?php
 	$test_images_dir = dirname( __FILE__ ) . '/test-images';
 
 	?>
