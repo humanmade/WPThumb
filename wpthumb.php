@@ -270,6 +270,9 @@ function wpthumb_calculate_image_cache_filename( $filename, $args ) {
 	
     $ext = strtolower( end( explode( '.', $filename ) ) );
     
+    //Remove a query string if there is one
+    $ext = reset( explode( '?', $ext ) );
+    
     if( strlen( $ext > 4 ) ) {
     	//seems like we dont have an ext, lets guess at JPG
     	// TODO this is very nice
@@ -930,8 +933,13 @@ add_action( 'admin_notices', 'wpthumb_errors' );
 function wpthumb_test() {
 	
 	$remote_image_src = 'http://selfridgesretaillimited.scene7.com/is/image/SelfridgesRetailLimited/432-3000609-M1112318_GILLIGANRUSTMULTI?$PDP_M$';
+	$image_with_query = 'http://static.zara.net/photos//2011/I/0/2/p/1564/330/401/1564330401_1_1_3.jpg?timestamp=1313153350286';
 	
 	?>
+	<img src="<?php echo wpthumb( $image_with_query, 'width=100&height=100&crop=1' ) ?>" />
+	
+	<?php exit; ?>
+
 	<img src="<?php echo wpthumb( $remote_image_src, 'width=100&height=100&crop=1' ) ?>" />
 	<?php
 	$test_images_dir = dirname( __FILE__ ) . '/test-images';
