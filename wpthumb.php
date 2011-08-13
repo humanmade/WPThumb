@@ -219,7 +219,7 @@ function wpthumb_calculate_image_cache_file_path( $src, $args ) {
 
     $path = wpthumb_get_file_path_from_file_url( $src );
 
-    return wpthumb_calculate_image_cache_dir( $path, $args ) . '/' . wpthumb_calculate_image_cache_filename( end( explode( '/', $path ) ), $args );
+    return wpthumb_calculate_image_cache_dir( $path, $args ) . '/' . wpthumb_calculate_image_cache_filename( end( explode( '/', $path ) ), $args, $path );
 }
 
 /**
@@ -266,7 +266,7 @@ function wpthumb_calculate_image_cache_dir( $path, $args = null ) {
  * @param mixed $args
  * @return string - filename
  */
-function wpthumb_calculate_image_cache_filename( $filename, $args ) {
+function wpthumb_calculate_image_cache_filename( $filename, $args, $full_path = '' ) {
 	
     $ext = strtolower( end( explode( '.', $filename ) ) );
     
@@ -279,7 +279,7 @@ function wpthumb_calculate_image_cache_filename( $filename, $args ) {
 		$ext = 'jpg';
     }
     
-    $args['path'] = $filename;
+    $args['path'] = $full_path ? $full_path : $filename;
 
     return crc32( serialize( $args ) ) . '.' . $ext;
 }
