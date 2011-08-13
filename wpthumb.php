@@ -38,7 +38,7 @@ function wpthumb_media_form_crop_position( $fields, $post ) {
     $html .= '<input type="radio" name="attachments[' . $post->ID . '][wpthumb_crop_pos]" value="right,bottom" title="Right, Bottom" ' . checked( 'right,bottom', $current_position, false ) . '/>';
     $html .= '</div>';
 
-    $fields[] = array(
+    $fields['crop-from-position'] = array(
     	'label' => __('Crop Position', 'wpthumb'),
     	'input' => 'html',
     	'html' => $html
