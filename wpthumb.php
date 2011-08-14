@@ -509,10 +509,13 @@ function wpthumb_get_file_url_from_file_path( $url ) {
     	$upload_dir = wp_upload_dir();
     	return str_replace( $upload_dir['basedir'], get_bloginfo('wpurl') . '/files', $url );
 
-    } else {
-    	return str_replace( ABSPATH, get_bloginfo('wpurl') . '/', $url );
-
-    }
+    } elseif( strpos( $upload_dir['baseurl'], $url ) !== false ) {
+        return str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $url );
+       
+	} else {
+	
+		return str_replace( get_bloginfo('url') . '/', ABSPATH, $url );
+	}    
 
 }
 
