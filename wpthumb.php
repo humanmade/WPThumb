@@ -487,13 +487,16 @@ function wpthumb_parse_args( $args ) {
  */
 function wpthumb_get_file_path_from_file_url( $url ) {
 
-    $upload_dir = wp_upload_dir();
-
+	$upload_dir = wp_upload_dir();
+	
     if ( is_multisite() && !is_main_site() )
 		return str_replace( get_bloginfo('wpurl') . '/files', $upload_dir['basedir'], $url );
 
-    else
+    elseif( strpos( $url, $upload_dir['baseurl'] ) !== false )
     	return str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $url );
+    
+    else
+    	return str_replace( get_bloginfo( 'url' ) . '/', ABSPATH, $url );
 }
 
 /**
@@ -509,12 +512,12 @@ function wpthumb_get_file_url_from_file_path( $url ) {
     	$upload_dir = wp_upload_dir();
     	return str_replace( $upload_dir['basedir'], get_bloginfo('wpurl') . '/files', $url );
 
-    } elseif( strpos( $upload_dir['baseurl'], $url ) !== false ) {
-        return str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $url );
+    } elseif( strpos( $url, $upload_dir['basedir'] ) !== false ) {
+        return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $url );
        
 	} else {
 	
-		return str_replace( get_bloginfo('url') . '/', ABSPATH, $url );
+		return str_replace( ABSPATH, get_bloginfo( 'url' ) . '/', $url );
 	}    
 
 }
