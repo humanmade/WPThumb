@@ -85,7 +85,7 @@ function wpthumb( $url, $args = array() ) {
 
     if ( !class_exists( 'phpThumbFactory' ) && error_log( 'phpThumbFactory class not found.' ) )
         return $url;
-	
+
     // Check if is using legacy args
     if ( is_numeric( $args ) )
     	$legacy_args = array_combine( array_slice( array( 'width', 'height', 'crop', 'resize' ), 0, count( array_slice( func_get_args(), 1 ) ) ), array_slice( func_get_args(), 1 ) );
@@ -167,28 +167,28 @@ function wpthumb( $url, $args = array() ) {
     	}
 
     	// Cropping
-    	
+
     	if ( $crop === true && $resize === true ) :
     	  if ( $crop_from_position && count( $crop_from_position ) == 2 && method_exists( $thumb, 'adaptiveResizeFromPoint' ) && empty( $background_fill ) ) {
     	  	$thumb->adaptiveResizeFromPoint( $width, $height, $crop_from_position[0], $crop_from_position[1] );
-		
+
     	  }
-    	  
+
     	  elseif( $background_fill == 'solid' && $thumb->canBackgroundFillSolidColorWithResize( $width, $height ) ) {
 			$thumb->resize( $width, $height );
     	  	$thumb->backgroundFillColorAuto( $width, $height );
     	  }
-			
+
 		  else {
 		  	$thumb->adaptiveResize( $width, $height );
 		  }
-		  	
+
     	elseif ( $crop === true && $resize === false ) :
     	  $thumb->cropFromCenter( $width, $height );
-		
+
     	else :
     	  $thumb->resize( $width, $height );
-		
+
     	endif;
 
     	// Watermarking (post resizing)
@@ -237,14 +237,14 @@ function wpthumb_calculate_image_cache_dir( $path, $args = null ) {
     // If the image was remote, we want to store them in the remote images folder, not it's name
     if ( strpos( $original_filename, '0_0_resize' ) === 0 )
     	$original_filename = end( explode( '/', str_replace( '/' . $original_filename, '', $path ) ) );
-	
+
 	$parts = explode( '.', $original_filename );
 	array_pop($parts);
 	$filename_nice = implode( '_', $parts );
-	
+
     $upload_dir = wp_upload_dir();
     $upload_dir_base = $upload_dir['basedir'];
-    
+
     if ( strpos( $path, $upload_dir_base ) === 0 ) :
     	$new_dir = $upload_dir_base . '/cache' . $upload_dir['subdir'] . '/' . $filename_nice;
 
@@ -267,18 +267,18 @@ function wpthumb_calculate_image_cache_dir( $path, $args = null ) {
  * @return string - filename
  */
 function wpthumb_calculate_image_cache_filename( $filename, $args, $full_path = '' ) {
-	
+
     $ext = strtolower( end( explode( '.', $filename ) ) );
-    
+
     //Remove a query string if there is one
     $ext = reset( explode( '?', $ext ) );
-    
+
     if( strlen( $ext > 4 ) ) {
     	//seems like we dont have an ext, lets guess at JPG
     	// TODO this is very nice
 		$ext = 'jpg';
     }
-    
+
     $args['path'] = $full_path ? $full_path : $filename;
 
     return crc32( serialize( $args ) ) . '.' . $ext;
@@ -295,7 +295,7 @@ function wpthumb_create_dir_for_file( $path ) {
 
     $filename = end( explode( '/', $path ) );
     $dir = str_replace( $filename, '', $path );
-	
+
 	wp_mkdir_p( $dir );
 
     return;
@@ -349,19 +349,19 @@ function wpthumb_post_image( $null, $id, $args ) {
     	// TODO Might be ok to delete as I think it has been duplicated.  Needs testing.
     	if ( $args == 'thumbnail' )
     		$new_args = array( 'width' => get_option('thumbnail_size_w'), 'height' => get_option('thumbnail_size_h'), 'crop' => get_option('thumbnail_crop') );
-    	
+
     	elseif ( $args == 'medium' )
     		$new_args = array( 'width' => get_option('medium_size_w'), 'height' => get_option('medium_size_h') );
-    	
+
     	elseif ( $args == 'large' )
     		$new_args = array( 'width' => get_option('large_size_w'), 'height' => get_option('large_size_h') );
-    	
+
     	elseif ( is_string( $args ) && ( $args != ( $new_filter_args = apply_filters( 'wpthumb_create_args_from_size', $args ) ) ) )
     		$new_args = $new_filter_args;
-    	
+
     	elseif ( is_array( $args ) )
     		$new_args = $args;
-    
+
     	else
     		$new_args = null;
 
@@ -488,13 +488,13 @@ function wpthumb_parse_args( $args ) {
 function wpthumb_get_file_path_from_file_url( $url ) {
 
 	$upload_dir = wp_upload_dir();
-	
+
     if ( is_multisite() && !is_main_site() )
 		return str_replace( get_bloginfo('wpurl') . '/files', $upload_dir['basedir'], $url );
 
     elseif( strpos( $url, $upload_dir['baseurl'] ) !== false )
     	return str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $url );
-    
+
     else
     	return str_replace( get_bloginfo( 'url' ) . '/', ABSPATH, $url );
 }
@@ -508,17 +508,17 @@ function wpthumb_get_file_path_from_file_url( $url ) {
  */
 function wpthumb_get_file_url_from_file_path( $url ) {
 
-    if ( is_multisite() && !is_main_site() ) {
-    	$upload_dir = wp_upload_dir();
+   	$upload_dir = wp_upload_dir();
+
+    if ( is_multisite() && !is_main_site() )
     	return str_replace( $upload_dir['basedir'], get_bloginfo('wpurl') . '/files', $url );
 
-    } elseif( strpos( $url, $upload_dir['basedir'] ) !== false ) {
+    elseif( strpos( $url, $upload_dir['basedir'] ) !== false )
         return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $url );
-       
-	} else {
-	
+
+	else
+
 		return str_replace( ABSPATH, get_bloginfo( 'url' ) . '/', $url );
-	}    
 
 }
 
@@ -937,13 +937,13 @@ function wpthumb_errors() {
 add_action( 'admin_notices', 'wpthumb_errors' );
 
 function wpthumb_test() {
-	
+
 	$remote_image_src = 'http://selfridgesretaillimited.scene7.com/is/image/SelfridgesRetailLimited/432-3000609-M1112318_GILLIGANRUSTMULTI?$PDP_M$';
 	$image_with_query = 'http://static.zara.net/photos//2011/I/0/2/p/1564/330/401/1564330401_1_1_3.jpg?timestamp=1313153350286';
-	
+
 	?>
 	<img src="<?php echo wpthumb( $image_with_query, 'width=100&height=100&crop=1' ) ?>" />
-	
+
 	<?php exit; ?>
 
 	<img src="<?php echo wpthumb( $remote_image_src, 'width=100&height=100&crop=1' ) ?>" />
@@ -954,17 +954,17 @@ function wpthumb_test() {
 	<style>
 		body{ background: pink }
 	</style>
-	
+
 	<h2>Auto Background Fill</h2>
 	<table>
-	
+
 		<thead>
 			<th>Original Image</th>
 			<th>Non-Padded Adaptive Resize</th>
 			<th>Padded Resize</th>
 			<th>Arguments</th>
 		</thead>
-		
+
 		<tr>
 			<td>
 				<?php $memory_usage = memory_get_usage(); ?>
@@ -975,15 +975,15 @@ function wpthumb_test() {
 				<?php $memory_usage = memory_get_usage(); ?>
 				<img src="<?php echo wpthumb( $test_images_dir . '/white.jpeg', 'width=500&height=200&crop=1&cache=0' ) ?>"><br />
 				Memory Usage: <?php echo number_format( ( memory_get_peak_usage() - $memory_usage ) / 1024 / 1024, 2 ) ?>MB
-			</td>		
-				
+			</td>
+
 			<td>
 				<?php $memory_usage = memory_get_usage(); ?>
 				<img src="<?php echo wpthumb( $test_images_dir . '/white.jpeg', 'width=500&height=200&crop=1&background_fill=solid&cache=0' ) ?>"><br />
 				Memory Usage: <?php echo number_format( ( memory_get_peak_usage() - $memory_usage ) / 1024 / 1024, 2 ) ?>MB
 			</td>
 		</tr>
-		
+
 		<tr>
 			<td>
 				<?php $memory_usage = memory_get_usage(); ?>
@@ -994,33 +994,33 @@ function wpthumb_test() {
 				<?php $memory_usage = memory_get_usage(); ?>
 				<img src="<?php echo wpthumb( $test_images_dir . '/google.png', 'width=100&height=100&crop=1&cache=0' ) ?>"><br />
 				Memory Usage: <?php echo number_format( ( memory_get_peak_usage() - $memory_usage ) / 1024 / 1024, 2 ) ?>MB
-			</td>		
-				
+			</td>
+
 			<td>
 				<?php $memory_usage = memory_get_usage(); ?>
 				<img src="<?php echo wpthumb( $test_images_dir . '/google.png', 'width=100&height=100&crop=1&background_fill=solid&cache=0' ) ?>"><br />
 				Memory Usage: <?php echo number_format( ( memory_get_peak_usage() - $memory_usage ) / 1024 / 1024, 2 ) ?>MB
 			</td>
 		</tr>
-		
+
 		<tr>
 			<td><img src="<?php echo wpthumb( $test_images_dir . '/gradient-horizontal.jpg', 'width=0&height=100&cache=0' ) ?>"></td>
-			<td><img src="<?php echo wpthumb( $test_images_dir . '/gradient-horizontal.jpg', 'width=500&height=100&crop=1&cache=0' ) ?>"></td>			
+			<td><img src="<?php echo wpthumb( $test_images_dir . '/gradient-horizontal.jpg', 'width=500&height=100&crop=1&cache=0' ) ?>"></td>
 			<td><img src="<?php echo wpthumb( $test_images_dir . '/gradient-horizontal.jpg', 'width=500&height=100&crop=1&background_fill=solid&cache=0' ) ?>"></td>
 		</tr>
-		
+
 		<tr>
 			<td><img src="<?php echo wpthumb( $test_images_dir . '/gradient-vertical.jpg', 'width=100&height=500&cache=0' ) ?>"></td>
-			<td><img src="<?php echo wpthumb( $test_images_dir . '/gradient-vertical.jpg', 'width=100&height=500&crop=1&cache=0' ) ?>"></td>			
+			<td><img src="<?php echo wpthumb( $test_images_dir . '/gradient-vertical.jpg', 'width=100&height=500&crop=1&cache=0' ) ?>"></td>
 			<td><img src="<?php echo wpthumb( $test_images_dir . '/gradient-vertical.jpg', 'width=100&height=500&crop=1&background_fill=solid&cache=0' ) ?>"></td>
 		</tr>
-		
+
 		<tr>
 			<td><img src="<?php echo wpthumb( $test_images_dir . '/photo.png', 'width=100&height=0&crop=1&cache=0' ) ?>"></td>
-			<td><img src="<?php echo wpthumb( $test_images_dir . '/photo.png', 'width=500&height=100&crop=1&cache=0' ) ?>"></td>			
+			<td><img src="<?php echo wpthumb( $test_images_dir . '/photo.png', 'width=500&height=100&crop=1&cache=0' ) ?>"></td>
 			<td><img src="<?php echo wpthumb( $test_images_dir . '/photo.png', 'width=500&height=100&crop=1&background_fill=solid&cache=0' ) ?>"></td>
 		</tr>
-	</table>	
+	</table>
 
 	<?php
 	exit;
