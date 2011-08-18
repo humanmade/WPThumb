@@ -375,8 +375,6 @@ function wpthumb_post_image( $null, $id, $args ) {
 
     	$args = $new_args;
 
-		var_dump( $args );
-
     }
 
     $args = wp_parse_args( $args );
