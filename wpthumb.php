@@ -358,7 +358,7 @@ function wpthumb_post_image( $null, $id, $args ) {
     	elseif ( $args == 'large' )
     		$new_args = array( 'width' => get_option('large_size_w'), 'height' => get_option('large_size_h') );
 
-		elseif( isset( $_wp_additional_image_sizes ) && count( $_wp_additional_image_sizes ) && array_key_exists( $args, $_wp_additional_image_sizes ) )
+		elseif( is_string( $args ) && isset( $_wp_additional_image_sizes ) && count( $_wp_additional_image_sizes ) && array_key_exists( $args, $_wp_additional_image_sizes ) )
     		$new_args = array( 'width' => $_wp_additional_image_sizes[$args]['width'], 'height' => $_wp_additional_image_sizes[$args]['height'], 'crop' => $_wp_additional_image_sizes[$args]['crop'] );
 
     	elseif ( is_string( $args ) && ( $args != ( $new_filter_args = apply_filters( 'wpthumb_create_args_from_size', $args ) ) ) )
