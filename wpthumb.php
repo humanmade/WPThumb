@@ -345,6 +345,8 @@ function wpthumb_post_image( $null, $id, $args ) {
 
     if ( ( !strpos( (string) $args, '=' ) ) && !( is_array( $args ) && isset( $args[0] ) && $args[0] == $args[1] ) ) {
 
+		global $_wp_additional_image_sizes;
+	
     	// Convert keyword sizes to heights & widths. Will still use file wordpress saved unless you change the thumbnail dimensions.
     	// TODO Might be ok to delete as I think it has been duplicated.  Needs testing.
     	if ( $args == 'thumbnail' )
@@ -355,6 +357,9 @@ function wpthumb_post_image( $null, $id, $args ) {
 
     	elseif ( $args == 'large' )
     		$new_args = array( 'width' => get_option('large_size_w'), 'height' => get_option('large_size_h') );
+
+		elseif( isset( $_wp_additional_image_sizes ) && count( $_wp_additional_image_sizes ) && array_key_exists( $args, $_wp_additional_image_sizes ) )
+    		$new_args = array( 'width' => $_wp_additional_image_sizes[$args]['width'], 'height' => $_wp_additional_image_sizes[$args]['height'], 'crop' => $_wp_additional_image_sizes[$args]['crop'] );
 
     	elseif ( is_string( $args ) && ( $args != ( $new_filter_args = apply_filters( 'wpthumb_create_args_from_size', $args ) ) ) )
     		$new_args = $new_filter_args;
@@ -369,6 +374,8 @@ function wpthumb_post_image( $null, $id, $args ) {
 	    	return $null;
 
     	$args = $new_args;
+
+		var_dump( $args );
 
     }
 
