@@ -316,20 +316,28 @@ function wpthumb_image_from_args( $image_path, $args ) {
     $args = wp_parse_args( $args );
 
     extract( $args );
-
-    $image = wpthumb( $image_path, $args );
-
-    $crop = (bool) ( empty( $crop ) ) ? false : $crop;
-
-    if ( $image_meta = getimagesize( wpthumb_get_file_path_from_file_url( $image ) ) ) :
-
-        $html_width = $image_meta[0];
-        $html_height = $image_meta[1];
-
-    else :
-    	$html_width = $html_height = false;
-
-    endif;
+	
+	if( file_exists( $image_path ) ) {
+    	$image = wpthumb( $image_path, $args );
+		
+    	$crop = (bool) ( empty( $crop ) ) ? false : $crop;
+		
+    	if ( $image_meta = getimagesize( wpthumb_get_file_path_from_file_url( $image ) ) ) :
+		
+    	    $html_width = $image_meta[0];
+    	    $html_height = $image_meta[1];
+		
+    	else :
+    		$html_width = $html_height = false;
+    	
+    	endif;
+	} else {
+		
+		$html_width = $width;
+		$html_height = $height;
+		$image = null;
+		
+	}
 
     return array( $image, $html_width, $html_height, true );
 
@@ -419,11 +427,9 @@ function wpthumb_post_image( $null, $id, $args ) {
     if ( empty( $path ) )
     	$path = get_attached_file( $id );
 
-    if ( file_exists( $path ) && !is_dir( $path ) && !$args['default'] )
-    	return wpthumb_image_from_args( $path, $args );
-
-    else
-    	return $null;
+    return wpthumb_image_from_args( $path, $args );
+	
+	
 }
 add_filter( 'image_downsize', 'wpthumb_post_image', 99, 3 );
 
