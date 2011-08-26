@@ -97,7 +97,10 @@ function wpthumb( $url, $args = array() ) {
     	$args = wpthumb_parse_args( $args );
 
     extract( $args );
-
+	
+	if( !file_exists( $url ) && strpos( $url, '/' ) === 0 )
+		$url = '';
+	
     // If the url is blank, use the default
     if ( empty( $url ) && $default )
     	$url = $default;
