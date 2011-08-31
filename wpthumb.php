@@ -97,10 +97,10 @@ function wpthumb( $url, $args = array() ) {
     	$args = wpthumb_parse_args( $args );
 
     extract( $args );
-	
+
 	if( !file_exists( $url ) && strpos( $url, '/' ) === 0 )
 		$url = '';
-	
+
     // If the url is blank, use the default
     if ( empty( $url ) && $default )
     	$url = $default;
@@ -242,18 +242,19 @@ function wpthumb_calculate_image_cache_dir( $path, $args = null ) {
     	$original_filename = end( explode( '/', str_replace( '/' . $original_filename, '', $path ) ) );
 
 	$parts = explode( '.', $original_filename );
-	array_pop($parts);
+
+	array_pop( $parts );
+
 	$filename_nice = implode( '_', $parts );
 
     $upload_dir = wp_upload_dir();
-    $upload_dir_base = $upload_dir['basedir'];
 
-    if ( strpos( $path, $upload_dir_base ) === 0 ) :
-    	$new_dir = $upload_dir_base . '/cache' . $upload_dir['subdir'] . '/' . $filename_nice;
+    if ( strpos( $path, $upload_dir['basedir'] ) === 0 ) :
+    	$new_dir = $upload_dir['basedir'] . '/cache' . $upload_dir['subdir'] . '/' . $filename_nice;
 
     else :
     	$parts = parse_url( $path );
-    	$new_dir = $upload_dir_base . '/cache/remote/' . $parts['host'];
+    	$new_dir = $upload_dir['basedir'] . '/cache/remote/' . $parts['host'];
 
     endif;
 
@@ -273,12 +274,12 @@ function wpthumb_calculate_image_cache_filename( $filename, $args, $full_path = 
 
     $ext = strtolower( end( explode( '.', $filename ) ) );
 
-    //Remove a query string if there is one
+    // Remove a query string if there is one
     $ext = reset( explode( '?', $ext ) );
 
-    if( strlen( $ext > 4 ) ) {
-    	//seems like we dont have an ext, lets guess at JPG
-    	// TODO this is very nice
+    if ( strlen( $ext > 4 ) ) {
+    	// Seems like we dont have an ext, lets guess at JPG
+    	// TODO this isn't very nice
 		$ext = 'jpg';
     }
 
@@ -316,27 +317,27 @@ function wpthumb_image_from_args( $image_path, $args ) {
     $args = wp_parse_args( $args );
 
     extract( $args );
-	
+
 	if( file_exists( $image_path ) ) {
     	$image = wpthumb( $image_path, $args );
-		
+
     	$crop = (bool) ( empty( $crop ) ) ? false : $crop;
-		
+
     	if ( $image_meta = getimagesize( wpthumb_get_file_path_from_file_url( $image ) ) ) :
-		
+
     	    $html_width = $image_meta[0];
     	    $html_height = $image_meta[1];
-		
+
     	else :
     		$html_width = $html_height = false;
-    	
+
     	endif;
 	} else {
-		
+
 		$html_width = $width;
 		$html_height = $height;
 		$image = null;
-		
+
 	}
 
     return array( $image, $html_width, $html_height, true );
@@ -357,7 +358,7 @@ function wpthumb_post_image( $null, $id, $args ) {
     if ( ( !strpos( (string) $args, '=' ) ) && !( is_array( $args ) && isset( $args[0] ) && $args[0] == $args[1] ) ) {
 
 		global $_wp_additional_image_sizes;
-	
+
     	// Convert keyword sizes to heights & widths. Will still use file wordpress saved unless you change the thumbnail dimensions.
     	// TODO Might be ok to delete as I think it has been duplicated.  Needs testing.
     	if ( $args == 'thumbnail' )
@@ -428,8 +429,8 @@ function wpthumb_post_image( $null, $id, $args ) {
     	$path = get_attached_file( $id );
 
     return wpthumb_image_from_args( $path, $args );
-	
-	
+
+
 }
 add_filter( 'image_downsize', 'wpthumb_post_image', 99, 3 );
 
@@ -648,7 +649,9 @@ function wpthumb_is_image_smaller_than_dimensions( $path, $width, $height, $both
  */
 function wpthumb_delete_cache_for_file( $file ) {
 
-    wpthumb_rmdir_recursive( wpthumb_calculate_image_cache_dir( $file ) );
+	$upload_dir = wp_upload_dir();
+
+    wpthumb_rmdir_recursive( wpthumb_calculate_image_cache_dir( $upload_dir['basedir'] . $file ) );
 
     return $file;
 
@@ -912,25 +915,22 @@ function wpthumb_rmdir_recursive( $dir ) {
 
     while ( false !== ( $file = readdir( $handle ) ) ) {
 
-        if ( $file == '.' && $file == '..' ) {
+        if ( $file == '.' || $file == '..' )
         	continue;
 
-        	$path = $dir . $file;
+        $path = $dir . $file;
 
-        	if ( is_dir( $path ) )
-        		wpthumb_rmdir_recursive( $path );
+        if ( is_dir( $path ) )
+            wpthumb_rmdir_recursive( $path );
 
-        	else
-        		unlink( $path );
+        else
+        	unlink( $path );
 
-        }
     }
 
     closedir( $handle );
 
     rmdir( $dir );
-
-    return $result;
 
 }
 
@@ -950,12 +950,17 @@ function wpthumb_errors() {
 }
 add_action( 'admin_notices', 'wpthumb_errors' );
 
+/**
+ * wpthumb_test function.
+ *
+ * @access public
+ * @return null
+ */
 function wpthumb_test() {
 
 	$remote_image_src = 'http://selfridgesretaillimited.scene7.com/is/image/SelfridgesRetailLimited/432-3000609-M1112318_GILLIGANRUSTMULTI?$PDP_M$';
-	$image_with_query = 'http://static.zara.net/photos//2011/I/0/2/p/1564/330/401/1564330401_1_1_3.jpg?timestamp=1313153350286';
+	$image_with_query = 'http://static.zara.net/photos//2011/I/0/2/p/1564/330/401/1564330401_1_1_3.jpg?timestamp=1313153350286'; ?>
 
-	?>
 	<img src="<?php echo wpthumb( $image_with_query, 'width=100&height=100&crop=1' ) ?>" />
 
 	<?php exit; ?>
@@ -1040,5 +1045,5 @@ function wpthumb_test() {
 	exit;
 }
 
-if( isset( $_GET['wpthumb_test'] ) )
+if ( isset( $_GET['wpthumb_test'] ) )
 	add_action( 'init', 'wpthumb_test' );
