@@ -154,12 +154,12 @@ function wpthumb( $url, $args = array() ) {
     			return wpthumb_get_file_url_from_file_path( $file_path );
 
     		// Save the converted image
-    		$thumb->save( $new_filepath . '.jpg', 'jpg' );
+    		$thumb->save( $new_filepath . '.png', 'png' );
 
     		unset( $thumb );
 
     		// Pass the new file back through the function so they are resized
-    		return wpthumb( $new_filepath . '.jpg', $args );
+    		return wpthumb( $new_filepath . '.png', $args );
 
     	endif;
 
