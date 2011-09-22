@@ -521,19 +521,21 @@ function wpthumb_get_file_path_from_file_url( $url ) {
  * @param mixed $url
  * @return null
  */
-function wpthumb_get_file_url_from_file_path( $url ) {
+function wpthumb_get_file_url_from_file_path( $path ) {
+	
+	$upload_dir = wp_upload_dir();
 
-   	$upload_dir = wp_upload_dir();
+    if ( is_multisite() && !is_main_site() ) {
+    	
+    	return str_replace( $upload_dir['basedir'], get_bloginfo('wpurl') . '/files', $path );
 
-    if ( is_multisite() && !is_main_site() )
-    	return str_replace( $upload_dir['basedir'], get_bloginfo('wpurl') . '/files', $url );
-
-    elseif( strpos( $url, $upload_dir['basedir'] ) !== false )
-        return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $url );
-
-	else
-
-		return str_replace( ABSPATH, get_bloginfo( 'url' ) . '/', $url );
+    } elseif( strpos( $path, $upload_dir['basedir'] ) !== false ) {
+        return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $path );
+       
+	} else {
+	
+		return str_replace( ABSPATH, get_bloginfo( 'url' ) . '/', $path );
+	}    
 
 }
 
