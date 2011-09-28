@@ -504,6 +504,9 @@ function wpthumb_get_file_path_from_file_url( $url ) {
 
 	$upload_dir = wp_upload_dir();
 
+	if( strpos( $url, ABSPATH ) === 0 )
+		return $url;
+
     if ( is_multisite() && !is_main_site() )
 		return str_replace( get_bloginfo('wpurl') . '/files', $upload_dir['basedir'], $url );
 
