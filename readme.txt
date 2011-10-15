@@ -19,6 +19,10 @@ WPThumb is a simple plugin that makes use of the PHPThumb library. It seamlessly
 
 == Changelog ==
 
+=0.4=
+* Rewrote core functionality to use a Class
+* Added 22 Unit Tests (can be run using WP Unit)
+
 =0.3=
 * Ability to extend functionality using filters to manipulate image object.
 
