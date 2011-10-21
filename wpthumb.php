@@ -219,7 +219,7 @@ class WP_Thumb {
     		unset( $thumb );
 
     		// Pass the new file back through the function so they are resized
-    		return new WP_Thumb( $new_filepath . '.png', $this->args );
+    		return wpthumb( $new_filepath . '.png', $this->args );
 
     	endif;
     	
@@ -432,7 +432,8 @@ function wpthumb( $url, $args = array() ) {
     if ( isset( $legacy_args ) && $legacy_args )
     	$args = $legacy_args;
 	
-	return new WP_Thumb( $url, $args );
+	$thumb = WP_Thumb( $url, $args );
+	return $thumb->returnImage();
 }
 
 
