@@ -24,8 +24,9 @@ class WP_Thumb {
 		if( $args )
 			$this->setArgs( $args );
 		
-		if( $file_path )
+		if( $file_path && ! file_exists( $this->getCacheFilePath() ) )
 			$this->generateCacheFile();
+			
 	}
 	
 	public function setFilePath( $file_path ) {
