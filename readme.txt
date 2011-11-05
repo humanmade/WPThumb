@@ -1,8 +1,8 @@
 === WPThumb ===
-Contributors: humanmade, mattheu, joehoyle, willmot
+Contributors: humanmade, mattheu, joehoyle, tcrsavage, willmot
 Tags: image resize
 Requires at least: 3.0
-Tested up to: 3.1.2
+Tested up to: 3.2.1
 Stable tag: 0.2
 
 Gallery and Portfolio management for your WordPress site. 
