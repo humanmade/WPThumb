@@ -41,7 +41,7 @@ class WP_Thumb {
     	if ( is_multisite() && !is_main_site() )
 			$this->file_path = str_replace( get_bloginfo('wpurl') . '/files', $upload_dir['basedir'], $file_path );
 		
-    	elseif( strpos( $url, $upload_dir['baseurl'] ) !== false )
+    	elseif( strpos( $file_path, $upload_dir['baseurl'] ) !== false )
     		$this->file_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $file_path );
 		
     	else
