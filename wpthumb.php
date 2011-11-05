@@ -433,7 +433,8 @@ function wpthumb( $url, $args = array() ) {
     if ( isset( $legacy_args ) && $legacy_args )
     	$args = $legacy_args;
 	
-	$thumb = WP_Thumb( $url, $args );
+	$thumb = new WP_Thumb( $url, $args );
+	
 	return $thumb->returnImage();
 }
 
