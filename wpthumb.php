@@ -192,7 +192,7 @@ class WP_Thumb {
 
     	// Create the image
     	try {
-    		$thumb = phpThumbFactory::create( $file_path, array( 'jpegQuality' => $jpeg_quality ) );
+    		$thumb = phpThumbFactory::create( $file_path, array( 'jpegQuality' => $this->args['jpeg_quality'] ) );
 
     	} catch ( Exception $e ) {
     		$this->error = $e;
