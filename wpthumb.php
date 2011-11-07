@@ -24,8 +24,9 @@ class WP_Thumb {
 		if( $args )
 			$this->setArgs( $args );
 		
-		if( $file_path )
+		if( $file_path && ! file_exists( $this->getCacheFilePath() ) )
 			$this->generateCacheFile();
+			
 	}
 	
 	public function setFilePath( $file_path ) {
@@ -40,7 +41,7 @@ class WP_Thumb {
     	if ( is_multisite() && !is_main_site() )
 			$this->file_path = str_replace( get_bloginfo('wpurl') . '/files', $upload_dir['basedir'], $file_path );
 		
-    	elseif( strpos( $url, $upload_dir['baseurl'] ) !== false )
+    	elseif( strpos( $file_path, $upload_dir['baseurl'] ) !== false )
     		$this->file_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $file_path );
 		
     	else
@@ -192,7 +193,7 @@ class WP_Thumb {
 
     	// Create the image
     	try {
-    		$thumb = phpThumbFactory::create( $file_path, array( 'jpegQuality' => $jpeg_quality ) );
+    		$thumb = phpThumbFactory::create( $file_path, array( 'jpegQuality' => $this->args['jpeg_quality'] ) );
 
     	} catch ( Exception $e ) {
     		$this->error = $e;
@@ -432,7 +433,8 @@ function wpthumb( $url, $args = array() ) {
     if ( isset( $legacy_args ) && $legacy_args )
     	$args = $legacy_args;
 	
-	$thumb = WP_Thumb( $url, $args );
+	$thumb = new WP_Thumb( $url, $args );
+	
 	return $thumb->returnImage();
 }
 

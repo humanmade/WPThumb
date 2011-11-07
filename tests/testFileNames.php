@@ -104,4 +104,29 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$this->assertEquals( $path, $image->getFilePath() );
 
 	}
+	
+	function testFilePathFromLocalFileUrlWithDifferentUploadDir() {
+	
+		// For this test we need to change the uplaod URL to something differnt that uplaod path
+		add_filter( 'upload_dir', function( $args ) {
+			$args['url'] = str_replace( 'wp-content/uploads', 'files', $args['url'] );
+			$args['baseurl'] = str_replace( 'wp-content/uploads', 'files', $args['baseurl'] );
+			
+			return $args;
+		} );
+		
+		$upload_dir = wp_upload_dir();
+		
+		unlink( $upload_dir['basedir'] . '/google.png' );
+		copy( dirname( __FILE__ ) . '/images/google.png', $upload_dir['basedir'] . '/google.png' );
+		
+		$this->assertFileExists( $upload_dir['basedir'] . '/google.png' );
+		
+		$test_url = $upload_dir['baseurl'] . '/google.png';
+		
+		$image = new WP_Thumb( $test_url, 'width=50&height=50&crop=1' );
+		
+		$this->assertEmpty( $image->error );
+	
+	}
 }
