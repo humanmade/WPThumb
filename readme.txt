@@ -1,5 +1,5 @@
 === WPThumb ===
-Contributors: humanmade, mattheu, joehoyle, tcrsavage, willmot
+Contributors: humanmade, joehoyle, mattheu, tcrsavage, willmot
 Tags: image resize
 Requires at least: 3.0
 Tested up to: 3.2.1
