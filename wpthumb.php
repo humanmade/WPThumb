@@ -167,7 +167,12 @@ class WP_Thumb {
 		
     	else :
     		$parts = parse_url( $this->getFilePath() );
-    		$new_dir = $upload_dir['basedir'] . '/cache/remote/' . sanitize_title( $parts['host'] );
+			
+			if ( !empty( $parts['host'] ) )
+	    		$new_dir = $upload_dir['basedir'] . '/cache/remote/' . sanitize_title( $parts['host'] );
+	    		
+	    	else
+	    		$new_dir = $upload_dir['basedir'] . '/cache/remote/';
 		
     	endif;
 		
