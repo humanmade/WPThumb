@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name: WPThumb
+Plugin Name: WP Thumb
 Plugin URI: https://github.com/humanmade/WPThumb
-Description: PHPThumb for WordPress
+Description: phpThumb for WordPress
 Author: Human Made Limited
-Version: 0.3
-Author URI: http://www.humanmade.co.uk/
+Version: 0.4
+Author URI: http://www.hmn.md/
 */
 
 class WP_Thumb {
