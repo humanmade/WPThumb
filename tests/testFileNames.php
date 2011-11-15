@@ -74,8 +74,8 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$image->setFilePath( $path );
 		
 		$this->assertNull( $image->error );
-		$this->assertContains( ABSPATH, $image->getCacheFileDirectory() );
-		$this->assertNotContains( '.', $image->getCacheFileDirectory() );
+		$this->assertContains( home_url(), $image->getCacheFileURL() );
+		$this->assertNotContains( '.', str_replace( array( home_url(), '.' . $image->getFileExtension() ), array( '', '' ), $image->getCacheFileURL() ) );
 		
 	}
 	
@@ -105,9 +105,12 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 
 	}
 	
-	function testFilePathFromLocalFileUrlWithDifferentUploadDir() {
+	function testFilePathFromLocalFileUrlWithDifferentUploadDirNoMultiSite() {
+		
+		if ( is_multisite() )
+			return;
 	
-		// For this test we need to change the uplaod URL to something differnt that uplaod path
+		// For this test we need to change the upload URL to something other than uplaod path
 		add_filter( 'upload_dir', function( $args ) {
 			$args['url'] = str_replace( 'wp-content/uploads', 'files', $args['url'] );
 			$args['baseurl'] = str_replace( 'wp-content/uploads', 'files', $args['baseurl'] );
@@ -128,5 +131,18 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		
 		$this->assertEmpty( $image->error );
 	
+	}
+	
+	function testGifIsConvertedToPNGInCacheFileName() {
+		
+		$path = dirname( __FILE__ ) . '/images/google.gif';
+		$url = str_replace( ABSPATH, get_bloginfo( 'url' ) . '/', $path );
+		
+		$image = new WP_Thumb;
+		$image->setFilePath( $path );
+		
+		$this->assertNull( $image->error );
+		$this->assertEquals( end( explode( '.', $image->getCacheFileName() ) ), 'png' );
+		
 	}
 }

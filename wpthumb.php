@@ -21,8 +21,7 @@ class WP_Thumb {
 		if( $file_path )
 			$this->setFilePath( $file_path );
 		
-		if( $args )
-			$this->setArgs( $args );
+		$this->setArgs( $args );
 		
 		if( $file_path && ! file_exists( $this->getCacheFilePath() ) )
 			$this->generateCacheFile();
@@ -38,10 +37,7 @@ class WP_Thumb {
 			return;
 		}
 		
-    	if ( is_multisite() && !is_main_site() )
-			$this->file_path = str_replace( get_bloginfo('wpurl') . '/files', $upload_dir['basedir'], $file_path );
-		
-    	elseif( strpos( $file_path, $upload_dir['baseurl'] ) !== false )
+		if( strpos( $file_path, $upload_dir['baseurl'] ) !== false )
     		$this->file_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $file_path );
 		
     	else
@@ -183,8 +179,14 @@ class WP_Thumb {
 	}
 	
 	public function getCacheFileName() {
-			
-    	return crc32( serialize( $this->args ) ) . '.' . $this->getFileExtension();
+
+		$serialize = crc32( serialize( array_merge( $this->args, array( $this->getFilePath() ) ) ) );
+		
+		// Gifs are converted to pngs
+		if ( $this->getFileExtension() == 'gif' )
+			return $serialize . '.png';
+		
+    	return $serialize . '.' . $this->getFileExtension();
 	
 	}
 	
@@ -211,7 +213,7 @@ class WP_Thumb {
 		extract( $this->args );
 		
 		// Convert gif images to png before resizing
-    	if ( $ext == '.gif' ) :
+    	if ( $this->getFileExtension() == 'gif' ) :
 
     		// Don't resize animated gifs and the animations will be broken
     		if ( $args['resize_animations'] !== true && $this->isAnimatedGif() ) {
@@ -236,8 +238,8 @@ class WP_Thumb {
     	}
     	
     	// Cropping
-
     	if ( $crop === true && $resize === true ) :
+    	  
     	  	if ( $crop_from_position && count( $crop_from_position ) == 2 && method_exists( $thumb, 'adaptiveResizeFromPoint' ) && empty( $background_fill ) ) {
 				$thumb->adaptiveResizeFromPoint( $width, $height, $crop_from_position[0], $crop_from_position[1] );
 		  	
@@ -293,20 +295,24 @@ class WP_Thumb {
 		return $this->getFileURLForFilePath( $path );
 	}
 	
+	public function getCacheFileURL() {
+		return $this->getFileURLForFilePath( $this->getCacheFilePath() );
+	}
+	
+	public function getFileURL() {
+		return $this->getFileURLForFilePath( $this->getFilePath() );
+	}
+ 	
 	private function getFileURLForFilePath( $path ) {
 	
 		$upload_dir = wp_upload_dir();
-
-    	if ( is_multisite() && !is_main_site() ) {
-    		
-    		return str_replace( $upload_dir['basedir'], get_bloginfo('wpurl') . '/files', $path );
 		
-    	} elseif( strpos( $path, $upload_dir['basedir'] ) !== false ) {
+		if ( strpos( $path, $upload_dir['basedir'] ) !== false ) {
     	    return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $path );
     	   
-		} else {
-		
+		} else {		
 			return str_replace( ABSPATH, get_bloginfo( 'url' ) . '/', $path );
+
 		} 
 	
 	}
@@ -513,17 +519,6 @@ function wpthumb_post_image( $null, $id, $args ) {
 
     if ( empty( $args['crop_from_position'] ) )
     	 $args['crop_from_position'] = get_post_meta( $id, 'wpthumb_crop_pos', true );
-	
-	
-
-    if ( $args['original_size'] == 'thumbnail' && $args['crop_from_position'] == array( 'center', 'center' ) ) {
-
-    	$intermediate = image_get_intermediate_size( $id, 'thumbnail' );
-    	$path = wpthumb_get_file_path_from_file_url( $intermediate['url'] );
-
-    	if ( wpthumb_is_image_smaller_than_dimensions( $path, $args['width'], $args['height'] ) )
-			$path = null;
-    }
 
     if ( empty( $path ) )
     	$path = get_attached_file( $id );
@@ -534,7 +529,7 @@ function wpthumb_post_image( $null, $id, $args ) {
 	
     extract( $args );
 
-	if( file_exists( $path ) ) {
+	if ( file_exists( $path ) ) {
 		$image_src = $image->returnImage();
     	$crop = (bool) ( empty( $crop ) ) ? false : $crop;
 
@@ -547,11 +542,12 @@ function wpthumb_post_image( $null, $id, $args ) {
     		$html_width = $html_height = false;
 
     	endif;
+	
 	} else {
 
 		$html_width = $width;
 		$html_height = $height;
-		$image_src = null;
+		$image_src = $image->getFileURL(  );
 
 	}
 

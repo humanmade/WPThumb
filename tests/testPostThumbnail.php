@@ -4,12 +4,14 @@ class WPThumbPostThumbnailTestCase extends WP_UnitTestCase {
 
 	function testPostThumbnailResize() {
 		
-		$post_id = 1;
-		$post = get_post( $post_id );
+		$post = reset( get_posts( 'showposts=1' ) );
 		$this->assertNotNull( $post->ID, 'test post not found' );
 		$_old_thumbnail = get_post_thumbnail_id( $post->ID );
 		
 		$attachment = reset( get_posts( 'post_type=attachment' ) );
+		
+		$this->assertFileExists( get_attached_file( $attachment->ID ) );
+		
 		$this->assertNotNull( $attachment->ID, 'test attachment not found' );
 		
 		set_post_thumbnail( $post->ID, $attachment->ID );

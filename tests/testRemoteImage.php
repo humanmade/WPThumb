@@ -53,4 +53,17 @@ class WPThumbRemoteImageTestCase extends WP_UnitTestCase {
 		$this->assertTrue( $image->errored() );
 		
 	}
+	
+	function testDifferentFileURLSWithSameArgs() {
+	
+		$url_1 = 'http://www.google.com/images/srpr/logo3w.png';
+		$image_1 = new WP_Thumb( $url_1, "crop=1&return=path&width=80&height=80&cache=0" );
+
+		$url_2 = 'http://www.google.co.uk/images/srpr/logo3w.png';
+		$image_2 = new WP_Thumb( $url_2, "crop=1&return=path&width=80&height=80&cache=0" );
+		
+		$this->assertNotEquals( $image_1->getCacheFilePath(), $image_2->getCacheFilePath() );
+
+	}
+	
 }
