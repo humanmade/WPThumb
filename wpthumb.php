@@ -530,7 +530,9 @@ function wpthumb_post_image( $null, $id, $args ) {
     extract( $args );
 
 	if ( file_exists( $path ) ) {
+	
 		$image_src = $image->returnImage();
+    
     	$crop = (bool) ( empty( $crop ) ) ? false : $crop;
 
     	if ( !$image->errored() && $image_meta = getimagesize( $image->getCacheFilePath() ) ) :
@@ -547,7 +549,7 @@ function wpthumb_post_image( $null, $id, $args ) {
 
 		$html_width = $width;
 		$html_height = $height;
-		$image_src = $image->getFileURL(  );
+		$image_src = $image->getFileURL();
 
 	}
 
