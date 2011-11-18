@@ -4,7 +4,7 @@ Plugin Name: WP Thumb
 Plugin URI: https://github.com/humanmade/WPThumb
 Description: phpThumb for WordPress
 Author: Human Made Limited
-Version: 0.4
+Version: 0.5
 Author URI: http://www.hmn.md/
 */
 
