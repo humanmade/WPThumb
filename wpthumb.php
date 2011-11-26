@@ -154,13 +154,21 @@ class WP_Thumb {
 	}
 	
 	public function getCacheFilePath() {
-
+		
+		$path = $this->getFilePath();
+		if ( empty( $path ) )
+			return '';
+			
 	    return $this->getCacheFileDirectory() . '/' . $this->getCacheFileName();
 	
 	}
 	
 	public function getCacheFileDirectory() {
-	
+		
+		$path = $this->getFilePath();
+		if ( $path )
+			return '';
+			
 		$original_filename = end( explode( '/', $this->getFilePath() ) );
 
     	// If the image was remote, we want to store them in the remote images folder, not it's name
@@ -196,6 +204,10 @@ class WP_Thumb {
 	}
 	
 	public function getCacheFileName() {
+		
+		$path = $this->getFilePath();
+		if ( $path )
+			return '';
 
 		$serialize = crc32( serialize( array_merge( $this->args, array( $this->getFilePath() ) ) ) );
 		
@@ -309,7 +321,7 @@ class WP_Thumb {
 		if ( $this->args['return'] == 'path' )
 			return $path;
 		
-		return $this->getFileURLForFilePath( $path );
+		return $path ? $this->getFileURLForFilePath( $path ) : $path;
 	}
 	
 	public function getCacheFileURL() {
