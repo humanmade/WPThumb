@@ -156,7 +156,7 @@ class WP_Thumb {
 	public function getCacheFilePath() {
 		
 		$path = $this->getFilePath();
-		if ( empty( $path ) )
+		if ( !$path )
 			return '';
 			
 	    return $this->getCacheFileDirectory() . '/' . $this->getCacheFileName();
@@ -166,7 +166,7 @@ class WP_Thumb {
 	public function getCacheFileDirectory() {
 		
 		$path = $this->getFilePath();
-		if ( $path )
+		if ( !$path )
 			return '';
 			
 		$original_filename = end( explode( '/', $this->getFilePath() ) );
@@ -206,7 +206,7 @@ class WP_Thumb {
 	public function getCacheFileName() {
 		
 		$path = $this->getFilePath();
-		if ( $path )
+		if ( !$path )
 			return '';
 
 		$serialize = crc32( serialize( array_merge( $this->args, array( $this->getFilePath() ) ) ) );
