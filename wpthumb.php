@@ -157,6 +157,7 @@ class WP_Thumb {
 	public function getCacheFilePath() {
 
 		$path = $this->getFilePath();
+		
 		if ( !$path )
 			return '';
 
@@ -207,11 +208,12 @@ class WP_Thumb {
 	public function getCacheFileName() {
 
 		$path = $this->getFilePath();
+	
 		if ( !$path )
 			return '';
 
 		$serialize = crc32( serialize( array_merge( $this->args, array( $this->getFilePath() ) ) ) );
-
+		
 		// Gifs are converted to pngs
 		if ( $this->getFileExtension() == 'gif' )
 			return $serialize . '.png';
@@ -298,7 +300,7 @@ class WP_Thumb {
     	// Watermarking (post resizing)
     	if ( isset( $watermark_options['mask'] ) && $watermark_options['mask'] && isset( $watermark_options['pre_resize'] ) && $watermark_options['pre_resize'] === false )
     		$thumb->createWatermark($watermark_options['mask'], $watermark_options['position'], $watermark_options['padding']);
-
+		
 		wp_mkdir_p( $this->getCacheFileDirectory() );
 
     	$thumb->save( $new_filepath );
