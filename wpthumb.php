@@ -250,9 +250,11 @@ class WP_Thumb {
     			$this->error = new WP_Error( 'animated-gif' );
     			return $this->returnImage();
     		}
-
+    		
+			wp_mkdir_p( $this->getCacheFileDirectory() );
+			
     		// Save the converted image
-    		$thumb->save( $new_filepath . '.png', 'png' );
+    		$thumb->save( $new_filepath, 'png' );
 
     		unset( $thumb );
 
