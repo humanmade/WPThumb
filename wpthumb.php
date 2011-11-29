@@ -657,9 +657,11 @@ function wpthumb_delete_cache_for_file( $file ) {
 
 	$upload_dir = wp_upload_dir();
 
-    wpthumb_rmdir_recursive( wpthumb_calculate_image_cache_dir( $upload_dir['basedir'] . $file ) );
+	$wpthumb = new WP_Thumb( $upload_dir['basedir'] . $file );
 
-    return $file;
+	wpthumb_rmdir_recursive( $wpthumb->getCacheFileDirectory() );
+
+	return $file;
 
 }
 add_filter( 'wp_delete_file', 'wpthumb_delete_cache_for_file' );
