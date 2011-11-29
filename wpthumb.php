@@ -225,7 +225,7 @@ class WP_Thumb {
 		$file_path = $this->getFilePath();
 		
 		// Up the php memory limit
-    	@ini_set( 'memory_limit', '256M' );
+    	@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
 
     	// Create the image
     	try {
