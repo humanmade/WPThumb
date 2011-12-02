@@ -3,7 +3,7 @@ Contributors: humanmade, joehoyle, mattheu, tcrsavage, willmot
 Tags: image resize
 Requires at least: 3.0
 Tested up to: 3.2.1
-Stable tag: 0.2
+Stable tag: trunk
 
 Gallery and Portfolio management for your WordPress site. 
 
@@ -18,6 +18,10 @@ WPThumb is a simple plugin that makes use of the PHPThumb library. It seamlessly
 * Can extend using filters to make use of any of the phpThumb Library functions by manipulating the image object.
 
 == Changelog ==
+
+=0.5=
+* Added more tests
+* Fix minor bugs
 
 =0.4=
 * Rewrote core functionality to use a Class

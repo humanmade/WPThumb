@@ -1,52 +1,70 @@
 <?php
+
 /*
 Plugin Name: WP Thumb
 Plugin URI: https://github.com/humanmade/WPThumb
 Description: phpThumb for WordPress
 Author: Human Made Limited
-Version: 0.4
+Version: 0.5
 Author URI: http://www.hmn.md/
 */
 
+/*  Copyright 2011 Human Made Limited  (email : hello@humanmade.co.uk)
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
 class WP_Thumb {
-	
+
 	private $args;
 	private $file_path;
-	
+
 	function __construct( $file_path = null, $args = array() ) {
-		
+
 		if ( !class_exists( 'PhpThumbFactory' ) )
 	    	include_once( dirname( __FILE__ ) . '/phpthumb/src/ThumbLib.inc.php' );
-		
+
 		if( $file_path )
 			$this->setFilePath( $file_path );
-		
+
 		$this->setArgs( $args );
-		
+
 		if( $file_path && ! file_exists( $this->getCacheFilePath() ) )
 			$this->generateCacheFile();
-			
+
 	}
-	
+
 	public function setFilePath( $file_path ) {
-		
+
 		$upload_dir = wp_upload_dir();
 
 		if( strpos( $file_path, ABSPATH ) === 0 ) {
 			$this->file_path = $file_path;
 			return;
 		}
-		
+
 		if( strpos( $file_path, $upload_dir['baseurl'] ) !== false )
     		$this->file_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $file_path );
-		
+
     	else
     		$this->file_path = str_replace( get_bloginfo( 'url' ) . '/', ABSPATH, $file_path );
 
 	}
-	
+
 	public function setArgs( $args ) {
-	
+
 		 $arg_defaults = array(
     		'width' 				=> 0,
     		'height'				=> 0,
@@ -63,140 +81,154 @@ class WP_Thumb {
     		'custom' 				=> false,
     		'background_fill'		=> null
     	);
-		
+
     	$args = wp_parse_args( $args, $arg_defaults );
     	$new_args = array();
-		
+
     	if ( $args['width'] === 'thumbnail' )
     		$new_args = array( 'width' => get_option('thumbnail_size_w'), 'height' => get_option('thumbnail_size_h'), 'crop' => get_option('thumbnail_crop') );
-		
+
     	elseif ( $args['width'] === 'medium' )
     		$new_args = array( 'width' => get_option('medium_size_w'), 'height' => get_option('medium_size_h') );
-		
+
     	elseif ( $args['width'] === 'large' )
     		$new_args = array( 'width' => get_option('large_size_w'), 'height' => get_option('large_size_h') );
-		
+
     	elseif ( is_string( $args['width'] ) && $args['width'] )
     		$new_args = apply_filters( 'wpthumb_create_args_from_size', $args );
-		
+
     	elseif ( is_array( $args['width'] ) )
     		$new_args = $args;
-		
+
     	$args = wp_parse_args( $new_args, $args );
-		
+
     	// Cast some args
     	$args['crop']	= (bool) $args['crop'];
     	$args['resize'] = (bool) $args['resize'];
     	$args['cache'] 	= (bool) $args['cache'];
 		$args['width'] 	= (int) $args['width'];
 		$args['height'] = (int) $args['height'];
-				
+
     	// Format the crop from position arg
     	if ( is_string( $args['crop_from_position'] ) )
     		$args['crop_from_position'] = explode( ',', $args['crop_from_position'] );
-		
+
 		// Sort out the watermark args
 	    if ( ! empty( $args['watermark_options']['mask'] ) ) {
     		$wpthumb_wm_defaults = array( 'padding' => 0, 'position' => 'cc', 'pre_resize' => false );
     		$args['watermark_options'] = wp_parse_args( $args['watermark_options'], $wpthumb_wm_defaults );
 	    }
-  		
+
     	$this->args = $args;
-	
+
 	}
-	
+
 	public function getFilePath() {
-		
+
 		if( strpos( $this->file_path, '/' ) === 0 && ! file_exists( $this->file_path ) && $this->args['default'] )
 			$this->file_path = $this->args['default'];
-    	
+
 		return $this->file_path;
 	}
-	
+
 	public function getArgs() {
 		return $this->args;
 	}
-	
+
 	public function getFileExtension() {
-	
+
 		$path = $this->getFilePath();
-		
+
 		$ext = strtolower( end( explode( '.', $path ) ) );
-		
+
 		// Remove a query string if there is one
     	$ext = reset( explode( '?', $ext ) );
-		
+
     	if ( strlen( $ext ) > 4 ) {
     		// Seems like we dont have an ext, lets guess at JPG
     		// TODO this isn't very nice
 			$ext = 'jpg';
     	}
-    
+
 		return $ext;
-		
+
 	}
-	
+
 	public function getCacheFilePath() {
 
+		$path = $this->getFilePath();
+		
+		if ( !$path )
+			return '';
+
 	    return $this->getCacheFileDirectory() . '/' . $this->getCacheFileName();
-	
+
 	}
-	
+
 	public function getCacheFileDirectory() {
-	
+
+		$path = $this->getFilePath();
+		if ( !$path )
+			return '';
+
 		$original_filename = end( explode( '/', $this->getFilePath() ) );
 
     	// If the image was remote, we want to store them in the remote images folder, not it's name
     	if ( strpos( $original_filename, '0_0_resize' ) === 0 )
     		$original_filename = end( explode( '/', str_replace( '/' . $original_filename, '', $this->getFilePath() ) ) );
-		
+
 		$parts = explode( '.', $original_filename );
-		
+
 		array_pop( $parts );
-		
+
 		$filename_nice = implode( '_', $parts );
-		
+
     	$upload_dir = wp_upload_dir();
-		
+
     	if ( strpos( $this->getFilePath(), $upload_dir['basedir'] ) === 0 ) :
     		$new_dir = $upload_dir['basedir'] . '/cache' . $upload_dir['subdir'] . '/' . $filename_nice;
-		
+
     	else :
     		$parts = parse_url( $this->getFilePath() );
-			
+
 			if ( !empty( $parts['host'] ) )
 	    		$new_dir = $upload_dir['basedir'] . '/cache/remote/' . sanitize_title( $parts['host'] );
-	    		
+
 	    	else
 	    		$new_dir = $upload_dir['basedir'] . '/cache/remote/';
-		
+
     	endif;
-		
+
     	$new_dir = str_replace( '/cache/cache', '/cache', $new_dir );
-		
+
     	return $new_dir;
-	
+
 	}
-	
+
 	public function getCacheFileName() {
+
+		$path = $this->getFilePath();
+	
+		if ( !$path )
+			return '';
 
 		$serialize = crc32( serialize( array_merge( $this->args, array( $this->getFilePath() ) ) ) );
 		
 		// Gifs are converted to pngs
 		if ( $this->getFileExtension() == 'gif' )
 			return $serialize . '.png';
-		
+
     	return $serialize . '.' . $this->getFileExtension();
-	
+
 	}
-	
+
 	public function generateCacheFile() {
-		
+
 		$new_filepath = $this->getCacheFilePath();
 		$file_path = $this->getFilePath();
-		
+
 		// Up the php memory limit
-    	@ini_set( 'memory_limit', '256M' );
+    	@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
 
     	// Create the image
     	try {
@@ -207,22 +239,24 @@ class WP_Thumb {
     		return $this->returnImage();
 
     	}
-    	
+
     	$thumb = apply_filters( 'wpthumb_image_filter', $thumb, $this->args );
-		
+
 		extract( $this->args );
-		
+
 		// Convert gif images to png before resizing
     	if ( $this->getFileExtension() == 'gif' ) :
 
     		// Don't resize animated gifs and the animations will be broken
-    		if ( $args['resize_animations'] !== true && $this->isAnimatedGif() ) {
+    		if ( !empty( $resize_animations ) !== true && $this->isAnimatedGif() ) {
     			$this->error = new WP_Error( 'animated-gif' );
     			return $this->returnImage();
     		}
-
+    		
+			wp_mkdir_p( $this->getCacheFileDirectory() );
+			
     		// Save the converted image
-    		$thumb->save( $new_filepath . '.png', 'png' );
+    		$thumb->save( $new_filepath, 'png' );
 
     		unset( $thumb );
 
@@ -230,26 +264,26 @@ class WP_Thumb {
     		return wpthumb( $new_filepath . '.png', $this->args );
 
     	endif;
-    	
+
     	// Watermarking (pre resizing)
     	if ( isset( $watermark_options['mask'] ) && $watermark_options['mask'] && isset( $watermark_options['pre_resize'] ) && $watermark_options['pre_resize'] === true ) {
     		$thumb->resize( 99999, 99999 );
     		$thumb->createWatermark( $watermark_options['mask'], $watermark_options['position'], $watermark_options['padding'] );
     	}
-    	
+
     	// Cropping
     	if ( $crop === true && $resize === true ) :
-    	  
+
     	  	if ( $crop_from_position && count( $crop_from_position ) == 2 && method_exists( $thumb, 'adaptiveResizeFromPoint' ) && empty( $background_fill ) ) {
 				$thumb->adaptiveResizeFromPoint( $width, $height, $crop_from_position[0], $crop_from_position[1] );
-		  	
+
     	  	}
-		  	
+
     	  	elseif( $background_fill == 'solid' && $thumb->canBackgroundFillSolidColorWithResize( $width, $height ) ) {
 		  		$thumb->resize( $width, $height );
     	  		$thumb->backgroundFillColorAuto( $width, $height );
     	  	}
-		  	
+
 		  	else {
 		  		$thumb->adaptiveResize( $width, $height );
 		  	}
@@ -258,69 +292,69 @@ class WP_Thumb {
 			$thumb->cropFromCenter( $width, $height );
 
     	else :
-    	
+
 			$thumb->resize( $width, $height );
 
     	endif;
-    	
+
     	// Watermarking (post resizing)
     	if ( isset( $watermark_options['mask'] ) && $watermark_options['mask'] && isset( $watermark_options['pre_resize'] ) && $watermark_options['pre_resize'] === false )
     		$thumb->createWatermark($watermark_options['mask'], $watermark_options['position'], $watermark_options['padding']);
 		
 		wp_mkdir_p( $this->getCacheFileDirectory() );
-		
+
     	$thumb->save( $new_filepath );
 
     	// Destroy the image
     	unset( $thumb );
-	
+
 	}
-	
+
 	public function errored() {
 
 		return ! empty( $this->error );
-		
+
 	}
-	
+
 	public function returnImage() {
-		
+
 		if ( ! empty( $this->error ) )
 			$path = $this->getFilePath();
 		else
 			$path = $this->getCacheFilePath();
-		
+
 		if ( $this->args['return'] == 'path' )
 			return $path;
-		
-		return $this->getFileURLForFilePath( $path );
+
+		return $path ? $this->getFileURLForFilePath( $path ) : $path;
 	}
-	
+
 	public function getCacheFileURL() {
 		return $this->getFileURLForFilePath( $this->getCacheFilePath() );
 	}
-	
+
 	public function getFileURL() {
 		return $this->getFileURLForFilePath( $this->getFilePath() );
 	}
- 	
+
 	private function getFileURLForFilePath( $path ) {
-	
+
 		$upload_dir = wp_upload_dir();
-		
+
 		if ( strpos( $path, $upload_dir['basedir'] ) !== false ) {
     	    return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $path );
-    	   
-		} else {		
+
+		} else {
 			return str_replace( ABSPATH, get_bloginfo( 'url' ) . '/', $path );
 
-		} 
-	
+		}
+
 	}
-	
+
 	private function isAnimatedGif() {
-		
+
 		$filename = $this->getFilePath();
-		
+
 		$filecontents = file_get_contents( $filename );
 
         $str_loc = $count = 0;
@@ -354,7 +388,7 @@ class WP_Thumb {
 			return true;
 
     	return false;
-	
+
 	}
 
 }
@@ -444,9 +478,9 @@ function wpthumb( $url, $args = array() ) {
 	
     if ( isset( $legacy_args ) && $legacy_args )
     	$args = $legacy_args;
-	
+
 	$thumb = new WP_Thumb( $url, $args );
-	
+
 	return $thumb->returnImage();
 }
 
@@ -525,15 +559,15 @@ function wpthumb_post_image( $null, $id, $args ) {
     	$path = get_attached_file( $id );
 
 	$image = new WP_Thumb( $path, $args );
-	
+
     $args = $image->getArgs();
-	
+
     extract( $args );
 
 	if ( file_exists( $path ) ) {
-	
+
 		$image_src = $image->returnImage();
-    
+
     	$crop = (bool) ( empty( $crop ) ) ? false : $crop;
 
     	if ( !$image->errored() && $image_meta = getimagesize( $image->getCacheFilePath() ) ) :
@@ -545,7 +579,7 @@ function wpthumb_post_image( $null, $id, $args ) {
     		$html_width = $html_height = false;
 
     	endif;
-	
+
 	} else {
 
 		$html_width = $width;
@@ -629,9 +663,11 @@ function wpthumb_delete_cache_for_file( $file ) {
 
 	$upload_dir = wp_upload_dir();
 
-    wpthumb_rmdir_recursive( wpthumb_calculate_image_cache_dir( $upload_dir['basedir'] . $file ) );
+	$wpthumb = new WP_Thumb( $upload_dir['basedir'] . $file );
 
-    return $file;
+	wpthumb_rmdir_recursive( $wpthumb->getCacheFileDirectory() );
+
+	return $file;
 
 }
 add_filter( 'wp_delete_file', 'wpthumb_delete_cache_for_file' );
@@ -1059,10 +1095,9 @@ function wpthumb_test() {
 	<?php exit; ?>
 
 	<img src="<?php echo wpthumb( $remote_image_src, 'width=100&height=100&crop=1' ) ?>" />
-	<?php
-	$test_images_dir = dirname( __FILE__ ) . '/test-images';
 
-	?>
+	<?php $test_images_dir = dirname( __FILE__ ) . '/test-images'; ?>
+
 	<style>
 		body{ background: pink }
 	</style>
