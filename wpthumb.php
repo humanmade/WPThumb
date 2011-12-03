@@ -989,7 +989,9 @@ function wpthumb_wm_get_options( $id ) {
     	return array();
 
     $options['mask'] = get_template_directory() . '/images/watermark.png';
-        
+    
+    $mask = wpthumb_wm_mask( $id );
+    
     if( !empty( $mask ) ) {
         $options['mask'] = wpthumb_wm_get_watermark_mask_file( $mask );
     } else {
@@ -1011,8 +1013,6 @@ function wpthumb_wm_get_options( $id ) {
 
     if ( $position == 'bottom-right' )
     	$options['position'] = 'rb';
-
-    $options['pre_resize'] = true;
 
     return $options;
 }
