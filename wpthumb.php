@@ -698,6 +698,8 @@ function wpthumb_wm_check_for_submitted() {
     		update_post_meta( $attach_id, 'use_watermark', $_POST['wpthumb_wm_use_watermark'][$attach_id] );
     		update_post_meta( $attach_id, 'wpthumb_wm_position', $_POST['wpthumb_wm_watermark_position'][$attach_id] );
     		update_post_meta( $attach_id, 'wpthumb_wm_padding', (int) $_POST['wpthumb_wm_watermark_padding'][$attach_id] );
+    		update_post_meta( $attach_id, 'wpthumb_wm_pre_resize', '0' );
+			update_post_meta( $attach_id, 'wpthumb_wm_mask', $_POST['wm_watermark_mask'][$attach_id] );
 
     	}
     }
