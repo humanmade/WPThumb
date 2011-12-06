@@ -38,10 +38,11 @@ class WP_Thumb {
 
 		if( $file_path )
 			$this->setFilePath( $file_path );
+		
+		if ( $args )
+			$this->setArgs( $args );
 
-		$this->setArgs( $args );
-
-		if( $file_path && ! file_exists( $this->getCacheFilePath() ) )
+		if( $file_path && $args && ! file_exists( $this->getCacheFilePath() ) )
 			$this->generateCacheFile();
 
 	}
@@ -132,7 +133,7 @@ class WP_Thumb {
 	}
 
 	public function getArgs() {
-		return $this->args;
+		return (array) $this->args;
 	}
 
 	public function getFileExtension() {
@@ -212,7 +213,7 @@ class WP_Thumb {
 		if ( !$path )
 			return '';
 
-		$serialize = crc32( serialize( array_merge( $this->args, array( $this->getFilePath() ) ) ) );
+		$serialize = crc32( serialize( array_merge( $this->getArgs(), array( $this->getFilePath() ) ) ) );
 		
 		// Gifs are converted to pngs
 		if ( $this->getFileExtension() == 'gif' )
