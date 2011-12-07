@@ -188,7 +188,11 @@ class WP_Thumb {
 
     	if ( strpos( $this->getFilePath(), $upload_dir['basedir'] ) === 0 ) :
     		$new_dir = $upload_dir['basedir'] . '/cache' . $upload_dir['subdir'] . '/' . $filename_nice;
-
+		
+		elseif ( strpos( $this->getFilePath(), ABSPATH ) === 0 ) :
+			
+			$new_dir = $upload_dir['basedir'] . '/cache/local';
+		
     	else :
     		$parts = parse_url( $this->getFilePath() );
 
@@ -196,7 +200,7 @@ class WP_Thumb {
 	    		$new_dir = $upload_dir['basedir'] . '/cache/remote/' . sanitize_title( $parts['host'] );
 
 	    	else
-	    		$new_dir = $upload_dir['basedir'] . '/cache/remote/';
+	    		$new_dir = $upload_dir['basedir'] . '/cache/remote';
 
     	endif;
 
