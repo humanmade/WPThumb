@@ -562,6 +562,8 @@ function wpthumb_media_form_watermark_save( $post, $attachment ){
     update_post_meta( $post['ID'], 'use_watermark', ! empty( $attachment['wpthumb_wm_use_watermark'] ) );
     update_post_meta( $post['ID'], 'wpthumb_wm_position', $attachment['wpthumb_wm_watermark_position'] );
     update_post_meta( $post['ID'], 'wpthumb_wm_padding', (int) $attachment['wpthumb_wm_watermark_padding'] );
+	update_post_meta( $post['ID'], 'wpthumb_wm_pre_resize', '0' );
+	update_post_meta( $post['ID'], 'wpthumb_wm_mask', $attachment['wm_watermark_mask'] );
 	
     return $post;
 }
