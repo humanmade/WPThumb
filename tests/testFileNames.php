@@ -145,4 +145,13 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$this->assertEquals( end( explode( '.', $image->getCacheFileName() ) ), 'png' );
 		
 	}
+	
+	function testLocalFileCacheFilePath() {
+	
+		$image = new WP_Thumb;
+		$image->setFilePath( ABSPATH . 'foo.jpg' );
+		
+		$this->assertFalse( strpos( $image->getCacheFilePath(), '//' ) );
+	
+	}
 }

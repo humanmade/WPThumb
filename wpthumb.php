@@ -39,9 +39,10 @@ class WP_Thumb {
 		if( $file_path )
 			$this->setFilePath( $file_path );
 
+		if ( $args )
 		$this->setArgs( $args );
 
-		if( $file_path && ! file_exists( $this->getCacheFilePath() ) )
+		if( $file_path && $args && ! file_exists( $this->getCacheFilePath() ) )
 			$this->generateCacheFile();
 
 	}
@@ -132,7 +133,7 @@ class WP_Thumb {
 	}
 
 	public function getArgs() {
-		return $this->args;
+		return (array) $this->args;
 	}
 
 	public function getFileExtension() {
@@ -188,6 +189,10 @@ class WP_Thumb {
     	if ( strpos( $this->getFilePath(), $upload_dir['basedir'] ) === 0 ) :
     		$new_dir = $upload_dir['basedir'] . '/cache' . $upload_dir['subdir'] . '/' . $filename_nice;
 
+		elseif ( strpos( $this->getFilePath(), ABSPATH ) === 0 ) :
+			
+			$new_dir = $upload_dir['basedir'] . '/cache/local';
+		
     	else :
     		$parts = parse_url( $this->getFilePath() );
 
@@ -195,7 +200,7 @@ class WP_Thumb {
 	    		$new_dir = $upload_dir['basedir'] . '/cache/remote/' . sanitize_title( $parts['host'] );
 
 	    	else
-	    		$new_dir = $upload_dir['basedir'] . '/cache/remote/';
+	    		$new_dir = $upload_dir['basedir'] . '/cache/remote';
 
     	endif;
 
@@ -212,7 +217,7 @@ class WP_Thumb {
 		if ( !$path )
 			return '';
 
-		$serialize = crc32( serialize( array_merge( $this->args, array( $this->getFilePath() ) ) ) );
+		$serialize = crc32( serialize( array_merge( $this->getArgs(), array( $this->getFilePath() ) ) ) );
 		
 		// Gifs are converted to pngs
 		if ( $this->getFileExtension() == 'gif' )
