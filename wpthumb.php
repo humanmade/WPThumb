@@ -455,6 +455,114 @@ function wpthumb_media_form_crop_position_save( $post, $attachment ){
 add_filter( 'attachment_fields_to_save', 'wpthumb_media_form_crop_position_save', 10, 2);
 
 /**
+ * wpthumb_media_form_crop_position function.
+ *
+ * Adds a back end for selecting the crop position of images.
+ *
+ * @access public
+ * @param array $fields
+ * @param array $post
+ * @return $post
+ */
+function wpthumb_media_form_watermark( $fields, $post ) {
+
+    $current_position = wpthumb_wm_position( $post->ID );
+	
+	$watermark_masks_options_html = '';
+    foreach( wpthumb_wm_get_watermark_masks() as $mask_id => $watermark_mask ) {
+        $watermark_masks_options_html .= '<option value="' . $mask_id . '" ' . ( wpthumb_wm_mask( $post->ID ) == $mask_id ? 'selected="selected"' : '' ) . '>' . $watermark_mask['label'] . '</option>' . "\n";
+    }
+    
+    if ( !$current_position )
+    	$current_position = 'top,left';
+
+    $html = '<style>.watermark_pos { } .watermark_pos input { margin: 5px; } .wpthumb_wrap { display: inline-block; padding: 0 5px; }</style>';
+    $html .= '<div rel="' . $post->ID . '" class="wm-watermark-options"><label><input class="wpthumb_apply_watermark" name="attachments[' . $post->ID . '][wpthumb_wm_use_watermark]" type="checkbox"' . checked( wpthumb_wm_image_has_watermark( $post->ID ), true, false ) . ' /> Apply Watermark</label>';
+    $html .= '<div class="watermark_pos" style="display:' . ( wpthumb_wm_image_has_watermark( $post->ID ) ? 'block' : 'none' ) . '; ">';
+    $html .= '<br /><span class="wpthumb_wrap"><label>Position</label><select class="wm_watermark_position" name="attachments[' . $post->ID . '][wpthumb_wm_watermark_position]">
+         	    <option ' . ( wpthumb_wm_position($post->ID) == 'top-left' ? 'selected="selected"' : '' ) .' value="top-left">Top Left</option>
+         	    <option ' . ( wpthumb_wm_position($post->ID) == 'top-right' || wpthumb_wm_position($post->ID) == '' ? 'selected="selected"' : '' ) .' value="top-right">Top Right</option>
+         	    <option ' . ( wpthumb_wm_position($post->ID) == 'bottom-left' ? 'selected="selected"' : '' ) .' value="bottom-left">Bottom Left</option>
+         	    <option ' . ( wpthumb_wm_position($post->ID) == 'bottom-right' ? 'selected="selected"' : '' ) .' value="bottom-right">Bottom Right</option>
+         	</select></span>
+         	
+         	<span class="wpthumb_wrap"><label>Padding</label><input class="wm_watermark_padding" type="text" value="' . wpthumb_wm_padding($post->ID) . '" style="width:30px" name="attachments[' . $post->ID . '][wpthumb_wm_watermark_padding]">px</span>
+           	
+           	<span class="wpthumb_wrap"><label>Select Watermark</label>
+            <select name="attachments[' . $post->ID . '][wm_watermark_mask]" class="wm_watermark_mask">
+            	' . $watermark_masks_options_html . '
+			</select></span>
+			
+			<span class="wpthumb_wrap"><a class="button preview-watermark" href="' . str_replace( ABSPATH, get_bloginfo('url') . '/', dirname( __FILE__ )) . '/watermark-actions.php">Preview</a></span>
+			
+			<br /><span class="wm-watermark-preview"></span>
+                ';
+	
+	$html .= '</div></div>';
+    $html .= '<script type="text/javascript">jQuery( document ).ready( function() { jQuery( "div[rel=\"' . $post->ID . '\"] .wpthumb_apply_watermark" ).change( function() { jQuery(this).parent().next( ".watermark_pos" ).toggle() } ) } );</script>
+    
+    		<script type="text/javascript">
+    		    jQuery(".wm-watermark-options a.preview-watermark").live("click", function(e) {
+    		        e.preventDefault();
+    		        WMCreatePreview( jQuery(this).closest(".wm-watermark-options") );
+    		    });
+
+    		    function WMCreatePreview( optionsPane ) {
+    		        position = jQuery(optionsPane).find("select.wm_watermark_position").val();
+    		        padding = jQuery(optionsPane).find("input.wm_watermark_padding").val();
+    		        mask = jQuery(optionsPane).find("select.wm_watermark_mask").val();
+    		        
+    		        //show loading
+    		        jQuery(optionsPane).next(".wm-watermark-preview").html("<span class=\"wm-loading\">Generating Preview...</span>");
+    		        
+    		        if( typeof(WMCreatePreviewXHR) != "undefined" )
+    		            WMCreatePreviewXHR.abort();
+    		            
+    		        WMCreatePreviewXHR = jQuery.get(jQuery(optionsPane).find("a.preview-watermark").attr("href"), { action: "wpthumb_wm_watermark_preview_image", position: position, padding: padding, image_id: jQuery(optionsPane).attr("rel"), mask: mask },
+    		        function(data){    
+    		            jQuery(optionsPane).find(".wm-watermark-preview").html(data).show();
+    		        });
+    		    }
+    		</script>
+    		<style>
+    		    /* .A1B1 input[type=button] { display: none; } */
+    		    .wm-watermark-preview img { padding: 3px; border: 1px solid #a1a1a1; }
+    		    .wm-watermark-preview a {font-size: 11px; text-decoration: none; text-align: center; display :block; width: 200px; }
+    		    .wm-loading { line-height: 16px; text-align: center; width: 120px; background: url(' . get_bloginfo('url') . '/wp-admin/images/loading.gif) no-repeat; padding-left: 20px; padding-top: 1px; padding-bottom: 2px; font-size: 11px; color: #999; }
+    		</style>
+    
+    ';
+
+    $fields['watermark'] = array(
+    	'label' => __('Watermark', 'wpthumb'),
+    	'input' => 'html',
+    	'html' => $html
+    );
+    return $fields;
+}
+add_filter( 'attachment_fields_to_edit', 'wpthumb_media_form_watermark', 10, 2 );
+
+/**
+ * wpthumb_media_form_watermark_save function.
+ *
+ * Saves watermark in post meta.
+ *
+ * @access public
+ * @param array $post
+ * @param array $attachment
+ * @return $post
+ */
+function wpthumb_media_form_watermark_save( $post, $attachment ){
+
+    update_post_meta( $post['ID'], 'use_watermark', ! empty( $attachment['wpthumb_wm_use_watermark'] ) );
+    update_post_meta( $post['ID'], 'wpthumb_wm_position', $attachment['wpthumb_wm_watermark_position'] );
+    update_post_meta( $post['ID'], 'wpthumb_wm_padding', (int) $attachment['wpthumb_wm_watermark_padding'] );
+	
+    return $post;
+}
+add_filter( 'attachment_fields_to_save', 'wpthumb_media_form_watermark_save', 10, 2);
+
+/**
  * Resizes a given image (local).
  *
  * @param mixed absolute path to the image
@@ -671,164 +779,6 @@ function wpthumb_delete_cache_for_file( $file ) {
 
 }
 add_filter( 'wp_delete_file', 'wpthumb_delete_cache_for_file' );
-
-/**
- * wpthumb_wm_check_for_submitted function.
- *
- * @access public
- * @return null
- */
-function wpthumb_wm_check_for_submitted() {
-
-    if ( !empty( $_POST['wpthumb_wm_watermark_position'] ) ) {
-
-    	//is_multiple check
-    	preg_match( '/multiple=([A-z0-9_][^&]*)/', $_POST['_wp_http_referer'], $multiple_matches );
-    	$multiple = $multiple_matches[1];
-
-    	preg_match( '/button=([A-z0-9_][^&]*)/', $_POST['_wp_http_referer'], $matches );
-    	$button_id = $matches[1];
-
-    	// If the custom button was pressed
-    	if ( is_array( $_POST[$button_id] ) ) {
-
-    		$attach_id = key( $_POST[$button_id] );
-    		$attach_thumb_url = wp_get_attachment_thumb_url( $attach_id );
-
-    		update_post_meta( $attach_id, 'use_watermark', $_POST['wpthumb_wm_use_watermark'][$attach_id] );
-    		update_post_meta( $attach_id, 'wpthumb_wm_position', $_POST['wpthumb_wm_watermark_position'][$attach_id] );
-    		update_post_meta( $attach_id, 'wpthumb_wm_padding', (int) $_POST['wpthumb_wm_watermark_padding'][$attach_id] );
-
-    	}
-    }
-}
-add_action( 'admin_head-media-upload-popup', 'wpthumb_wm_check_for_submitted' );
-
-/**
- * wpthumb_wm_add_scripts function.
- *
- * @access public
- * @return null
- */
-function wpthumb_wm_add_scripts() {
-    if( !$_GET['button'] )
-        return;
-    
-    ?>
-    <script type="text/javascript">
-        jQuery(".add-watermark").live('click', function(e) {
-            e.preventDefault();
-            addWmPane = jQuery(this).closest('tr').next('tr');
-            jQuery(addWmPane).show();
-        });
-        jQuery(".wm-watermark-options a.preview-watermark").live('click', function(e) {
-            e.preventDefault();
-            WMCreatePreview( jQuery(this).closest(".wm-watermark-options") );
-        });
-        jQuery(".wm-watermark-options a.cancel-watermark").live('click', function(e) {
-            e.preventDefault();
-            jQuery(this).closest(".wm-watermark-options").find("input.wm_use_watermark").removeAttr('checked');
-            jQuery(this).closest("tr").hide();
-        });
-        function WMCreatePreview( optionsPane ) {
-            position = jQuery(optionsPane).find("select.wm_watermark_position").val();
-            padding = jQuery(optionsPane).find("input.wm_watermark_padding").val();
-            mask = jQuery(optionsPane).find("select.wm_watermark_mask").val();
-            
-            //show loading
-            jQuery(optionsPane).next(".wm-watermark-preview").html('<span class="wm-loading">Generating Preview...</span>');
-            
-            if( typeof(WMCreatePreviewXHR) != 'undefined' )
-                WMCreatePreviewXHR.abort();
-                
-            WMCreatePreviewXHR = jQuery.get(jQuery(optionsPane).find("a.preview-watermark").attr("href"), { action: 'wpthumb_wm_watermark_preview_image', position: position, padding: padding, image_id: jQuery(optionsPane).attr('rel'), mask: mask },
-            function(data){    
-                jQuery(optionsPane).next(".wm-watermark-preview").html(data).show();
-            });
-        }
-    </script>
-    <style>
-        /* .A1B1 input[type=button] { display: none; } */
-        .watermark { border: 1px solid #1B77AD; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; overflow: hidden; padding: 0 10px; }
-        .wm-watermark-options { width: 230px; font-size: 11px; float: left; }
-        .wm-watermark-preview { width: 205px; float: left; text-align: center; line-height: 180%; margin-top: 20px; }
-        .wm-watermark-options label { font-size: 11px; }
-        .wm-watermark-preview img { padding: 3px; border: 1px solid #a1a1a1; }
-        .wm-watermark-preview a {font-size: 11px; text-decoration: none; }
-        .wm-loading { line-height: 16px; text-align: center; width: 120px; background: url(<?php echo get_bloginfo('url') . '/wp-admin/images/loading.gif' ?>) no-repeat; padding-left: 20px; padding-top: 1px; padding-bottom: 2px; font-size: 11px; color: #999; }
-    </style>
-    <?php
-}
-add_action( 'admin_head-media-upload-popup', 'wpthumb_wm_add_scripts' );
-
-/**
- * wpthumb_wm_add_watermark_button function.
- *
- * @access public
- * @param mixed $form_fields
- * @param mixed $media
- * @return null
- */
-function wpthumb_wm_add_watermark_button( $form_fields, $media ) {
-    
-      if ( !isset( $form_fields['buttons'] ) || !strpos( $form_fields['buttons']['tr'], 'Set as Post Image' ) )
-    	return $form_fields;
-    
-    //work out hihc button id this is
-    $buttons = get_option( 'custom_media_buttons' );
-
-    if ( $_GET['button'] ) :
-        $button_id = $_GET['button'];
-
-    endif;
-    
-    $button = '<a class="button add-watermark" rel="' . $media->ID . '">' . (wpthumb_wm_image_has_watermark($media->ID) ? 'Edit' : 'Add') .' Watermark</a>';
-    
-    $watermark_masks_options_html = '';
-    foreach( wpthumb_wm_get_watermark_masks() as $mask_id => $watermark_mask ) {
-        $watermark_masks_options_html .= '<option value="' . $mask_id . '" ' . ( wpthumb_wm_mask( $media->ID ) == $mask_id ? 'selected="selected"' : '' ) . '>' . $watermark_mask['label'] . '</option>' . "\n";
-    }
-    
-    $form_fields['buttons']['tr'] = substr( $form_fields['buttons']['tr'], 0, strlen($form_fields['buttons']['tr']) - 11) . $button . '</td></tr>';
-    $form_fields['buttons']['tr'] .= '
-        <tr style="display:none"><td></td><td>
-            <div class="watermark">
-            <div rel="' . $media->ID . '" class="wm-watermark-options">
-                <p><label>
-                    <input class="wm_use_watermark" ' . (wpthumb_wm_image_has_watermark( $media->ID ) ? 'checked="checked"' : '') . ' type="checkbox" name="wpthumb_wm_use_watermark[' . $media->ID . ']" />
-                    <strong>Apply watermark</strong>
-                </label></p>
-                <p><label>Positition</label>
-                    <select class="wm_watermark_position" name="wpthumb_wm_watermark_position[' . $media->ID . ']">
-                        <option ' . ( wpthumb_wm_position($media->ID) == 'top-left' ? 'selected="selected"' : '' ) .' value="top-left">Top Left</option>
-                        <option ' . ( wpthumb_wm_position($media->ID) == 'top-right' || wpthumb_wm_position($media->ID) == '' ? 'selected="selected"' : '' ) .' value="top-right">Top Right</option>
-                        <option ' . ( wpthumb_wm_position($media->ID) == 'bottom-left' ? 'selected="selected"' : '' ) .' value="bottom-left">Bottom Left</option>
-                        <option ' . ( wpthumb_wm_position($media->ID) == 'bottom-right' ? 'selected="selected"' : '' ) .' value="bottom-right">Bottom Right</option>
-                    </select>
-                </p>
-                <p><label>Padding</label>
-                    <input class="wm_watermark_padding" type="text" value="' . wpthumb_wm_padding($media->ID) . '" style="width:30px" name="wpthumb_wm_watermark_padding[' . $media->ID . ']">px
-                </p>
-                <p><small>Padding (gutter) is the space that the watermark appears from the edge of the image</small><br /></p>
-                
-                <p>
-                    <label>Select Watermark</label>
-                    <select name="wm_watermark_mask[' . $media->ID . ']" class="wm_watermark_mask">
-                        ' . $watermark_masks_options_html . '
-                    </select>
-                </p>
-                
-                <p class="clear clearfix">
-                    <input type="submit" name="' . $button_id . '[' . $media->ID . ']" class="button-primary" value="Add Watermark"> <a href="' . str_replace( ABSPATH, get_bloginfo('url') . '/', dirname( __FILE__ )) . '/watermark-actions.php' . '" class="button preview-watermark">Preview</a> | <a href="" class="cancel-watermark">Cancel</a>
-                </p>
-            </div>
-            <div class="wm-watermark-preview">    
-            </div>
-            </div>
-        </td></tr>';
-    return $form_fields;
-}
-add_filter( 'attachment_fields_to_edit', 'wpthumb_wm_add_watermark_button', 100, 2 );
 
 function wpthumb_wm_watermark_preview_image( $position, $padding, $image_id, $mask ) {
     $image = get_attached_file($image_id);
