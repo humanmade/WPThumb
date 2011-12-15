@@ -108,7 +108,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 	function testFilePathFromLocalFileUrlWithDifferentUploadDirNoMultiSite() {
 		
 		if ( is_multisite() )
-			return;
+			$this->markTestSkipped( 'Only runs on a MultiSite setup' );
 	
 		// For this test we need to change the upload URL to something other than uplaod path
 		add_filter( 'upload_dir', function( $args ) {
@@ -120,7 +120,9 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		
 		$upload_dir = wp_upload_dir();
 		
-		unlink( $upload_dir['basedir'] . '/google.png' );
+		if ( file_exists( $upload_dir['basedir'] . '/google.png' ) )
+			unlink( $upload_dir['basedir'] . '/google.png' );
+	
 		copy( dirname( __FILE__ ) . '/images/google.png', $upload_dir['basedir'] . '/google.png' );
 		
 		$this->assertFileExists( $upload_dir['basedir'] . '/google.png' );
