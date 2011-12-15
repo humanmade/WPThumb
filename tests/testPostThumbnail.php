@@ -3,6 +3,8 @@
 class WPThumbPostThumbnailTestCase extends WP_UnitTestCase {
 
 	function testPostThumbnailResize() {
+	
+		require_once( ABSPATH . WPINC . '/post-thumbnail-template.php' );
 		
 		$post = reset( get_posts( 'showposts=1' ) );
 		$this->assertNotNull( $post->ID, 'test post not found' );
