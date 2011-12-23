@@ -48,7 +48,7 @@ class WP_Thumb {
 		if ( $args )
 		$this->setArgs( $args );
 
-		if( $file_path && $args && ! file_exists( $this->getCacheFilePath() ) )
+		if( $file_path && $args && ( ! file_exists( $this->getCacheFilePath() ) || ! $this->args['cache'] ) )
 			$this->generateCacheFile();
 
 	}
