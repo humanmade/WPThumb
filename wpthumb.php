@@ -29,6 +29,8 @@ Author URI: http://www.hmn.md/
 define( 'WP_THUMB_PATH', dirname( __FILE__ ) . '/' );
 define( 'WP_THUMB_URL', str_replace( ABSPATH, site_url( '/' ), WP_THUMB_PATH ) );
 
+// TODO wpthumb_create_args_from_size filter can pass string or array which makes it difficult to hook into
+
 // Watermkaing stuff
 include_once( WP_THUMB_PATH . '/wpthumb.watermark.php' );
 
