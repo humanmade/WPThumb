@@ -26,6 +26,14 @@ Author URI: http://www.hmn.md/
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+define( 'WP_THUMB_PATH', dirname( __FILE__ ) . '/' );
+define( 'WP_THUMB_URL', str_replace( ABSPATH, site_url( '/' ), WP_THUMB_PATH ) );
+
+// TODO wpthumb_create_args_from_size filter can pass string or array which makes it difficult to hook into
+
+// Watermkaing stuff
+include_once( WP_THUMB_PATH . '/wpthumb.watermark.php' );
+
 class WP_Thumb {
 
 	private $args;
@@ -39,9 +47,10 @@ class WP_Thumb {
 		if( $file_path )
 			$this->setFilePath( $file_path );
 
+		if ( $args )
 		$this->setArgs( $args );
 
-		if( $file_path && ! file_exists( $this->getCacheFilePath() ) )
+		if( $file_path && $args && ( ! file_exists( $this->getCacheFilePath() ) || ! $this->args['cache'] ) )
 			$this->generateCacheFile();
 
 	}
@@ -132,7 +141,7 @@ class WP_Thumb {
 	}
 
 	public function getArgs() {
-		return $this->args;
+		return (array) $this->args;
 	}
 
 	public function getFileExtension() {
@@ -188,6 +197,10 @@ class WP_Thumb {
     	if ( strpos( $this->getFilePath(), $upload_dir['basedir'] ) === 0 ) :
     		$new_dir = $upload_dir['basedir'] . '/cache' . $upload_dir['subdir'] . '/' . $filename_nice;
 
+		elseif ( strpos( $this->getFilePath(), ABSPATH ) === 0 ) :
+			
+			$new_dir = $upload_dir['basedir'] . '/cache/local';
+		
     	else :
     		$parts = parse_url( $this->getFilePath() );
 
@@ -195,7 +208,7 @@ class WP_Thumb {
 	    		$new_dir = $upload_dir['basedir'] . '/cache/remote/' . sanitize_title( $parts['host'] );
 
 	    	else
-	    		$new_dir = $upload_dir['basedir'] . '/cache/remote/';
+	    		$new_dir = $upload_dir['basedir'] . '/cache/remote';
 
     	endif;
 
@@ -212,7 +225,7 @@ class WP_Thumb {
 		if ( !$path )
 			return '';
 
-		$serialize = crc32( serialize( array_merge( $this->args, array( $this->getFilePath() ) ) ) );
+		$serialize = crc32( serialize( array_merge( $this->getArgs(), array( $this->getFilePath() ) ) ) );
 		
 		// Gifs are converted to pngs
 		if ( $this->getFileExtension() == 'gif' )
@@ -228,7 +241,7 @@ class WP_Thumb {
 		$file_path = $this->getFilePath();
 
 		// Up the php memory limit
-    	@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
+    	@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', '256M' ) );
 
     	// Create the image
     	try {
@@ -472,9 +485,10 @@ function wpthumb( $url, $args = array() ) {
         return $url;
 
     // Check if is using legacy args
-    if ( is_numeric( $args ) )
-    	$legacy_args = array_combine( array_slice( array( 'width', 'height', 'crop', 'resize' ), 0, count( array_slice( func_get_args(), 1 ) ) ), array_slice( func_get_args(), 1 ) );
-
+    if ( is_numeric( $args ) ) {
+    	$legacy_args = array_combine( array_slice( array( 'width', 'height', 'crop', 'resize' ), 0, count( array_slice( func_get_args(), 1 ) ) ), array_slice( func_get_args(), 1, 4 ) );
+	}
+	
     if ( isset( $legacy_args ) && $legacy_args )
     	$args = $legacy_args;
 
@@ -670,246 +684,6 @@ function wpthumb_delete_cache_for_file( $file ) {
 
 }
 add_filter( 'wp_delete_file', 'wpthumb_delete_cache_for_file' );
-
-/**
- * wpthumb_wm_check_for_submitted function.
- *
- * @access public
- * @return null
- */
-function wpthumb_wm_check_for_submitted() {
-
-    if ( !empty( $_POST['wpthumb_wm_watermark_position'] ) ) {
-
-    	//is_multiple check
-    	preg_match( '/multiple=([A-z0-9_][^&]*)/', $_POST['_wp_http_referer'], $multiple_matches );
-    	$multiple = $multiple_matches[1];
-
-    	preg_match( '/button=([A-z0-9_][^&]*)/', $_POST['_wp_http_referer'], $matches );
-    	$button_id = $matches[1];
-
-    	// If the custom button was pressed
-    	if ( is_array( $_POST[$button_id] ) ) {
-
-    		$attach_id = key( $_POST[$button_id] );
-    		$attach_thumb_url = wp_get_attachment_thumb_url( $attach_id );
-
-    		update_post_meta( $attach_id, 'use_watermark', $_POST['wpthumb_wm_use_watermark'][$attach_id] );
-    		update_post_meta( $attach_id, 'wpthumb_wm_position', $_POST['wpthumb_wm_watermark_position'][$attach_id] );
-    		update_post_meta( $attach_id, 'wpthumb_wm_padding', (int) $_POST['wpthumb_wm_watermark_padding'][$attach_id] );
-
-    	}
-    }
-}
-add_action( 'admin_head-media-upload-popup', 'wpthumb_wm_check_for_submitted' );
-
-/**
- * wpthumb_wm_add_scripts function.
- *
- * @access public
- * @return null
- */
-function wpthumb_wm_add_scripts() {
-
-    if ( !isset( $_GET['button'] ) || !$_GET['button'] )
-    	return; ?>
-
-    <script type="text/javascript">
-
-    	jQuery( '.add-watermark' ).live( 'click', function( e ) {
-    		e.preventDefault();
-    		addWmPane = jQuery(this).closest('tr').next('tr');
-    		jQuery(addWmPane).show();
-    	} );
-
-    	jQuery(".wm-watermark-options a.preview-watermark").live('click', function(e) {
-    		e.preventDefault();
-    		WMCreatePreview( jQuery(this).closest(".wm-watermark-options") );
-    	} );
-
-    	jQuery(".wm-watermark-options a.cancel-watermark").live('click', function(e) {
-    		e.preventDefault();
-    		jQuery(this).closest(".wm-watermark-options").find("input.wpthumb_wm_use_watermark").removeAttr('checked');
-    		jQuery(this).closest("tr").hide();
-    	});
-
-    	function WMCreatePreview( optionsPane ) {
-    		position = jQuery(optionsPane).find("select.wpthumb_wm_watermark_position").val();
-    		padding = jQuery(optionsPane).find("input.wpthumb_wm_watermark_padding").val();
-
-    		//show loading
-    		jQuery(optionsPane).next(".wm-watermark-preview").html('<span class="wm-loading">Generating Preview...</span>');
-
-    		if ( typeof(WMCreatePreviewXHR) != 'undefined' )
-    			WMCreatePreviewXHR.abort();
-
-    		WMCreatePreviewXHR = jQuery.get(jQuery(optionsPane).find("a.preview-watermark").attr("href"), { action: 'wpthumb_wm_watermark_preview_image', position: position, padding: padding, image_id: jQuery(optionsPane).attr('rel') },
-    		function(data){
-    			jQuery(optionsPane).next(".wm-watermark-preview").html(data).show();
-    		});
-    	}
-
-    </script>
-
-    <style>
-    	/* .A1B1 input[type=button] { display: none; } */
-    	.watermark { border: 1px solid #1B77AD; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; overflow: hidden; padding: 0 10px; }
-    	.wm-watermark-options { width: 230px; font-size: 11px; float: left; }
-    	.wm-watermark-preview { width: 205px; float: left; text-align: center; line-height: 180%; margin-top: 20px; }
-    	.wm-watermark-options label { font-size: 11px; }
-    	.wm-watermark-preview img { padding: 3px; border: 1px solid #a1a1a1; }
-    	.wm-watermark-preview a {font-size: 11px; text-decoration: none; }
-    	.wm-loading { line-height: 16px; text-align: center; width: 120px; background: url(<?php echo get_bloginfo('url') . '/wp-admin/images/loading.gif' ?>) no-repeat; padding-left: 20px; padding-top: 1px; padding-bottom: 2px; font-size: 11px; color: #999; }
-    </style>
-
-<?php }
-add_action( 'admin_head-media-upload-popup', 'wpthumb_wm_add_scripts' );
-
-/**
- * wpthumb_wm_add_watermark_button function.
- *
- * @access public
- * @param mixed $form_fields
- * @param mixed $media
- * @return null
- */
-function wpthumb_wm_add_watermark_button( $form_fields, $media ) {
-
-    if ( !isset( $form_fields['buttons'] ) || !strpos( $form_fields['buttons']['tr'], 'Set as Post Image' ) )
-    	return $form_fields;
-
-    $button = '<a class="button add-watermark" rel="' . $media->ID . '">' . (wpthumb_wm_image_has_watermark($media->ID) ? 'Edit' : 'Add') .' Watermark</a>';
-    $form_fields['buttons']['tr'] = substr( $form_fields['buttons']['tr'], 0, strlen($form_fields['buttons']['tr']) - 11) . $button . '</td></tr>';
-    $form_fields['buttons']['tr'] .= '
-    	<tr style="display:none"><td></td><td>
-    		<div class="watermark">
-    		<div rel="' . $media->ID . '" class="wm-watermark-options">
-    			<p><label>
-    				<input class="wpthumb_wm_use_watermark" ' . (wpthumb_wm_image_has_watermark( $media->ID ) ? 'checked="checked"' : '') . ' type="checkbox" name="wpthumb_wm_use_watermark[' . $media->ID . ']" />
-    				<strong>Apply watermark</strong>
-    			</label></p>
-    			<p><label>Positition</label>
-    				<select class="wpthumb_wm_watermark_position" name="wpthumb_wm_watermark_position[' . $media->ID . ']">
-    					<option ' . ( wpthumb_wm_position($media->ID) == 'top-left' ? 'selected="selected"' : '' ) .' value="top-left">Top Left</option>
-    					<option ' . ( wpthumb_wm_position($media->ID) == 'top-right' ? 'selected="selected"' : '' ) .' value="top-right">Top Right</option>
-    					<option ' . ( wpthumb_wm_position($media->ID) == 'bottom-left' ? 'selected="selected"' : '' ) .' value="bottom-left">Bottom Left</option>
-    					<option ' . ( wpthumb_wm_position($media->ID) == 'bottom-left' ? 'selected="selected"' : '' ) .' value="bottom-right">Bottom Right</option>
-    				</select>
-    			</p>
-    			<p><label>Padding</label>
-    				<input class="wpthumb_wm_watermark_padding" type="text" value="' . wpthumb_wm_padding($media->ID) . '" style="width:30px" name="wpthumb_wm_watermark_padding[' . $media->ID . ']">px
-    			</p>
-    			<p><small>Padding (or gutter) is the space that the watermark appears from the edge of the image</small><br /></p>
-    			<p class="clear clearfix">
-    				<input type="submit" name="afp_post_image[' . $media->ID . ']" class="button-primary" value="Add Watermark"> <a href="' . str_replace( ABSPATH, get_bloginfo('url') . '/', dirname( __FILE__ )) . '/watermark-actions.php' . '" class="button preview-watermark">Preview</a> | <a href="" class="cancel-watermark">Cancel</a>
-    			</p>
-    		</div>
-    		<div class="wm-watermark-preview">
-    		</div>
-    		</div>
-    	</td></tr>';
-    return $form_fields;
-}
-add_filter( 'attachment_fields_to_edit', 'wpthumb_wm_add_watermark_button', 100, 2 );
-
-/**
- * wpthumb_wm_watermark_preview_image function.
- *
- * @access public
- * @param mixed $position
- * @param mixed $padding
- * @param mixed $image_id
- * @return string
- */
-function wpthumb_wm_watermark_preview_image( $position, $padding, $image_id ) {
-
-    $image = get_attached_file($image_id);
-    $watermark = array();
-    $watermark['mask'] = get_template_directory() . '/images/watermark.png';
-
-    if ( $position == 'top-left' )
-    	$watermark['position'] = 'lt';
-
-    if ( $position == 'top-right' )
-    	$watermark['position'] = 'rt';
-
-    if ( $position == 'bottom-left' )
-    	$watermark['position'] = 'lb';
-
-    if ( $position == 'bottom-right' )
-    	$watermark['position'] = 'rb';
-
-    $watermark['padding'] = (int) $padding;
-    $watermark['pre_resize'] = true;
-
-    return '<img src="' . wpthumb( $image, 200, 0, false, true, $watermark, false ) . '" /><a target="_blank" href="' . wpthumb( $image, 1000, 0, false, true, $watermark, false ) . '">View Large</a>';
-}
-
-/**
- * wpthumb_wm_image_has_watermark function.
- *
- * @access public
- * @param mixed $image_id
- * @return null
- */
-function wpthumb_wm_image_has_watermark( $image_id ) {
-    return (bool) get_post_meta( $image_id, 'use_watermark', true );
-}
-
-/**
- * wpthumb_wm_position function.
- *
- * @access public
- * @param mixed $image_id
- * @return null
- */
-function wpthumb_wm_position( $image_id ) {
-    return get_post_meta( $image_id, 'wpthumb_wm_position', true );
-}
-
-/**
- * wpthumb_wm_padding function.
- *
- * @access public
- * @param mixed $image_id
- * @return null
- */
-function wpthumb_wm_padding( $image_id ) {
-    return (int) get_post_meta( $image_id, 'wpthumb_wm_padding', true );
-}
-
-/**
- * wpthumb_wm_get_options function.
- *
- * @access public
- * @param mixed $id
- * @return array
- */
-function wpthumb_wm_get_options( $id ) {
-
-    if ( !wpthumb_wm_image_has_watermark( $id ) )
-    	return array();
-
-    $options['mask'] = get_template_directory() . '/images/watermark.png';
-    $options['padding'] = wpthumb_wm_padding($id);
-    $position = wpthumb_wm_position( $id );
-
-    if ( $position == 'top-left' )
-    	$options['position'] = 'lt';
-
-    if ( $position == 'top-right' )
-    	$options['position'] = 'rt';
-
-    if ( $position == 'bottom-left' )
-    	$options['position'] = 'lb';
-
-    if ( $position == 'bottom-right' )
-    	$options['position'] = 'rb';
-
-    $options['pre_resize'] = true;
-
-    return $options;
-}
 
 /**
  * Removes a dir tree. I.e. recursive rmdir
