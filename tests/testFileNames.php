@@ -157,4 +157,25 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$this->assertFalse( strpos( $image->getCacheFilePath(), '//' ) );
 	
 	}
+	
+	function testMultipleRemotePathCacheFileNames() {
+	
+		$files = array( 
+			
+			'https://fbcdn-profile-a.akamaihd.net/hprofile-ak-snc4/276941_243774452360675_675769393_n.jpg',
+			'https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/372773_166158836814274_569429670_n.jpg',
+			'https://fbcdn-profile-a.akamaihd.net/hprofile-ak-snc4/372977_301165979915058_1266923901_n.jpg',
+			'https://fbcdn-profile-a.akamaihd.net/hprofile-ak-snc4/373643_305978336102241_1099286630_n.jpg'
+			
+		);
+		
+		$wp_thumb_files = array();
+		
+		foreach ( $files as $url ) {
+		
+			$url = wpthumb( $url, 'width=100&crop=1&height=100' );
+			$this->assertNotContains( $url, $wp_thumb_files );
+		}
+	
+	}
 }
