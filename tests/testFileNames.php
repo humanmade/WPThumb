@@ -111,7 +111,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 			$this->markTestSkipped( 'Only runs on a MultiSite setup' );
 	
 		// For this test we need to change the upload URL to something other than uplaod path
-		add_filter( 'upload_dir', function( $args ) {
+		add_filter( 'upload_dir', $f = function( $args ) {
 			$args['url'] = str_replace( 'wp-content/uploads', 'files', $args['url'] );
 			$args['baseurl'] = str_replace( 'wp-content/uploads', 'files', $args['baseurl'] );
 			
@@ -132,7 +132,8 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$image = new WP_Thumb( $test_url, 'width=50&height=50&crop=1' );
 		
 		$this->assertEmpty( $image->error );
-	
+		
+		remove_filter( 'upload_dir', $f );
 	}
 	
 	function testGifIsConvertedToPNGInCacheFileName() {
