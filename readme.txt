@@ -5,11 +5,11 @@ Requires at least: 3.0
 Tested up to: 3.2.1
 Stable tag: 0.6
 
-Gallery and Portfolio management for your WordPress site. 
+An on-demand image generation replacement for WordPress' image resizing.
 
 == Description ==
 
-WPThumb is a simple plugin that makes use of the PHPThumb library. It seamlessly intergrates with the wordpress image functions. You can specify height, width and crop values, and an image will be generated, which is then cached for future use. 
+WP Thumb is a simple plugin that makes use of the PHPThumb library. It seamlessly intergrates with the WordPress image functions. You can specify height, width and crop values, and an image will be generated, which is then cached for future use. 
 
 = Features =
 
