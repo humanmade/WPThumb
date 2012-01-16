@@ -3,7 +3,7 @@ Contributors: humanmade, joehoyle, mattheu, tcrsavage, willmot
 Tags: image resize
 Requires at least: 3.0
 Tested up to: 3.2.1
-Stable tag: trunk
+Stable tag: 0.6
 
 Gallery and Portfolio management for your WordPress site. 
 
