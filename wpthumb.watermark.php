@@ -33,7 +33,10 @@ function wpthumb_get_image_with_scaled_watermark( $id = null, $image_args = arra
 		$args['watermark_options']['original_image_height'] = $original_image_height;
 		$args['watermark_options']['pre_resize'] = true;
 				
-		return wpthumb( get_attached_file( $id ), $args );
+		$orig = new WP_Thumb( get_attached_file( $id ), 'width=600&height=900' );
+		
+		return wpthumb( $orig->getCacheFilePath(), $args );
+
 	}
 }
 
