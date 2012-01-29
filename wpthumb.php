@@ -31,6 +31,17 @@ define( 'WP_THUMB_URL', str_replace( ABSPATH, site_url( '/' ), WP_THUMB_PATH ) )
 
 // TODO wpthumb_create_args_from_size filter can pass string or array which makes it difficult to hook into
 
+// Don't activate on anything less than PHP 5.2.4
+if ( version_compare( phpversion(), '5.2.4', '<' ) ) {
+
+	require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+	deactivate_plugins( WP_THUMB_PATH . '/plugin.php' );
+
+	if ( isset( $_GET['action'] ) && ( $_GET['action'] == 'activate' || $_GET['action'] == 'error_scrape' ) )
+		die( __( 'WP Thumb requires PHP version 5.2.4 or greater.', 'wpthumb' ) );
+
+}
+
 // Load the watermarking class
 include_once( WP_THUMB_PATH . '/wpthumb.watermark.php' );
 
