@@ -19,6 +19,10 @@ WP Thumb is a simple plugin that makes use of the PHPThumb library. It seamlessl
 
 == Changelog ==
 
+#### 0.8
+
+* Don't activate on less than PHP 5.2.4
+
 #### 0.7
 
 * Fix some issues with resizing gifs
