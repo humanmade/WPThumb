@@ -629,14 +629,6 @@ add_filter( 'attachment_fields_to_save', 'wpthumb_media_form_crop_position_save'
  */
 function wpthumb( $url, $args = array() ) {
 
-	// TODO we duplicate this in the wpthumb class
-    if ( ! class_exists( 'PhpThumbFactory' ) )
-    	include_once( dirname( __FILE__ ) . '/phpthumb/src/ThumbLib.inc.php' );
-
-	// TODO this seems uneeded
-    if ( ! class_exists( 'phpThumbFactory' ) && error_log( 'phpThumbFactory class not found.' ) )
-        return $url;
-
     // Check if is using legacy args
     if ( is_numeric( $args ) )
     	$legacy_args = array_combine( array_slice( array( 'width', 'height', 'crop', 'resize' ), 0, count( array_slice( func_get_args(), 1 ) ) ), array_slice( func_get_args(), 1, 4 ) );
