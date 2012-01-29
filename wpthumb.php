@@ -339,30 +339,6 @@ class WP_Thumb {
 
 		extract( $this->args );
 
-		// Convert gif images to png before resizing
-    	if ( $this->getFileExtension() == 'gif' ) :
-
-    		// Don't resize animated gifs as the animations will be broken
-    		if ( ! empty( $resize_animations ) !== true && $this->isAnimatedGif() ) {
-
-    			$this->error = new WP_Error( 'animated-gif' );
-
-    			return $this->returnImage();
-
-    		}
-
-			wp_mkdir_p( $this->getCacheFileDirectory() );
-
-    		// Save the converted image
-    		$thumb->save( $new_filepath, 'png' );
-
-    		unset( $thumb );
-
-    		// Pass the new file back through the function so they are resized
-    		return wpthumb( $new_filepath . '.png', $this->args );
-
-    	endif;
-
     	// Watermarking (pre resizing)
     	if ( isset( $watermark_options['mask'] ) && $watermark_options['mask'] && isset( $watermark_options['pre_resize'] ) && $watermark_options['pre_resize'] === true ) {
 

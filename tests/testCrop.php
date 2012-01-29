@@ -24,6 +24,28 @@ class WPThumbCropTestCase extends WP_UnitTestCase {
 	
 	}
 	
+	function testCropStandardGif() {
+	
+		$path = dirname( __FILE__ ) . '/images/google.gif';
+		list( $width, $height ) = getimagesize( $path );
+		
+		$this->assertNotNull( $width );
+		$this->assertNotNull( $height );
+				
+		$image = new WP_Thumb( $path, "width=80&height=80&crop=1&resize=0&cache=0&return=path" );
+		
+		$file = $image->returnImage();
+		
+		$this->assertContains( '/cache/', $file );
+		$this->assertContains( ABSPATH, $file );
+		
+		list( $new_width, $new_height ) = getimagesize( $file );
+		
+		$this->assertEquals( $new_width, 80, 'Width is not expected' );
+		$this->assertEquals( $new_height, 80, 'Height is not expcted' );
+	
+	}
+	
 	function testCropLargerThanSourceImage() {
 	
 		$path = dirname( __FILE__ ) . '/images/google.png';
