@@ -5,7 +5,7 @@ Plugin Name: WP Thumb
 Plugin URI: https://github.com/humanmade/WPThumb
 Description: An on-demand image generation replacement for WordPress' image resizing.
 Author: Human Made Limited
-Version: 0.6
+Version: 0.7
 Author URI: http://www.hmn.md/
 */
 
@@ -75,7 +75,7 @@ class WP_Thumb {
 		if ( $args )
 			$this->setArgs( $args );
 
-		if ( $file_path && $args && ( ! file_exists( $this->getCacheFilePath() ) || ! $this->args['cache'] ) )
+		if ( $this->getFilePath() && $this->getArgs() && ( ! file_exists( $this->getCacheFilePath() ) || ! $this->args['cache'] ) )
 			$this->generateCacheFile();
 
 	}
@@ -118,14 +118,15 @@ class WP_Thumb {
     		'crop_from_position' 	=> 'center,center',
     		'resize'				=> true,
     		'watermark_options' 	=> array(),
-    		'cache'					=> true,
+    		'cache'					=> false,
     		'skip_remote_check' 	=> false,
     		'default'				=> null,
     		'jpeg_quality' 			=> 80,
     		'resize_animations' 	=> true,
     		'return' 				=> 'url',
     		'custom' 				=> false,
-    		'background_fill'		=> null
+    		'background_fill'		=> null,
+    		'output_file'			=> false
     	);
 
     	$args = wp_parse_args( $args, $arg_defaults );
@@ -192,6 +193,22 @@ class WP_Thumb {
 	}
 
 	/**
+	 * Get a specific arg
+	 *
+	 * @access public
+	 * @param string $arg
+	 * @return bool
+	 */
+	public function getArg( $arg ) {
+
+		if ( isset( $this->args[$arg] ) )
+			return $this->args[$arg];
+
+		return false;
+
+	}
+
+	/**
 	 * Get the extension of the original image
 	 *
 	 * @todo should use pathinfo
@@ -239,6 +256,9 @@ class WP_Thumb {
 	 * @return string
 	 */
 	public function getCacheFileDirectory() {
+
+		if ( $this->getArg( 'output_file' ) )
+			return dirname( $this->getArg( 'output_file' ) );
 
 		$path = $this->getFilePath();
 
@@ -293,6 +313,9 @@ class WP_Thumb {
 	 */
 	public function getCacheFileName() {
 
+		if ( $this->getArg( 'output_file' ) )
+			return basename( $this->getArg( 'output_file' ) );
+
 		$path = $this->getFilePath();
 
 		if ( ! $path )
@@ -339,6 +362,30 @@ class WP_Thumb {
 
 		extract( $this->args );
 
+		wp_mkdir_p( $this->getCacheFileDirectory() );
+
+		// Convert gif images to png before resizing
+    	if ( $this->getFileExtension() == 'gif' ) :
+
+    		// Don't resize animated gifs as the animations will be broken
+    		if ( ! empty( $resize_animations ) !== true && $this->isAnimatedGif() ) {
+
+    			$this->error = new WP_Error( 'animated-gif' );
+
+    			return $this->returnImage();
+
+    		}
+
+    		// Save the converted image
+    		$thumb->save( $new_filepath, 'png' );
+
+    		unset( $thumb );
+
+    		// Pass the new file back through the function so they are resized
+    		return new WP_Thumb( $new_filepath, array_merge( $this->args, array( 'output_file' => $new_filepath, 'cache' => false ) ) );
+
+    	endif;
+
     	// Watermarking (pre resizing)
     	if ( isset( $watermark_options['mask'] ) && $watermark_options['mask'] && isset( $watermark_options['pre_resize'] ) && $watermark_options['pre_resize'] === true ) {
 
@@ -379,9 +426,6 @@ class WP_Thumb {
     	// Watermarking (post resizing)
     	if ( isset( $watermark_options['mask'] ) && $watermark_options['mask'] && isset( $watermark_options['pre_resize'] ) && $watermark_options['pre_resize'] === false )
     		$thumb->createWatermark($watermark_options['mask'], $watermark_options['position'], $watermark_options['padding']);
-
-		// TODO we could call this above the gif and remove the call in gif
-		wp_mkdir_p( $this->getCacheFileDirectory() );
 
     	$thumb->save( $new_filepath );
 

@@ -3,7 +3,7 @@ Contributors: humanmade, joehoyle, mattheu, tcrsavage, willmot
 Tags: image, resize, thumbnail, crop, phpthumb
 Requires at least: 3.0
 Tested up to: 3.3.1
-Stable tag: 0.6
+Stable tag: 0.7
 
 An on-demand image generation replacement for WordPress' image resizing.
 
@@ -19,22 +19,35 @@ WP Thumb is a simple plugin that makes use of the PHPThumb library. It seamlessl
 
 == Changelog ==
 
-=0.5=
+#### 0.7
+
+* Fix some issues with resizing gifs
+* Unit tests for cropping gifs
+* Improved code formatting and commenting
+* Pipe `STDERR` to `dev/null` in phpthumb `exec` so that error_log isn't polluted with checks for ImageMagick
+* Fix some readme layout issues
+
+#### 0.5
+
 * Added more tests
 * Fix minor bugs
 
-=0.4=
+#### 0.4
+
 * Rewrote core functionality to use a Class
 * Added 22 Unit Tests (can be run using WP Unit)
 
-=0.3=
+#### 0.3
+
 * Ability to extend functionality using filters to manipulate image object.
 
-=0.2=
+#### 0.2
+
 * Add some error messages and try to prevent some conflicts with our other plugins. 
 * Swap Joe Hoyles helper for HM Core.
 
-= 0.1 =
+#### 0.1
+
 * Add Joe Hoyles helper. 
 
 == Installation ==
