@@ -92,6 +92,19 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 
 	}
 	
+	function testFileWithPathNoExtension() {
+	
+		$path = dirname( __FILE__ ) . '/images/google';
+		
+		$image = new WP_Thumb;
+		$image->setFilePath( $path );
+		
+		$this->assertNull( $image->error );
+		$this->assertContains( ABSPATH, $image->getCacheFileDirectory() );
+		$this->assertEquals( 'jpg', $image->getFileExtension() );
+
+	}
+	
 	function testFileWithLocalURL() {
 	
 		$path = dirname( __FILE__ ) . '/images/google.png';

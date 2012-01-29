@@ -118,7 +118,7 @@ class WP_Thumb {
     		'crop_from_position' 	=> 'center,center',
     		'resize'				=> true,
     		'watermark_options' 	=> array(),
-    		'cache'					=> false,
+    		'cache'					=> true,
     		'skip_remote_check' 	=> false,
     		'default'				=> null,
     		'jpeg_quality' 			=> 80,
@@ -180,7 +180,7 @@ class WP_Thumb {
 		if ( strpos( $this->file_path, '/' ) === 0 && ! file_exists( $this->file_path ) && $this->args['default'] )
 			$this->file_path = $this->args['default'];
 
-		return $this->file_path;
+		return reset( explode( '?', $this->file_path ) );
 	}
 
 	/**
@@ -211,21 +211,14 @@ class WP_Thumb {
 	/**
 	 * Get the extension of the original image
 	 *
-	 * @todo should use pathinfo
 	 * @return string
 	 */
 	public function getFileExtension() {
 
-		$path = $this->getFilePath();
+		$ext = pathinfo( $this->getFilePath(), PATHINFO_EXTENSION );
 
-		$ext = strtolower( end( explode( '.', $path ) ) );
-
-		// Remove a query string if there is one
-    	$ext = reset( explode( '?', $ext ) );
-
-    	if ( strlen( $ext ) > 4 ) {
+    	if ( ! $ext ) {
     		// Seems like we dont have an ext, lets guess at JPG
-    		// TODO this isn't very nice
 			$ext = 'jpg';
     	}
 
@@ -265,8 +258,7 @@ class WP_Thumb {
 		if ( ! $path )
 			return '';
 
-		// TODO use basename
-		$original_filename = end( explode( '/', $this->getFilePath() ) );
+		$original_filename = basename( $this->getFilePath() );
 
     	// If the image was remote, we want to store them in the remote images folder, not it's name
     	if ( strpos( $original_filename, '0_0_resize' ) === 0 )
