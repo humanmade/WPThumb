@@ -75,7 +75,9 @@ class WP_Thumb {
 		if ( $args )
 			$this->setArgs( $args );
 
-		if ( $this->getFilePath() && $this->getArgs() && ( ! file_exists( $this->getCacheFilePath() ) || ! $this->args['cache'] ) )
+		$dimensions = array_slice( (array) @getimagesize( $this->getFilePath() ), 0, 2 );
+
+		if ( ( $this->getArg( 'width' ) != $dimensions[0] || $this->getArg( 'height' ) != $dimensions[1] ) && $this->getFilePath() && $this->getArgs() && ( ! file_exists( $this->getCacheFilePath() ) || ! $this->args['cache'] ) )
 			$this->generateCacheFile();
 
 	}
@@ -118,7 +120,7 @@ class WP_Thumb {
     		'crop_from_position' 	=> 'center,center',
     		'resize'				=> true,
     		'watermark_options' 	=> array(),
-    		'cache'					=> true,
+    		'cache'					=> false,
     		'skip_remote_check' 	=> false,
     		'default'				=> null,
     		'jpeg_quality' 			=> 80,
@@ -446,7 +448,9 @@ class WP_Thumb {
 	 */
 	public function returnImage() {
 
-		if ( ! empty( $this->error ) )
+		$dimensions = array_slice( (array) @getimagesize( $this->getFilePath() ), 0, 2 );
+
+		if ( ! empty( $this->error ) || ( $this->getArg( 'width' ) == $dimensions[0] && $this->getArg( 'height' ) == $dimensions[1] ) )
 			$path = $this->getFilePath();
 
 		else
