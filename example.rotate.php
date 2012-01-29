@@ -1,12 +1,14 @@
 <?php
-/*
-Plugin Name: WPThumb-rotator
-Plugin URI: https://github.com/humanmade/WPThumb
-Description: Extends WPThumb to rotate the image. 
-Author: humanmade limited, Matthew Haines-Young
-Version: 0.1
-Author URI: http://www.humanmade.co.uk/
-*/
+
+/* Example plugin that extends the functionality of WP Thumb
+ *
+ * \Plugin Name: WPThumb-rotator
+ * \Plugin URI: https://github.com/humanmade/WPThumb
+ * \Description: Extends WPThumb to rotate the image. 
+ * \Author: Human Made Limited
+ * \Version: 0.1
+ * \Author URI: http://www.humanmade.co.uk/
+ */
 
 // This makes use of filters in WPThumb that allow you to manipulate the image object using any of the phpThumb functions.
 // In this case - I have set a custom argument when calling the attachment eg wp_get_attachment_image( $id ,array( 'thumbnail', 'custom' => 'rotator' ));
