@@ -9,11 +9,11 @@ An on-demand image generation replacement for WordPress' image resizing.
 
 == Description ==
 
-WP Thumb is a simple plugin that makes use of the PHPThumb library. It seamlessly intergrates with the WordPress image functions. You can specify height, width and crop values, and an image will be generated, which is then cached for future use. 
+WP Thumb is a simple plugin that makes use of the PHPThumb library. It seamlessly intergrates with the WordPress image functions. You can specify height, width and crop values, and an image will be generated, which is then cached for future use.
 
 = Features =
 
-* Automatic images resizing, cropping and caching. 
+* Automatic images resizing, cropping and caching.
 * Ideal for when you want to change the dimensions of default image sizes.
 * Can extend using filters to make use of any of the phpThumb Library functions by manipulating the image object.
 
@@ -26,6 +26,7 @@ WP Thumb is a simple plugin that makes use of the PHPThumb library. It seamlessl
 * Improved code formatting and commenting
 * Pipe `STDERR` to `dev/null` in phpthumb `exec` so that error_log isn't polluted with checks for ImageMagick
 * Fix some readme layout issues
+* Don't resize if image is already correct dimensions, + unit test
 
 #### 0.5
 
@@ -43,12 +44,12 @@ WP Thumb is a simple plugin that makes use of the PHPThumb library. It seamlessl
 
 #### 0.2
 
-* Add some error messages and try to prevent some conflicts with our other plugins. 
+* Add some error messages and try to prevent some conflicts with our other plugins.
 * Swap Joe Hoyles helper for HM Core.
 
 #### 0.1
 
-* Add Joe Hoyles helper. 
+* Add Joe Hoyles helper.
 
 == Installation ==
 
