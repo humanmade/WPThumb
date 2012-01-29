@@ -120,7 +120,7 @@ class WP_Thumb {
     		'crop_from_position' 	=> 'center,center',
     		'resize'				=> true,
     		'watermark_options' 	=> array(),
-    		'cache'					=> false,
+    		'cache'					=> true,
     		'skip_remote_check' 	=> false,
     		'default'				=> null,
     		'jpeg_quality' 			=> 80,
