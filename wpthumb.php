@@ -252,7 +252,7 @@ class WP_Thumb {
 		if ( ! $path )
 			return '';
 
-	    return apply_filters( 'wpthumb_cache_file_path', trailingslashit( $this->getCacheFileDirectory() ) . $this->getCacheFileName() );
+	    return apply_filters( 'wpthumb_cache_file_path', trailingslashit( $this->getCacheFileDirectory() ) . $this->getCacheFileName(), $this );
 
 	}
 
