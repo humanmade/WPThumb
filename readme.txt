@@ -3,7 +3,7 @@ Contributors: humanmade, joehoyle, mattheu, tcrsavage, willmot
 Tags: image, resize, thumbnail, crop, phpthumb
 Requires at least: 3.0
 Tested up to: 3.3.1
-Stable tag: 0.7
+Stable tag: 0.8
 
 An on-demand image generation replacement for WordPress' image resizing.
 
