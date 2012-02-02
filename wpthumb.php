@@ -252,7 +252,7 @@ class WP_Thumb {
 		if ( ! $path )
 			return '';
 
-	    return trailingslashit( $this->getCacheFileDirectory() ) . $this->getCacheFileName();
+	    return apply_filters( 'wpthumb_cache_file_path', trailingslashit( $this->getCacheFileDirectory() ) . $this->getCacheFileName() );
 
 	}
 
@@ -383,7 +383,10 @@ class WP_Thumb {
 
     		// Save the converted image
     		$thumb->save( $new_filepath, 'png' );
-
+                
+                // tell everone
+		do_action( 'wpthumb_save_file', $new_filepath, $this );
+		
     		unset( $thumb );
 
     		// Pass the new file back through the function so they are resized
@@ -722,7 +725,9 @@ function wpthumb_post_image( $null, $id, $args ) {
 
     if ( empty( $path ) )
     	$path = get_attached_file( $id );
-
+    	
+    $path = apply_filters( 'wpthumb_post_image_path', $path, $id, $args );
+        
 	$image = new WP_Thumb( $path, $args );
 
     $args = $image->getArgs();
