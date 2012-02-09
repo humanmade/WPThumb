@@ -85,11 +85,21 @@ class WP_Thumb {
 
 		if ( $args )
 			$this->setArgs( $args );
-
-		$dimensions = array_slice( (array) @getimagesize( $this->getFilePath() ), 0, 2 );
-
-		if ( ( $this->getArg( 'width' ) != $dimensions[0] || $this->getArg( 'height' ) != $dimensions[1] ) && $this->getFilePath() && $this->getArgs() && ( ! file_exists( $this->getCacheFilePath() ) || ! $this->args['cache'] ) )
-			$this->generateCacheFile();
+		
+		if ( $this->getFilePath() && $this->getArgs() ) {
+		
+			if ( ! $this->isRemote() ) {
+				$dimensions = array_slice( (array) @getimagesize( $this->getFilePath() ), 0, 2 );
+			
+				if ( ( $this->getArg( 'width' ) != $dimensions[0] || $this->getArg( 'height' ) != $dimensions[1] ) && ( ! file_exists( $this->getCacheFilePath() ) || ! $this->args['cache'] ) )
+					$this->generateCacheFile();
+					
+			} elseif ( ! file_exists( $this->getCacheFilePath() ) || ! $this->args['cache'] ) {
+				
+				$this->generateCacheFile();
+			
+			}
+		}
 
 	}
 
@@ -336,6 +346,12 @@ class WP_Thumb {
     	return $serialize . '.' . $this->getFileExtension();
 
 	}
+	
+	public function isRemote() {
+
+		return strpos( $this->getFilePath(), ABSPATH ) !== 0;
+	
+	}
 
 	/**
 	 * Generate the new cache file using the original image and args
@@ -344,6 +360,9 @@ class WP_Thumb {
 	 */
 	public function generateCacheFile() {
 
+		// Performance testing
+		do_action( 'start_operation', 'generateCacheFile' );
+		
 		$new_filepath = $this->getCacheFilePath();
 		$file_path = $this->getFilePath();
 
@@ -358,7 +377,8 @@ class WP_Thumb {
     	} catch ( Exception $e ) {
 
     		$this->error = $e;
-
+			
+			do_action( 'end_operation', 'generateCacheFile' );
     		return $this->returnImage();
 
     	}
@@ -376,7 +396,8 @@ class WP_Thumb {
     		if ( ! empty( $resize_animations ) !== true && $this->isAnimatedGif() ) {
 
     			$this->error = new WP_Error( 'animated-gif' );
-
+				
+				do_action( 'end_operation', 'generateCacheFile' );
     			return $this->returnImage();
 
     		}
@@ -388,7 +409,9 @@ class WP_Thumb {
 		do_action( 'wpthumb_save_file', $new_filepath, $this );
 		
     		unset( $thumb );
-
+			
+			do_action( 'end_operation', 'generateCacheFile' );
+			
     		// Pass the new file back through the function so they are resized
     		return new WP_Thumb( $new_filepath, array_merge( $this->args, array( 'output_file' => $new_filepath, 'cache' => false ) ) );
 
@@ -439,6 +462,8 @@ class WP_Thumb {
 
     	// Destroy the image
     	unset( $thumb );
+    	
+    	do_action( 'end_operation', 'generateCacheFile' );
 
 	}
 
@@ -461,14 +486,32 @@ class WP_Thumb {
 	 * @return null
 	 */
 	public function returnImage() {
+		
+		do_action( 'start_operation', 'getimagesize' );
 
-		$dimensions = array_slice( (array) @getimagesize( $this->getFilePath() ), 0, 2 );
-
-		if ( ! empty( $this->error ) || ( $this->getArg( 'width' ) == $dimensions[0] && $this->getArg( 'height' ) == $dimensions[1] ) )
+		if ( ! empty( $this->error ) ) {
+		
 			$path = $this->getFilePath();
+		
+		} else {
 
-		else
-			$path = $this->getCacheFilePath();
+			if ( ! $this->isRemote() ) {
+				
+				if ( ( $dimensions = array_slice( (array) @getimagesize( $this->getFilePath() ), 0, 2 ) ) && $this->getArg( 'width' ) == $dimensions[0] && $this->getArg( 'height' ) == $dimensions[1] )
+					$path = $this->getFilePath();
+				
+				else
+					$path = $this->getCacheFilePath();
+					
+			} else {
+			
+				$path = $this->getCacheFilePath();
+			
+			}
+		
+		}
+
+		do_action( 'end_operation', 'getimagesize' );
 
 		if ( $this->args['return'] == 'path' )
 			return $path;
