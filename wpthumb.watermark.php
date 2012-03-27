@@ -328,7 +328,7 @@ function wpthumb_media_form_watermark( $fields, $post ) {
     		    		// if this was the featured image, lets call an update on the post thumbnail
     		    		// so it shows the watermark in the Featured Image box
     		    		var win = window.dialogArguments || opener || parent || top;
-    		    		<?php if ( get_post_thumbnail_id( $calling_post_id ) ) : ?>
+    		    		<?php if ( function_exists( 'get_post_thumbnail_id' ) && get_post_thumbnail_id( $calling_post_id ) ) : ?>
     		    			if ( jQuery(optionsPane).attr("rel") == <?php echo get_post_thumbnail_id( $calling_post_id ) ?> )
 	    		    			win.WPSetThumbnailHTML( data );
 	    		    	<?php endif; ?>
