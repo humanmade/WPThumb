@@ -9,7 +9,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$image = new WP_Thumb;
 		$image->setFilePath( $path );
 
-		$this->assertNull( $image->error );
+		$this->assertFalse( $image->errored() );
 		$this->assertContains( 'google', $image->getCacheFilePath() );
 
 		$this->assertEquals( 'png', $image->getFileExtension() );
@@ -23,7 +23,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$image = new WP_Thumb;
 		$image->setFilePath( $path );
 
-		$this->assertNull( $image->error );
+		$this->assertFalse( $image->errored() );
 		$this->assertContains( ABSPATH, $image->getCacheFileDirectory() );
 	}
 
@@ -34,7 +34,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$image = new WP_Thumb;
 		$image->setFilePath( $path );
 
-		$this->assertNull( $image->error );
+		$this->assertFalse( $image->errored() );
 		$this->assertContains( ABSPATH, $image->getCacheFileDirectory() );
 		$this->assertContains( 'remote', $image->getCacheFileDirectory() );
 	}
@@ -46,7 +46,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$image = new WP_Thumb;
 		$image->setFilePath( $path );
 
-		$this->assertNull( $image->error );
+		$this->assertFalse( $image->errored() );
 		$this->assertContains( ABSPATH, $image->getCacheFileDirectory() );
 		$this->assertContains( 'remote', $image->getCacheFileDirectory() );
 		$this->assertEquals( 'jpg', $image->getFileExtension() );
@@ -60,7 +60,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$image = new WP_Thumb;
 		$image->setFilePath( $path );
 
-		$this->assertNull( $image->error );
+		$this->assertFalse( $image->errored() );
 		$this->assertContains( ABSPATH, $image->getCacheFileDirectory() );
 		$this->assertNotContains( '~', $image->getCacheFileDirectory() );
 
@@ -73,7 +73,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$image = new WP_Thumb;
 		$image->setFilePath( $path );
 
-		$this->assertNull( $image->error );
+		$this->assertFalse( $image->errored() );
 		$this->assertContains( home_url(), $image->getCacheFileURL() );
 		$this->assertNotContains( '.', str_replace( array( home_url(), '.' . $image->getFileExtension() ), array( '', '' ), $image->getCacheFileURL() ) );
 
@@ -86,7 +86,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$image = new WP_Thumb;
 		$image->setFilePath( $path );
 
-		$this->assertNull( $image->error );
+		$this->assertFalse( $image->errored() );
 		$this->assertContains( ABSPATH, $image->getCacheFileDirectory() );
 		$this->assertEquals( 'png', $image->getFileExtension() );
 
@@ -99,7 +99,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$image = new WP_Thumb;
 		$image->setFilePath( $path );
 
-		$this->assertNull( $image->error );
+		$this->assertFalse( $image->errored() );
 		$this->assertContains( ABSPATH, $image->getCacheFileDirectory() );
 		$this->assertEquals( 'jpg', $image->getFileExtension() );
 
@@ -113,7 +113,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$image = new WP_Thumb;
 		$image->setFilePath( $url );
 
-		$this->assertNull( $image->error );
+		$this->assertFalse( $image->errored() );
 		$this->assertEquals( $path, $image->getFilePath() );
 
 	}
@@ -144,7 +144,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 
 		$image = new WP_Thumb( $test_url, 'width=50&height=50&crop=1' );
 
-		$this->assertEmpty( $image->error );
+		$this->assertFalse( $image->errored() );
 
 		remove_filter( 'upload_dir', $f );
 	}
@@ -157,7 +157,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$image = new WP_Thumb;
 		$image->setFilePath( $path );
 
-		$this->assertNull( $image->error );
+		$this->assertFalse( $image->errored() );
 		$this->assertEquals( end( explode( '.', $image->getCacheFileName() ) ), 'png' );
 
 	}
@@ -175,10 +175,9 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 
 		$files = array(
 
-			'https://fbcdn-profile-a.akamaihd.net/hprofile-ak-snc4/276941_243774452360675_675769393_n.jpg',
-			'https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/372773_166158836814274_569429670_n.jpg',
-			'https://fbcdn-profile-a.akamaihd.net/hprofile-ak-snc4/372977_301165979915058_1266923901_n.jpg',
-			'https://fbcdn-profile-a.akamaihd.net/hprofile-ak-snc4/373643_305978336102241_1099286630_n.jpg'
+			'http://fbcdn-profile-a.akamaihd.net/hprofile-ak-snc4/276941_243774452360675_675769393_n.jpg',
+			'http://fbcdn-profile-a.akamaihd.net/hprofile-ak-snc4/372977_301165979915058_1266923901_n.jpg',
+			'http://fbcdn-profile-a.akamaihd.net/hprofile-ak-snc4/373643_305978336102241_1099286630_n.jpg'
 
 		);
 
@@ -199,9 +198,9 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 
 		$dimensions = getimagesize( $path );
 
-		$image = new WP_Thumb( $path, array( 'width' => $dimensions[0], 'height' => $dimensions[1] ) );
+		$image = new WP_Thumb( $path, array( 'width' => $dimensions[0], 'height' => $dimensions[1], 'return' => 'path' ) );
 
-		$this->assertEmpty( $image->error );
+		$this->assertFalse( $image->errored() );
 
 		$this->assertEquals( $path, $image->returnImage() );
 
@@ -209,4 +208,11 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 
 	}
 
+	function testNonExistingLocalPath() {
+
+		$path = '/foo/bar.jpg';
+		$image = new WP_Thumb( $path, array( 'width' => 10, 'height' => 10 ) );
+
+		$this->assertTrue( $image->errored() );
+	}
 }
