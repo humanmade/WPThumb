@@ -447,7 +447,6 @@ class WP_Thumb {
 
 			if ( $crop_from_position && count( $crop_from_position ) == 2 && method_exists( $thumb, 'adaptiveResizeFromPoint' ) && empty( $background_fill ) ) {
 				$thumb->adaptiveResizeFromPoint( $width, $height, $crop_from_position[0], $crop_from_position[1] );
-
 			}
 
 			// Background file auto
@@ -457,7 +456,7 @@ class WP_Thumb {
 			}
 
 			// Background fill with color
-			elseif( ! empty( $background_fill ) ) {
+			elseif ( ! empty( $background_fill ) && $background_fill !== 'auto' ) {
 				$thumb->resize( $width, $height );
 				$thumb->backgroundFillWithColor( $width, $height, $background_fill );
 			}
