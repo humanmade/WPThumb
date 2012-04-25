@@ -95,17 +95,17 @@ class WP_Thumb {
 
 		if ( $args )
 			$this->setArgs( $args );
-		
+
 		if ( ( $this->getFilePath() && $this->getArgs() ) && ! $this->errored() ) {
-		
+
 			if ( ! $this->isRemote() ) {
 				$dimensions = array_slice( (array) @getimagesize( $this->getFilePath() ), 0, 2 );
-			
+
 				if ( ( $this->getArg( 'width' ) != $dimensions[0] || $this->getArg( 'height' ) != $dimensions[1] ) && ( ! file_exists( $this->getCacheFilePath() ) || ! $this->args['cache'] ) )
 					$this->generateCacheFile();
-					
+
 			} elseif ( ! file_exists( $this->getCacheFilePath() ) || ! $this->args['cache'] ) {
-				
+
 				$this->generateCacheFile();
 			}
 		}
@@ -200,6 +200,9 @@ class WP_Thumb {
 			$wpthumb_wm_defaults = array( 'padding' => 0, 'position' => 'cc', 'pre_resize' => false );
 			$args['watermark_options'] = wp_parse_args( $args['watermark_options'], $wpthumb_wm_defaults );
 		}
+
+		if ( $args['background_fill'] === 'solid' && $args['background_fill'] = 'auto' )
+			_deprecated_argument( __FUNCTION__, '0.8.3', 'Use "auto" instead.' );
 
 		$this->args = $args;
 
@@ -357,11 +360,11 @@ class WP_Thumb {
 		return $serialize . '.' . $this->getFileExtension();
 
 	}
-	
+
 	public function isRemote() {
 
 		return strpos( $this->getFilePath(), ABSPATH ) !== 0;
-	
+
 	}
 
 	/**
@@ -374,7 +377,7 @@ class WP_Thumb {
 		// Performance testing
 		do_action( 'start_operation', 'generateCacheFile' );
 		do_action( 'add_event', $this->getFilePath() );
-		
+
 		$new_filepath = $this->getCacheFilePath();
 		$file_path = $this->getFilePath();
 
@@ -389,7 +392,7 @@ class WP_Thumb {
 		} catch ( Exception $e ) {
 
 			$this->error = $e;
-			
+
 			do_action( 'end_operation', 'generateCacheFile' );
 			return $this->returnImage();
 
@@ -408,7 +411,7 @@ class WP_Thumb {
 			if ( ! empty( $resize_animations ) !== true && $this->isAnimatedGif() ) {
 
 				$this->error = new WP_Error( 'animated-gif' );
-				
+
 				do_action( 'end_operation', 'generateCacheFile' );
 				return $this->returnImage();
 
@@ -416,14 +419,14 @@ class WP_Thumb {
 
 			// Save the converted image
 			$thumb->save( $new_filepath, 'png' );
-				
-				// tell everone
-		do_action( 'wpthumb_save_file', $new_filepath, $this );
-		
+
+			// tell everyone
+			do_action( 'wpthumb_save_file', $new_filepath, $this );
+
 			unset( $thumb );
-			
+
 			do_action( 'end_operation', 'generateCacheFile' );
-			
+
 			// Pass the new file back through the function so they are resized
 			return new WP_Thumb( $new_filepath, array_merge( $this->args, array( 'output_file' => $new_filepath, 'cache' => false ) ) );
 
@@ -447,9 +450,16 @@ class WP_Thumb {
 
 			}
 
-			elseif( $background_fill == 'solid' && $thumb->canBackgroundFillSolidColorWithResize( $width, $height ) ) {
+			// Background file auto
+			elseif ( $background_fill === 'auto' && $thumb->canBackgroundFillSolidColorWithResize( $width, $height ) ) {
 				$thumb->resize( $width, $height );
-				$thumb->backgroundFillColorAuto( $width, $height );
+				$thumb->backgroundFillAutoColor( $width, $height );
+			}
+
+			// Background fill with color
+			elseif( ! empty( $background_fill ) ) {
+				$thumb->resize( $width, $height );
+				$thumb->backgroundFillWithColor( $width, $height, $background_fill );
 			}
 
 			else {
@@ -474,7 +484,7 @@ class WP_Thumb {
 
 		// Destroy the image
 		unset( $thumb );
-		
+
 		do_action( 'end_operation', 'generateCacheFile' );
 
 	}
@@ -500,25 +510,25 @@ class WP_Thumb {
 	public function returnImage() {
 
 		if ( $this->errored() ) {
-			
+
 			$path = $this->getFilePath();
-		
+
 		} else {
 
 			if ( ! $this->isRemote() ) {
-				
+
 				if ( ( $dimensions = array_slice( (array) @getimagesize( $this->getFilePath() ), 0, 2 ) ) && $this->getArg( 'width' ) == $dimensions[0] && $this->getArg( 'height' ) == $dimensions[1] )
 					$path = $this->getFilePath();
-				
+
 				else
 					$path = $this->getCacheFilePath();
-					
+
 			} else {
-			
+
 				$path = $this->getCacheFilePath();
-			
+
 			}
-		
+
 		}
 
 		if ( $this->args['return'] == 'path' )
@@ -781,9 +791,9 @@ function wpthumb_post_image( $null, $id, $args ) {
 
 	if ( empty( $path ) )
 		$path = get_attached_file( $id );
-		
+
 	$path = apply_filters( 'wpthumb_post_image_path', $path, $id, $args );
-		
+
 	$image = new WP_Thumb( $path, $args );
 
 	$args = $image->getArgs();
