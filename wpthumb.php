@@ -156,7 +156,7 @@ class WP_Thumb {
 			'cache'					=> true,
 			'skip_remote_check' 	=> false,
 			'default'				=> null,
-			'jpeg_quality' 			=> 80,
+			'jpeg_quality' 			=> 90,
 			'resize_animations' 	=> true,
 			'return' 				=> 'url',
 			'custom' 				=> false,
