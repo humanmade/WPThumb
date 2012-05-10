@@ -461,7 +461,10 @@ class WP_Thumb {
 				$thumb->backgroundFillWithColor( $width, $height, $background_fill );
 			}
 
-			else {
+			elseif ( $crop_from_position && count( $crop_from_position ) == 2 ) {
+				$thumb->adaptiveResizeFromPoint( $width, $height, $crop_from_position[0], $crop_from_position[1] );
+
+			} else {
 				$thumb->adaptiveResize( $width, $height );
 			}
 
