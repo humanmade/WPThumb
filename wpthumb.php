@@ -26,8 +26,8 @@ Author URI: http://www.hmn.md/
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-define( 'WP_THUMB_PATH', dirname( __FILE__ ) );
-define( 'WP_THUMB_URL', str_replace( ABSPATH, site_url( '/' ), WP_THUMB_PATH ) );
+define( 'WP_THUMB_PATH', plugin_dir_path( __FILE__ ) );
+define( 'WP_THUMB_URL', plugin_dir_url( __FILE__ ) );
 
 // TODO wpthumb_create_args_from_size filter can pass string or array which makes it difficult to hook into
 
