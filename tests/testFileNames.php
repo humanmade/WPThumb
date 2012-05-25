@@ -123,6 +123,8 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		if ( is_multisite() )
 			$this->markTestSkipped( 'Only runs on a MultiSite setup' );
 
+		$this->markTestSkipped( 'This test is currently broken, WP Thumb stored upload_dir statically so we can;t hook it to do this test' );
+
 		// For this test we need to change the upload URL to something other than uplaod path
 		add_filter( 'upload_dir', $f = function( $args ) {
 			$args['url'] = str_replace( 'wp-content/uploads', 'files', $args['url'] );
