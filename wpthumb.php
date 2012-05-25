@@ -76,6 +76,10 @@ class WP_Thumb {
 
 		return self::$wp_upload_dir;
 	}
+	
+	private static function get_home_path() {
+		return str_replace( str_replace( home_url(), '', site_url() ), '', ABSPATH );
+	}
 
 	/**
 	 * Setup phpthumb, parse the args and generate the cache file
@@ -122,17 +126,18 @@ class WP_Thumb {
 	public function setFilePath( $file_path ) {
 
 		$upload_dir = self::uploadDir();
-
-		if ( strpos( $file_path, ABSPATH ) === 0 ) {
-			$this->file_path = $file_path;
-			return;
+		
+		if ( strpos( $file_path, self::get_home_path() ) === 0 ) {
+			  $this->file_path = $file_path;
+			  return;
 		}
-
+		
+		// If it's an uploaded file
 		if ( strpos( $file_path, $upload_dir['baseurl'] ) !== false )
 			$this->file_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $file_path );
-
+		
 		else
-			$this->file_path = str_replace( get_bloginfo( 'url' ) . '/', ABSPATH, $file_path );
+			$this->file_path = str_replace( trailingslashit( home_url() ), self::get_home_path(), $file_path );
 
 		// if it's a local path, lets check it now
 		if ( strpos( $this->file_path , '/' ) === 0 && strpos( $this->file_path , '//' ) !== 0 && ! file_exists( $this->file_path ) )
@@ -314,11 +319,11 @@ class WP_Thumb {
 		if ( strpos( $this->getFilePath(), $upload_dir['basedir'] ) === 0 ) :
 			$new_dir = $upload_dir['basedir'] . '/cache' . $upload_dir['subdir'] . '/' . $filename_nice;
 
-		elseif ( strpos( $this->getFilePath(), ABSPATH ) === 0 ) :
-
+		elseif ( strpos( $this->getFilePath(), self::get_home_path() ) === 0 ) :
 			$new_dir = $upload_dir['basedir'] . '/cache/local';
 
 		else :
+
 			$parts = parse_url( $this->getFilePath() );
 
 			if ( ! empty( $parts['host'] ) )
@@ -363,7 +368,7 @@ class WP_Thumb {
 
 	public function isRemote() {
 
-		return strpos( $this->getFilePath(), ABSPATH ) !== 0;
+		return strpos( $this->getFilePath(), self::get_home_path() ) !== 0;
 
 	}
 
@@ -572,7 +577,7 @@ class WP_Thumb {
 			return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $path );
 
 		} else {
-			return str_replace( ABSPATH, get_bloginfo( 'url' ) . '/', $path );
+			return str_replace( self::get_home_path(), trailingslashit( home_url() ), $path );
 
 		}
 
