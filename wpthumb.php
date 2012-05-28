@@ -1102,3 +1102,76 @@ function wpthumb_test() {
 
 if ( isset( $_GET['wpthumb_test'] ) )
 	add_action( 'init', 'wpthumb_test' );
+	
+		
+/**
+ *	Add retina image attr to content images on insert
+ */
+function wpthumb_retina_get_image_tag( $html, $id, $caption, $title, $align, $url, $size, $alt = '' ) {
+	
+	global $_wp_additional_image_sizes;
+	
+	if ( in_array( $size, get_intermediate_image_sizes() ) ) {
+	
+		// If this is a defined/default image size.
+	
+		if ( isset( $_wp_additional_image_sizes[$size] ) ) {
+			$retina['width']  = (int)  $_wp_additional_image_sizes[$s]['width'];
+			$retina['height'] = (int)  $_wp_additional_image_sizes[$s]['height'];
+			$retina['crop']   = (bool) $_wp_additional_image_sizes[$s]['crop'];
+		} else {			
+			$retina['width']  = (int)  get_option( $size.'_size_w' );
+			$retina['height'] = (int)  get_option( $size.'_size_h' );
+			$retina['crop']   = (bool) get_option( $size.'_size_crop' );
+		}
+	
+	} elseif ( is_array( $size ) ) {
+	
+		// If an array of args.
+		
+		$retina = $size;
+		$retina['width']  = $size['width'] * 2;
+		$retina['height'] = $size['height'] * 2;
+		
+	}
+	
+    // Only continue if we have a width or a height
+    if ( empty( $retina['width'] ) && empty( $retina['height'] ) )
+    	return $html;
+	
+	$retina_image_attr = ' data-retina-src="' . reset( wp_get_attachment_image_src( $id, $retina ) ) . '" ';	
+	
+	return str_replace( '/>', $retina_image_attr . ' />', $html );	;
+	
+}
+add_filter( 'image_send_to_editor', 'wpthumb_retina_get_image_tag', 100, 8 ); 
+
+
+
+/**
+ * Add to extended_valid_elements for TinyMCE
+ *
+ * @param $init assoc. array of TinyMCE options
+ * @return $init the changed assoc. array
+ */
+function wpthumb_retina_change_mce_options( $init ) {
+
+    // Command separated string of extended elements
+    // I've set it to all - but maybe can modify defaults? If I only set the one I want, doesn't allow any others.
+    $ext = 'img[*]';
+
+    // Add to extended_valid_elements if it alreay exists
+    if ( isset( $init['extended_valid_elements'] ) ) {
+        $init['extended_valid_elements'] .= ',' . $ext;
+    } else {
+        $init['extended_valid_elements'] = $ext;
+    }
+
+    // Super important: return $init!
+    return $init;
+}
+
+add_filter( 'tiny_mce_before_init', 'wpthumb_retina_change_mce_options', 100 );
+
+
+
