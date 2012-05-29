@@ -9,7 +9,8 @@ Version: 1.0 Alpha
 Author URI: http://www.hmn.md/
 */
 
-/*  Copyright 2011 Human Made Limited  (email : hello@humanmade.co.uk)
+/*  
+	Copyright 2011 Human Made Limited  (email : hello@humanmade.co.uk)
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -132,8 +133,8 @@ class WP_Thumb {
 		$upload_dir = self::uploadDir();
 		
 		if ( strpos( $file_path, self::get_home_path() ) === 0 ) {
-			  $this->file_path = $file_path;
-			  return;
+				 $this->file_path = $file_path;
+				 return;
 		}
 		
 		// If it's an uploaded file
@@ -817,15 +818,16 @@ function wpthumb_post_image( $null, $id, $args ) {
 
 		$crop = (bool) ( empty( $crop ) ) ? false : $crop;
 
-		if ( ! $image->errored() && $image_meta = @getimagesize( $image->getCacheFilePath() ) ) :
+		if ( ! $image->errored() && $image_meta = @getimagesize( $image->getCacheFilePath() ) ) {
 
 			$html_width = $image_meta[0];
 			$html_height = $image_meta[1];
 
-		else :
+		} else {
+		
 			$html_width = $html_height = false;
 
-		endif;
+		}
 
 	} else {
 
@@ -1106,8 +1108,7 @@ function wpthumb_test() {
 
 if ( isset( $_GET['wpthumb_test'] ) )
 	add_action( 'init', 'wpthumb_test' );
-	
-		
+
 /**
  *	Add retina image attr to content images on insert
  */
@@ -1120,13 +1121,13 @@ function wpthumb_retina_get_image_tag( $html, $id, $caption, $title, $align, $ur
 		// If this is a defined/default image size.
 	
 		if ( isset( $_wp_additional_image_sizes[$size] ) ) {
-			$retina['width']  = (int)  $_wp_additional_image_sizes[$s]['width'];
-			$retina['height'] = (int)  $_wp_additional_image_sizes[$s]['height'];
-			$retina['crop']   = (bool) $_wp_additional_image_sizes[$s]['crop'];
+			$retina['width']	= (int)  $_wp_additional_image_sizes[$s]['width'];
+			$retina['height']	= (int)  $_wp_additional_image_sizes[$s]['height'];
+			$retina['crop']		= (bool) $_wp_additional_image_sizes[$s]['crop'];
 		} else {			
-			$retina['width']  = (int)  get_option( $size.'_size_w' );
-			$retina['height'] = (int)  get_option( $size.'_size_h' );
-			$retina['crop']   = (bool) get_option( $size.'_size_crop' );
+			$retina['width']	= (int)  get_option( $size.'_size_w' );
+			$retina['height']	= (int)  get_option( $size.'_size_h' );
+			$retina['crop']		= (bool) get_option( $size.'_size_crop' );
 		}
 	
 	} elseif ( is_array( $size ) ) {
@@ -1134,14 +1135,14 @@ function wpthumb_retina_get_image_tag( $html, $id, $caption, $title, $align, $ur
 		// If an array of args.
 		
 		$retina = $size;
-		$retina['width']  = $size['width'] * 2;
+		$retina['width'] = $size['width'] * 2;
 		$retina['height'] = $size['height'] * 2;
 		
 	}
 	
-    // Only continue if we have a width or a height
-    if ( empty( $retina['width'] ) && empty( $retina['height'] ) )
-    	return $html;
+	// Only continue if we have a width or a height
+	if ( empty( $retina['width'] ) && empty( $retina['height'] ) )
+		return $html;
 	
 	$retina_image_attr = ' data-retina-src="' . reset( wp_get_attachment_image_src( $id, $retina ) ) . '" ';	
 	
@@ -1160,22 +1161,19 @@ add_filter( 'image_send_to_editor', 'wpthumb_retina_get_image_tag', 100, 8 );
  */
 function wpthumb_retina_change_mce_options( $init ) {
 
-    // Command separated string of extended elements
-    // I've set it to all - but maybe can modify defaults? If I only set the one I want, doesn't allow any others.
-    $ext = 'img[*]';
+	// Command separated string of extended elements
+	// I've set it to all - but maybe can modify defaults? If I only set the one I want, doesn't allow any others.
+	$ext = 'img[*]';
 
-    // Add to extended_valid_elements if it alreay exists
-    if ( isset( $init['extended_valid_elements'] ) ) {
-        $init['extended_valid_elements'] .= ',' . $ext;
-    } else {
-        $init['extended_valid_elements'] = $ext;
-    }
+	// Add to extended_valid_elements if it alreay exists
+	if ( isset( $init['extended_valid_elements'] ) ) {
+		$init['extended_valid_elements'] .= ',' . $ext;
+	} else {
+		$init['extended_valid_elements'] = $ext;
+	}
 
-    // Super important: return $init!
-    return $init;
+	// Super important: return $init!
+	return $init;
 }
 
 add_filter( 'tiny_mce_before_init', 'wpthumb_retina_change_mce_options', 100 );
-
-
-
