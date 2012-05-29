@@ -307,15 +307,13 @@ function wpthumb_wm_get_default_watermark_mask() {
  */
 function wpthumb_media_form_watermark( $fields, $post ) {
 
-	$current_position = wpthumb_wm_position( $post->ID );
-
 	$watermark_masks_options_html = '';
 
 	foreach( wpthumb_wm_get_watermark_masks() as $mask_id => $watermark_mask )
 		$watermark_masks_options_html .= '<option value="' . $mask_id . '" ' . ( wpthumb_wm_mask( $post->ID ) == $mask_id ? 'selected="selected"' : '' ) . '>' . $watermark_mask['label'] . '</option>' . "\n";
 
-	if ( !$current_position )
-		$current_position = 'top,left';
+	if ( ! $current_position = wpthumb_wm_position( $post->ID ) )
+		$current_position = 'top-left';
 
 	if ( isset( $_GET['post_id'] ) )
 		$calling_post_id = absint( $_GET['post_id'] );
@@ -331,7 +329,7 @@ function wpthumb_media_form_watermark( $fields, $post ) {
 	<div rel="<?php echo $post->ID; ?>" class="wm-watermark-options">
 
 		<label>
-			<input class="wpthumb_apply_watermark" name="attachments[<?php echo $post->ID; ?>][wpthumb_wm_use_watermark]" type="checkbox"<?php checked( wpthumb_wm_image_has_watermark( $post->ID ), true, false ); ?>' /> 
+			<input<?php checked( wpthumb_wm_image_has_watermark( $post->ID ), true ); ?> class="wpthumb_apply_watermark" name="attachments[<?php echo $post->ID; ?>][wpthumb_wm_use_watermark]" type="checkbox" /> 
 			Apply Watermark
 		</label>
 		
@@ -343,11 +341,11 @@ function wpthumb_media_form_watermark( $fields, $post ) {
 			
 				<label>Position</label>
 			
-				<select class="wm_watermark_position" name="attachments['<?php echo $post->ID; ?>'][wpthumb_wm_watermark_position]">
-					<option <?php selected( wpthumb_wm_position( $post->ID ), 'top-left' ); ?> value="top-left">Top Left</option>
-					<option <?php selected( wpthumb_wm_position( $post->ID ), 'top-right' ); selected( wpthumb_wm_position( $post->ID ), false, false ); ?> value="top-right">Top Right</option>
-					<option <?php selected( wpthumb_wm_position( $post->ID ), 'bottom-left' ); ?> value="bottom-left">Bottom Left</option>
-					<option <?php selected( wpthumb_wm_position( $post->ID ), 'bottom-right' ); ?> value="bottom-right">Bottom Right</option>
+				<select class="wm_watermark_position" name="attachments[<?php echo $post->ID; ?>][wpthumb_wm_watermark_position]">
+					<option <?php selected( $current_position, 'top-left' ); ?> value="top-left">Top Left</option>
+					<option <?php selected( $current_position, 'top-right' ); ?> value="top-right">Top Right</option>
+					<option <?php selected( $current_position, 'bottom-left' ); ?> value="bottom-left">Bottom Left</option>
+					<option <?php selected( $current_position, 'bottom-right' ); ?> value="bottom-right">Bottom Right</option>
 				</select>
 			
 			</span>
@@ -500,7 +498,7 @@ add_filter( 'attachment_fields_to_edit', 'wpthumb_media_form_watermark', 10, 2 )
  * @param array $attachment
  * @return $post
  */
-function wpthumb_media_form_watermark_save( $post, $attachment ){
+function wpthumb_media_form_watermark_save( $post, $attachment ) {
 
 	update_post_meta( $post['ID'], 'use_watermark', ! empty( $attachment['wpthumb_wm_use_watermark'] ) );
 	update_post_meta( $post['ID'], 'wpthumb_wm_position', $attachment['wpthumb_wm_watermark_position'] );
@@ -533,7 +531,7 @@ function wpthumb_save_watermark_ajax_action() {
 	
 	// If the attachment is the post thumbnail, return the post thubmnail html
 	// to update the featured image box with
-	wp_die( _wp_post_thumbnail_html( $attachment_id ) );
+	die( _wp_post_thumbnail_html( $attachment_id ) );
 	
 }
 add_action( 'wp_ajax_wpthumb_watermark_save', 'wpthumb_save_watermark_ajax_action' );
