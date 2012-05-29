@@ -46,6 +46,9 @@ if ( version_compare( phpversion(), '5.3', '<' ) ) {
 // Load the watermarking class
 include_once( WP_THUMB_PATH . '/wpthumb.watermark.php' );
 
+// Load the settings page
+include_once( WP_THUMB_PATH . '/wpthumb.settings.php' );
+
 /**
  * Base WP_Thumb class
  *
