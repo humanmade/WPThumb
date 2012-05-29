@@ -822,6 +822,44 @@ function wpthumb_post_image( $null, $id, $args ) {
 
 			$html_width = $image_meta[0];
 			$html_height = $image_meta[1];
+			
+			// If the retina arg is true or the global option is set and the retina arg isn't false
+			if ( ! empty( $retina ) || ( get_option( 'wpthumb_retina' ) && isset( $retina ) && ! $retina ) ) {
+			  
+				add_filter( 'wp_get_attachment_image_attributes', $closure = function( $attr, $attachment ) use ( $args, $path, &$closure ) {
+			  
+					remove_filter( 'wp_get_attachment_image_attributes', $closure );
+			  
+					extract ( $args );
+			  
+					// Only continue if we have a width or a height
+					if ( empty( $width ) && empty( $height ) )
+						return $attr;
+					
+					// Get the original image with and height
+					list( $orig_width, $orig_height ) = @getimagesize( $path );
+					
+					// Make sure the original is big enough for a retina image
+					if ( $orig_width < $width * 2 || $orig_height < $height * 2 )
+						return $attr;
+					
+					wp_enqueue_script( 'wpthumb_retina', WP_THUMB_URL . 'wpthumb.retina.js', false, WP_THUMB_VERSION, true );
+					
+					$args['width'] = $width * 2;
+					$args['height'] = $height * 2;
+					
+					unset( $args['retina'] );
+					
+					$retina_image = new WP_Thumb( $path, $args );
+					
+					if ( ! $retina_image->errored() )
+						$attr['data-retina-src'] = $retina_image->returnImage();
+					
+					return $attr;
+			  
+				}, 10, 2 );
+			  
+			}
 
 		} else {
 		
@@ -837,43 +875,6 @@ function wpthumb_post_image( $null, $id, $args ) {
 
 	}
 	
-	if ( ! empty( $retina ) )
-		add_filter( 'wp_get_attachment_image_attributes', $closure = function( $attr = array(), $attachment ) use ( $args, $path, &$closure ) {
-		
-			remove_filter( 'wp_get_attachment_image_attributes', $closure );
-		
-		    extract ( $args );
-		
-		    // Only continue if we have a width or a height
-		    if ( empty( $width ) && empty( $height ) )
-		    	return $attr;
-		    
-		    // Get the original image with and height
-		    list( $orig_width, $orig_height ) = @getimagesize( $path );
-		    
-		    if ( ! isset( $width ) )
-		    	$width = null;
-		    	
-		    if ( ! isset( $height ) )
-		    	$height = null;
-		    
-		    // Make sure the original is big enough for a retina image
-		    if ( $orig_width < $width * 2 || $orig_height < $height * 2 )
-		    	return $attr;
-		    	
-		    wp_enqueue_script( 'wpthumb_retina', WP_THUMB_URL . 'wpthumb.retina.js', false, false, true );
-		    
-		    $args['width'] = $width * 2;
-		    $args['height'] = $height * 2;
-		    	
-		    unset( $args['retina'] );
-		    	
-		    $attr['data-retina-src'] = wpthumb( $path, $args );
-		
-		    return $attr;
-		    	
-		}, 10, 2 );
-
 	return array( $image_src, $html_width, $html_height, true );
 
 }
