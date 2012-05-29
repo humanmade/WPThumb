@@ -32,14 +32,14 @@ define( 'WP_THUMB_VERSION', '1.0' );
 
 // TODO wpthumb_create_args_from_size filter can pass string or array which makes it difficult to hook into
 
-// Don't activate on anything less than PHP 5.2.4
+// Don't activate on anything less than PHP 5.3
 if ( version_compare( phpversion(), '5.3', '<' ) ) {
 
 	require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 	deactivate_plugins( WP_THUMB_PATH . '/plugin.php' );
 
 	if ( isset( $_GET['action'] ) && ( $_GET['action'] == 'activate' || $_GET['action'] == 'error_scrape' ) )
-		die( __( 'WP Thumb requires PHP version 5.2.4 or greater.', 'wpthumb' ) );
+		die( __( 'WP Thumb requires PHP version 5.3 or greater.', 'wpthumb' ) );
 
 }
 
