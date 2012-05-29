@@ -1103,7 +1103,6 @@ function wpthumb_test() {
 if ( isset( $_GET['wpthumb_test'] ) )
 	add_action( 'init', 'wpthumb_test' );
 	
-		
 /**
  *	Add retina image attr to content images on insert
  */
@@ -1116,30 +1115,44 @@ function wpthumb_retina_get_image_tag( $html, $id, $caption, $title, $align, $ur
 		// If this is a defined/default image size.
 	
 		if ( isset( $_wp_additional_image_sizes[$size] ) ) {
-			$retina['width']  = (int)  $_wp_additional_image_sizes[$s]['width'];
-			$retina['height'] = (int)  $_wp_additional_image_sizes[$s]['height'];
-			$retina['crop']   = (bool) $_wp_additional_image_sizes[$s]['crop'];
+			$args['width']  = (int)  $_wp_additional_image_sizes[$s]['width'];
+			$args['height'] = (int)  $_wp_additional_image_sizes[$s]['height'];
+			$args['crop']   = (bool) $_wp_additional_image_sizes[$s]['crop'];
 		} else {			
-			$retina['width']  = (int)  get_option( $size.'_size_w' );
-			$retina['height'] = (int)  get_option( $size.'_size_h' );
-			$retina['crop']   = (bool) get_option( $size.'_size_crop' );
+			$args['width']  = (int)  get_option( $size.'_size_w' );
+			$args['height'] = (int)  get_option( $size.'_size_h' );
+			$args['crop']   = (bool) get_option( $size.'_size_crop' );
 		}
 	
 	} elseif ( is_array( $size ) ) {
 	
 		// If an array of args.
-		
-		$retina = $size;
-		$retina['width']  = $size['width'] * 2;
-		$retina['height'] = $size['height'] * 2;
+		$args['width']  = $size['width'] * 2;
+		$args['height'] = $size['height'] * 2;
 		
 	}
 	
     // Only continue if we have a width or a height
-    if ( empty( $retina['width'] ) && empty( $retina['height'] ) )
+    if ( empty( $args['width'] ) && empty( $args['height'] ) )
     	return $html;
+
+    // Get the original image with and height
+	list( $orig_width, $orig_height ) = @getimagesize( trailingslashit( WP_CONTENT_DIR ) . 'uploads/' . get_post_meta( $id, '_wp_attached_file', true ) );
 	
-	$retina_image_attr = ' data-retina-src="' . reset( wp_get_attachment_image_src( $id, $retina ) ) . '" ';	
+	if ( ! isset( $args['width'] ) )
+		$args['width'] = null;
+		    	
+	if ( ! isset( $args['height'] ) )
+		$args['height'] = null;
+		    
+	// Make sure the original is big enough for a retina image
+	if ( ! empty( $args['crop'] ) && ( $orig_width < $args['width'] * 2 || $orig_height < $args['height'] * 2 ) )
+		return $html;
+		
+	$args['width'] = $args['width'] * 2;
+	$args['height'] = $args['height'] * 2;
+		    		    	
+	$retina_image_attr = ' data-retina-src="' . reset( wp_get_attachment_image_src( $id, $args ) ) . '" ';	
 	
 	return str_replace( '/>', $retina_image_attr . ' />', $html );	;
 	
