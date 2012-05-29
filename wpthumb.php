@@ -828,36 +828,34 @@ function wpthumb_post_image( $null, $id, $args ) {
 	
 				add_filter( 'wp_get_attachment_image_attributes', $closure = function( $attr, $attachment ) use ( $args, $path, &$closure ) {
 		
-			remove_filter( 'wp_get_attachment_image_attributes', $closure );
-		
-		    extract ( $args );
-		
-		    // Only continue if we have a width or a height
-		    if ( empty( $width ) && empty( $height ) )
-		    	return $attr;
-		    
-		    // Get the original image with and height
-		    list( $orig_width, $orig_height ) = @getimagesize( $path );
-		    
-		    // Make sure the original is big enough for a retina image
-		    if ( $orig_width < $width * 2 || $orig_height < $height * 2 )
-		    	return $attr;
-		    	
-					wp_enqueue_script( 'wpthumb_retina', WP_THUMB_URL . 'wpthumb.retina.js', false, WP_THUMB_VERSION, true );
-		    
-		    $args['width'] = $width * 2;
-		    $args['height'] = $height * 2;
-		    	
-		    unset( $args['retina'] );
-		    	
-					$retina_image = new WP_Thumb( $path, $args );
-					
-					if ( ! $retina_image->errored() )
-						$attr['data-retina-src'] = $retina_image->returnImage();
-		
-		    return $attr;
-		    	
-		}, 10, 2 );
+ 		 		 	remove_filter( 'wp_get_attachment_image_attributes', $closure );
+ 		 		 		
+ 		 		 	extract ( $args );
+ 		 		 		
+ 		 		 	// Only continue if we have a width or a height
+ 		 		 	if ( empty( $width ) && empty( $height ) )
+	 		 		 	 return $attr;
+ 		 		 		
+ 		 		 	// Get the original image with and height
+ 		 		 	list( $orig_width, $orig_height ) = @getimagesize( $path );
+ 		 		 		 		    
+ 		 		 	// Make sure the original is big enough for a retina image
+ 		 		 	if ( $orig_width < $width * 2 || $orig_height < $height * 2 )
+ 		 		 		return $attr;
+ 		 		 		  		 		 		
+ 		 		 	$args['width'] = $width * 2;
+ 		 		 	$args['height'] = $height * 2;
+ 		 		 		 
+ 		 		 	unset( $args['retina'] );
+ 		 		 		 
+ 		 		 	$retina_image = new WP_Thumb( $path, $args );
+ 		 		 		 	
+ 		 		 	if ( ! $retina_image->errored() )
+ 		 		 		$attr['data-retina-src'] = $retina_image->returnImage();
+ 		 		 		
+ 		 		 	return $attr;
+		        	
+			    }, 10, 2 );
 
 			}
 
@@ -1115,6 +1113,9 @@ if ( isset( $_GET['wpthumb_test'] ) )
  */
 function wpthumb_retina_get_image_tag( $html, $id, $caption, $title, $align, $url, $size, $alt = '' ) {
 	
+	if( ! get_option( 'wpthumb_retina' ) )
+		return $html;
+	
 	global $_wp_additional_image_sizes;
 	
 	if ( in_array( $size, get_intermediate_image_sizes() ) ) {
@@ -1176,6 +1177,9 @@ add_filter( 'image_send_to_editor', 'wpthumb_retina_get_image_tag', 100, 8 );
  */
 function wpthumb_retina_change_mce_options( $init ) {
 
+	if( ! get_option( 'wpthumb_retina' ) )
+		return $html;
+
     // Command separated string of extended elements
     // I've set it to all - but maybe can modify defaults? If I only set the one I want, doesn't allow any others.
     $ext = 'img[*]';
@@ -1194,4 +1198,13 @@ function wpthumb_retina_change_mce_options( $init ) {
 add_filter( 'tiny_mce_before_init', 'wpthumb_retina_change_mce_options', 100 );
 
 
+/**
+ *	Enqueue the retina JS script.
+ */
+add_action( 'wp_enqueue_scripts', function() {
+
+	if( get_option( 'wpthumb_retina' ) )
+		wp_enqueue_script( 'wpthumb_retina', WP_THUMB_URL . 'wpthumb.retina.js', false, false, true );	
+		
+} );
 
