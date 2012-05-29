@@ -1144,7 +1144,7 @@ function wpthumb_retina_get_image_tag( $html, $id, $caption, $title, $align, $ur
     	return $html;
 	
     // Get the original image with and height
-	list( $orig_width, $orig_height ) = @getimagesize( trailingslashit( WP_CONTENT_DIR ) . 'uploads/' . get_post_meta( $id, '_wp_attached_file', true ) );
+	list( $orig_width, $orig_height ) = @getimagesize( trailingslashit( wp_upload_dir() ) . get_post_meta( $id, '_wp_attached_file', true ) );
 	
 	if ( ! isset( $args['width'] ) )
 		$args['width'] = null;
