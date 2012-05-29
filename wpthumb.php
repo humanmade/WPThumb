@@ -5,7 +5,7 @@ Plugin Name: WP Thumb
 Plugin URI: https://github.com/humanmade/WPThumb
 Description: An on-demand image generation replacement for WordPress' image resizing.
 Author: Human Made Limited
-Version: 0.8.2
+Version: 1.0 Alpha
 Author URI: http://www.hmn.md/
 */
 
@@ -28,6 +28,7 @@ Author URI: http://www.hmn.md/
 
 define( 'WP_THUMB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WP_THUMB_URL', plugin_dir_url( __FILE__ ) );
+define( 'WP_THUMB_VERSION', '1.0' ); 
 
 // TODO wpthumb_create_args_from_size filter can pass string or array which makes it difficult to hook into
 
