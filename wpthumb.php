@@ -5,11 +5,12 @@ Plugin Name: WP Thumb
 Plugin URI: https://github.com/humanmade/WPThumb
 Description: An on-demand image generation replacement for WordPress' image resizing.
 Author: Human Made Limited
-Version: 0.8.2
+Version: 1.0 Alpha
 Author URI: http://www.hmn.md/
 */
 
-/*  Copyright 2011 Human Made Limited  (email : hello@humanmade.co.uk)
+/*  
+	Copyright 2011 Human Made Limited  (email : hello@humanmade.co.uk)
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -28,22 +29,26 @@ Author URI: http://www.hmn.md/
 
 define( 'WP_THUMB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WP_THUMB_URL', plugin_dir_url( __FILE__ ) );
+define( 'WP_THUMB_VERSION', '1.0' ); 
 
 // TODO wpthumb_create_args_from_size filter can pass string or array which makes it difficult to hook into
 
-// Don't activate on anything less than PHP 5.2.4
+// Don't activate on anything less than PHP 5.3
 if ( version_compare( phpversion(), '5.3', '<' ) ) {
 
 	require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 	deactivate_plugins( WP_THUMB_PATH . '/plugin.php' );
 
 	if ( isset( $_GET['action'] ) && ( $_GET['action'] == 'activate' || $_GET['action'] == 'error_scrape' ) )
-		die( __( 'WP Thumb requires PHP version 5.2.4 or greater.', 'wpthumb' ) );
+		die( __( 'WP Thumb requires PHP version 5.3 or greater.', 'wpthumb' ) );
 
 }
 
 // Load the watermarking class
 include_once( WP_THUMB_PATH . '/wpthumb.watermark.php' );
+
+// Load the settings page
+include_once( WP_THUMB_PATH . '/wpthumb.settings.php' );
 
 /**
  * Base WP_Thumb class
@@ -813,26 +818,15 @@ function wpthumb_post_image( $null, $id, $args ) {
 
 		$crop = (bool) ( empty( $crop ) ) ? false : $crop;
 
-		if ( ! $image->errored() && $image_meta = @getimagesize( $image->getCacheFilePath() ) ) :
+		if ( ! $image->errored() && $image_meta = @getimagesize( $image->getCacheFilePath() ) ) {
 
 			$html_width = $image_meta[0];
 			$html_height = $image_meta[1];
 
-		else :
-			$html_width = $html_height = false;
-
-		endif;
-
-	} else {
-
-		$html_width = $width;
-		$html_height = $height;
-		$image_src = $image->getFileURL();
-
-	}
+			// If the retina arg is true or the global option is set and the retina arg isn't false
+			if ( ! empty( $retina ) || ( get_option( 'wpthumb_retina' ) && isset( $retina ) && ! $retina ) ) {
 	
-	if ( ! empty( $retina ) )
-		add_filter( 'wp_get_attachment_image_attributes', $closure = function( $attr = array(), $attachment ) use ( $args, $path, &$closure ) {
+				add_filter( 'wp_get_attachment_image_attributes', $closure = function( $attr, $attachment ) use ( $args, $path, &$closure ) {
 		
 			remove_filter( 'wp_get_attachment_image_attributes', $closure );
 		
@@ -845,29 +839,42 @@ function wpthumb_post_image( $null, $id, $args ) {
 		    // Get the original image with and height
 		    list( $orig_width, $orig_height ) = @getimagesize( $path );
 		    
-		    if ( ! isset( $width ) )
-		    	$width = null;
-		    	
-		    if ( ! isset( $height ) )
-		    	$height = null;
-		    
 		    // Make sure the original is big enough for a retina image
 		    if ( $orig_width < $width * 2 || $orig_height < $height * 2 )
 		    	return $attr;
 		    	
-		    wp_enqueue_script( 'wpthumb_retina', WP_THUMB_URL . 'wpthumb.retina.js', false, false, true );
+					wp_enqueue_script( 'wpthumb_retina', WP_THUMB_URL . 'wpthumb.retina.js', false, WP_THUMB_VERSION, true );
 		    
 		    $args['width'] = $width * 2;
 		    $args['height'] = $height * 2;
 		    	
 		    unset( $args['retina'] );
 		    	
-		    $attr['data-retina-src'] = wpthumb( $path, $args );
+					$retina_image = new WP_Thumb( $path, $args );
+					
+					if ( ! $retina_image->errored() )
+						$attr['data-retina-src'] = $retina_image->returnImage();
 		
 		    return $attr;
 		    	
 		}, 10, 2 );
 
+			}
+
+		} else {
+		
+			$html_width = $html_height = false;
+
+		}
+
+	} else {
+
+		$html_width = $width;
+		$html_height = $height;
+		$image_src = $image->getFileURL();
+
+	}
+	
 	return array( $image_src, $html_width, $html_height, true );
 
 }
@@ -1135,7 +1142,7 @@ function wpthumb_retina_get_image_tag( $html, $id, $caption, $title, $align, $ur
     // Only continue if we have a width or a height
     if ( empty( $args['width'] ) && empty( $args['height'] ) )
     	return $html;
-
+	
     // Get the original image with and height
 	list( $orig_width, $orig_height ) = @getimagesize( trailingslashit( WP_CONTENT_DIR ) . 'uploads/' . get_post_meta( $id, '_wp_attached_file', true ) );
 	
