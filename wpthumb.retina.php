@@ -1,6 +1,42 @@
 <?php
 
 /** 
+ *	Setup.
+ *
+ *	Register scripts.
+ */
+add_action( 'init', function() {
+	
+	wp_register_script( 'wpthumb_retina', WP_THUMB_URL . 'wpthumb.retina.js', false, false, true );	
+		
+} );
+
+define( 'WPTHUMB_RETINA_ENABLED', true );
+
+/**
+ *	Enqueue the retina JS script if the global setting is enabled.
+ */
+add_action( 'wp_enqueue_scripts', function() {
+
+	if( wpthumb_retina_is_enabled() )
+		wp_enqueue_script( 'wpthumb_retina' );
+		
+} );
+
+
+/**
+ *	Global setting for retina. Either set in media settings, or defined in wp-congig.php.
+ */
+function wpthumb_retina_is_enabled() {
+	
+	if( defined('WPTHUMB_RETINA_ENABLED') )
+		return (bool) WPTHUMB_RETINA_ENABLED;
+	
+	return (bool) get_option( 'wpthumb_retina' );
+	
+}
+
+/** 
  *	Generate the retina src attr. for WPThumb images.
  *	Hooks into wpthumb_action.
  */
@@ -10,11 +46,11 @@ function wpthumb_retina_action( $image, $id, $path, $args ) {
 	
 	// Do these checks again.
 	// @todo - is this uneccessary duplication?
-	if ( ! file_exists( $path ) || $image->errored() || ! $image_meta = @getimagesize( $image->getCacheFilePath() ) )
+	if ( ! wpthumb_retina_is_enabled() || ! file_exists( $path ) || $image->errored() || ! $image_meta = @getimagesize( $image->getCacheFilePath() ) )
 		return;
 	
 	// If the retina arg is true or the global option is set and the retina arg isn't false
-	if ( ! empty( $retina ) || ( get_option( 'wpthumb_retina' ) && isset( $retina ) && ! $retina ) ) {
+	if ( ! empty( $retina ) || wpthumb_retina_is_enabled() && isset( $retina ) && ! $retina ) {
 	
 	    add_filter( 'wp_get_attachment_image_attributes', $closure = function( $attr, $attachment ) use ( $args, $path, &$closure ) {
 	
@@ -58,7 +94,7 @@ add_action( 'wpthumb_action', 'wpthumb_retina_action', 10, 4 );
  */
 function wpthumb_retina_get_image_tag( $html, $id, $caption, $title, $align, $url, $size, $alt = '' ) {
 	
-	if( ! get_option( 'wpthumb_retina' ) )
+	if( ! wpthumb_retina_is_enabled() )
 		return $html;
 	
 	global $_wp_additional_image_sizes;
@@ -108,6 +144,8 @@ function wpthumb_retina_get_image_tag( $html, $id, $caption, $title, $align, $ur
 		    		    	
 	$retina_image_attr = ' data-retina-src="' . reset( wp_get_attachment_image_src( $id, $args ) ) . '" ';	
 	
+	wp_enqueue_script( 'wpthumb_retina' );
+	
 	return str_replace( '/>', $retina_image_attr . ' />', $html );	;
 	
 }
@@ -123,7 +161,7 @@ add_filter( 'image_send_to_editor', 'wpthumb_retina_get_image_tag', 100, 8 );
  */
 function wpthumb_retina_change_mce_options( $init ) {
 
-	if( ! get_option( 'wpthumb_retina' ) )
+	if( ! wpthumb_retina_is_enabled() )
 		return $html;
 
     // Command separated string of extended elements
@@ -140,14 +178,3 @@ function wpthumb_retina_change_mce_options( $init ) {
     return $init;
 }
 add_filter( 'tiny_mce_before_init', 'wpthumb_retina_change_mce_options', 100 );
-
-
-/**
- *	Enqueue the retina JS script.
- */
-add_action( 'wp_enqueue_scripts', function() {
-
-	if( get_option( 'wpthumb_retina' ) )
-		wp_enqueue_script( 'wpthumb_retina', WP_THUMB_URL . 'wpthumb.retina.js', false, false, true );	
-		
-} );
