@@ -77,8 +77,29 @@ class WP_Thumb {
 		return self::$wp_upload_dir;
 	}
 	
-	private static function get_home_path() {
+	private static function getHomePath() {
 		return str_replace( str_replace( home_url(), '', site_url() ), '', ABSPATH );
+	}
+	
+	private static function getDefaultArgs() {
+
+		return apply_filters( 'wpthumb_default_args',  array(
+			'width' 				=> 0,
+			'height'				=> 0,
+			'crop'					=> false,
+			'crop_from_position' 	=> 'center,center',
+			'resize'				=> true,
+			'cache'					=> true,
+			'skip_remote_check' 	=> false,
+			'default'				=> null,
+			'jpeg_quality' 			=> 90,
+			'resize_animations' 	=> true,
+			'return' 				=> 'url',
+			'custom' 				=> false,
+			'background_fill'		=> null,
+			'output_file'			=> false
+		) );
+
 	}
 
 	/**
@@ -127,7 +148,7 @@ class WP_Thumb {
 
 		$upload_dir = self::uploadDir();
 		
-		if ( strpos( $file_path, self::get_home_path() ) === 0 ) {
+		if ( strpos( $file_path, self::getHomePath() ) === 0 ) {
 			  $this->file_path = $file_path;
 			  return;
 		}
@@ -137,7 +158,7 @@ class WP_Thumb {
 			$this->file_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $file_path );
 		
 		else
-			$this->file_path = str_replace( trailingslashit( home_url() ), self::get_home_path(), $file_path );
+			$this->file_path = str_replace( trailingslashit( home_url() ), self::getHomePath(), $file_path );
 
 		// if it's a local path, lets check it now
 		if ( strpos( $this->file_path , '/' ) === 0 && strpos( $this->file_path , '//' ) !== 0 && ! file_exists( $this->file_path ) )
@@ -151,23 +172,7 @@ class WP_Thumb {
 	 */
 	public function setArgs( $args ) {
 
-		 $arg_defaults = array(
-			'width' 				=> 0,
-			'height'				=> 0,
-			'crop'					=> false,
-			'crop_from_position' 	=> 'center,center',
-			'resize'				=> true,
-			'watermark_options' 	=> array(),
-			'cache'					=> true,
-			'skip_remote_check' 	=> false,
-			'default'				=> null,
-			'jpeg_quality' 			=> 90,
-			'resize_animations' 	=> true,
-			'return' 				=> 'url',
-			'custom' 				=> false,
-			'background_fill'		=> null,
-			'output_file'			=> false
-		);
+		$arg_defaults = self::getDefaultArgs();
 
 		$args = wp_parse_args( $args, $arg_defaults );
 		$new_args = array();
@@ -200,19 +205,15 @@ class WP_Thumb {
 		if ( is_string( $args['crop_from_position'] ) )
 			$args['crop_from_position'] = explode( ',', $args['crop_from_position'] );
 
-		// Sort out the watermark args
-		if ( ! empty( $args['watermark_options']['mask'] ) ) {
-			$wpthumb_wm_defaults = array( 'padding' => 0, 'position' => 'cc', 'pre_resize' => false );
-			$args['watermark_options'] = wp_parse_args( $args['watermark_options'], $wpthumb_wm_defaults );
-		}
-
+		$args = apply_filters( 'wpthumb_set_args', $args, $this );
+		
 		if ( $args['background_fill'] === 'solid' && $args['background_fill'] = 'auto' )
 			_deprecated_argument( __FUNCTION__, '0.8.3', 'Use "auto" instead.' );
 
 		$this->args = $args;
 
 	}
-
+	
 	/**
 	 * Return the file path to the original image
 	 *
@@ -319,7 +320,7 @@ class WP_Thumb {
 		if ( strpos( $this->getFilePath(), $upload_dir['basedir'] ) === 0 ) :
 			$new_dir = $upload_dir['basedir'] . '/cache' . $upload_dir['subdir'] . '/' . $filename_nice;
 
-		elseif ( strpos( $this->getFilePath(), self::get_home_path() ) === 0 ) :
+		elseif ( strpos( $this->getFilePath(), self::getHomePath() ) === 0 ) :
 			$new_dir = $upload_dir['basedir'] . '/cache/local';
 
 		else :
@@ -368,7 +369,7 @@ class WP_Thumb {
 
 	public function isRemote() {
 
-		return strpos( $this->getFilePath(), self::get_home_path() ) !== 0;
+		return strpos( $this->getFilePath(), self::getHomePath() ) !== 0;
 
 	}
 
@@ -399,6 +400,7 @@ class WP_Thumb {
 			$this->error = $e;
 
 			do_action( 'end_operation', 'generateCacheFile' );
+			
 			return $this->returnImage();
 
 		}
@@ -437,18 +439,10 @@ class WP_Thumb {
 
 		endif;
 
-		// Watermarking (pre resizing)
-		if ( isset( $watermark_options['mask'] ) && $watermark_options['mask'] && isset( $watermark_options['pre_resize'] ) && $watermark_options['pre_resize'] === true ) {
-
-			// TODO why?
-			$thumb->resize( 99999, 99999 );
-
-			$thumb->createWatermark( $watermark_options['mask'], $watermark_options['position'], $watermark_options['padding'] );
-
-		}
+		do_action( 'wpthumb_pre_resize', $this->args, $thumb );
 
 		// Cropping
-		if ( $crop === true && $resize === true ) :
+		if ( $crop === true && $resize === true ) {
 
 			if ( $crop_from_position && count( $crop_from_position ) == 2 && method_exists( $thumb, 'adaptiveResizeFromPoint' ) && empty( $background_fill ) ) {
 				$thumb->adaptiveResizeFromPoint( $width, $height, $crop_from_position[0], $crop_from_position[1] );
@@ -471,21 +465,20 @@ class WP_Thumb {
 
 			} else {
 				$thumb->adaptiveResize( $width, $height );
+			
 			}
 
-		elseif ( $crop === true && $resize === false ) :
+		} elseif ( $crop === true && $resize === false ) {
 
 			$thumb->cropFromCenter( $width, $height );
 
-		else :
+		} else {
 
 			$thumb->resize( $width, $height );
 
-		endif;
-
-		// Watermarking (post resizing)
-		if ( isset( $watermark_options['mask'] ) && $watermark_options['mask'] && isset( $watermark_options['pre_resize'] ) && $watermark_options['pre_resize'] === false )
-			$thumb->createWatermark($watermark_options['mask'], $watermark_options['position'], $watermark_options['padding']);
+		}
+		
+		do_action( 'wpthumb_post_resize', $this->args, $thumb );
 
 		$thumb->save( $new_filepath );
 
@@ -577,7 +570,7 @@ class WP_Thumb {
 			return str_replace( $upload_dir['basedir'], $upload_dir['baseurl'], $path );
 
 		} else {
-			return str_replace( self::get_home_path(), trailingslashit( home_url() ), $path );
+			return str_replace( self::getHomePath(), trailingslashit( home_url() ), $path );
 
 		}
 

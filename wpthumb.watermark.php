@@ -42,7 +42,62 @@ function wpthumb_wm_watermark_preview_image_ajax() {
 	<?php exit;
 
 }
-add_action( 'wp_ajax_wpthumb_wm_watermark_preview_image', 'wpthumb_wm_watermark_preview_image_ajax' ); 
+add_action( 'wp_ajax_wpthumb_wm_watermark_preview_image', 'wpthumb_wm_watermark_preview_image_ajax' );
+
+/**
+ * Default for watermarking args
+ */
+function wpthumb_watermarking_default_arg( $args ) {
+
+	$args['watermark_options'] = array();
+	
+	return $args;
+
+}
+add_filter( 'wpthumb_default_args', 'wpthumb_watermarking_default_arg' );
+
+/**
+ * Setup the watermarking args
+ */
+function wpthumb_watermarking_set_args( $args ) {
+	
+	// Sort out the watermark args
+	if ( ! empty( $args['watermark_options']['mask'] ) ) {
+		$wpthumb_wm_defaults = array( 'padding' => 0, 'position' => 'cc', 'pre_resize' => false );
+		$args['watermark_options'] = wp_parse_args( $args['watermark_options'], $wpthumb_wm_defaults );
+	}
+	
+	return $args;
+
+}
+add_filter( 'wpthumb_set_args', 'wpthumb_watermarking_set_args' );
+
+function wpthumb_post_resize_generate_watermark( $args, $thumb ) {
+
+	extract ( $args );
+	
+	// Watermarking (post resizing)
+	if ( isset( $watermark_options['mask'] ) && $watermark_options['mask'] && isset( $watermark_options['pre_resize'] ) && $watermark_options['pre_resize'] === false )
+		$thumb->createWatermark( $watermark_options['mask'], $watermark_options['position'], $watermark_options['padding'] );
+	
+}
+add_action( 'wpthumb_post_resize', 'wpthumb_post_resize_generate_watermark', 10, 2 );
+
+function wpthumb_pre_resize_generate_watermark( $args, $thumb ) {
+
+	extract ( $args );
+
+    // Watermarking (pre resizing)
+    if ( isset( $watermark_options['mask'] ) && $watermark_options['mask'] && isset( $watermark_options['pre_resize'] ) && $watermark_options['pre_resize'] === true ) {
+
+        $thumb->resize( 99999, 99999 );
+    
+        $thumb->createWatermark( $watermark_options['mask'], $watermark_options['position'], $watermark_options['padding'] );
+    
+    }
+	
+}
+add_action( 'wpthumb_pre_resize', 'wpthumb_pre_resize_generate_watermark', 10, 2 );
 
 /**
  *
@@ -86,8 +141,8 @@ function wpthumb_wm_position( $image_id ) {
 	
 	if ( $pos = get_post_meta( $image_id, 'wpthumb_wm_position', true ) )
 		return $pos;
-		
-	//legacy
+
+	// Legacy
 	if ( $pos = get_post_meta( $image_id, 'wm_position', true ) )
 		 return $pos;
 }
