@@ -6,7 +6,7 @@
 function wpthumb_wm_watermark_preview_image_ajax() {
 
 	$position				= esc_attr( $_GET['position'] );
-	$watermark['padding']	= (int) esc_attr( $_GET['padding'] );
+	$padding				= (int) esc_attr( $_GET['padding'] );
 	$image_id				= esc_attr( $_GET['image_id'] );
 	$mask					= esc_attr( $_GET['mask'] );
    
@@ -25,13 +25,16 @@ function wpthumb_wm_watermark_preview_image_ajax() {
 
 	if ( $position === 'bottom-right' )
 		$watermark['position'] = 'rb';
+		
+	if ( $padding )
+		$watermark['padding'] = $padding;
 	
 	$watermark['pre_resize'] = true;
 	
 	$large_watermark = $watermark;
 	$large_watermark['pre_resize'] = false;
 	
-	$args = array( 'width' => 200, 'crop' => false, 'obfuscate_filename' => true, 'watermark_options' => $watermark );
+	$args = array( 'width' => 200, 'crop' => false, 'obfuscate_filename' => true, 'watermark_options' => $watermark, 'cache' => false );
 	
 	$image_src = wpthumb_get_image_with_scaled_watermark( $image_id, $args, 560, 0 ); ?>
 
@@ -159,7 +162,7 @@ function wpthumb_wm_padding( $image_id ) {
 	if ( $padding = (int) get_post_meta( $image_id, 'wpthumb_wm_padding', true ) )
 		return $padding;
 		
-	//legacy
+	// Legacy
 	if ( $padding = (int) get_post_meta( $image_id, 'wm_padding', true ) )
 		 return $padding;
 }
@@ -169,7 +172,7 @@ function wpthumb_wm_pre_resize( $image_id ) {
 	if ( $pre = (bool) get_post_meta( $image_id, 'wpthumb_wm_pre_resize', true ) )
 		return $pre;
 		
-	//legacy
+	// Legacy
 	if ( $pre = (bool) get_post_meta( $image_id, 'wm_pre_resize', true ) )
 		 return $pre;
 
@@ -180,7 +183,7 @@ function wpthumb_wm_mask( $image_id ) {
 	if ( $pre = (string) get_post_meta( $image_id, 'wpthumb_wm_mask', true ) )
 		return $pre;
 		
-	//legacy
+	// Legacy
 	if ( $pre = (string) get_post_meta( $image_id, 'wm_mask', true ) )
 		 return $pre;
 
@@ -202,6 +205,7 @@ function wpthumb_wm_get_watermark_masks() {
 	$masks = array_merge( $masks, $_wm_registered_watermarks );
 	
 	return $masks;
+
 }
 
 /**
@@ -219,7 +223,7 @@ function wpthumb_wm_get_watermark_mask_file( $mask ) {
 }
 
 /**
- * Registers extr awatermark images for the user to select in the admin
+ * Registers extra awatermark images for the user to select in the admin
  * 
  * @param string $name - sanetixed identifier
  * @param string $file - full path to the watermarking image
