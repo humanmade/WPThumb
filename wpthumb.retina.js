@@ -26,15 +26,13 @@ var responsiveEnhance = function( img, monitor ) {
 	
 		// Don't do this if we have done it already ( has class large )
 		if ( img.getAttribute( 'data-retina-src') !== undefined || ( ( ' ' + img.className + ' ' ).replace( /[\n\t]/g, ' ' ).indexOf(' image-retina ') !== -1 ) ) {
-	
+				
 			// Create a new image from
 			// Once loaded, replace the original image src.
 			// Add class image-retina.
 			var fullimg = new Image();
 			fullimg.src = img.getAttribute( 'data-retina-src' );    	
   			addEvent( fullimg, 'load', function(e) {
-  			
-  				console.log( this.src );
   				img.src = this.src;
 				img.className += ' image-retina';
 			});
