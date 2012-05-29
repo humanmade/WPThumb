@@ -10,7 +10,7 @@ function wpthumb_retina_action( $image, $id, $path, $args ) {
 	
 	// Do these checks again.
 	// @todo - is this uneccessary duplication?
-	if ( ! file_exists( $path ) || $image->errored() || ! $image_meta = @getimagesize( $image->getCacheFilePath() ) ) )
+	if ( ! file_exists( $path ) || $image->errored() || ! $image_meta = @getimagesize( $image->getCacheFilePath() ) )
 		return;
 	
 	// If the retina arg is true or the global option is set and the retina arg isn't false
