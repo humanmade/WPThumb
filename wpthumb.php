@@ -643,6 +643,9 @@ class WP_Thumb {
  */
 function wpthumb_media_form_crop_position( $fields, $post ) {
 
+	if ( ! wp_attachment_is_image( $post->ID ) )
+		return $fields;
+
 	$current_position = get_post_meta( $post->ID, 'wpthumb_crop_pos', true );
 
 	if ( ! $current_position )
