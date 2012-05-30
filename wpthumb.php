@@ -788,6 +788,8 @@ function wpthumb_post_image( $null, $id, $args ) {
 
 	if ( empty( $args['crop_from_position'] ) )
 		 $args['crop_from_position'] = get_post_meta( $id, 'wpthumb_crop_pos', true );
+		 
+	$args = apply_filters( 'wpthumb_post_image_args', $args, $id );
 
 	if ( empty( $path ) )
 		$path = get_attached_file( $id );
