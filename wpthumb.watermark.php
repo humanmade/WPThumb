@@ -75,6 +75,19 @@ function wpthumb_watermarking_set_args( $args ) {
 }
 add_filter( 'wpthumb_set_args', 'wpthumb_watermarking_set_args' );
 
+function wpthumb_add_watermark_args_to_post_images( $args, $post_id ) {
+	
+	if ( ! wpthumb_wm_image_has_watermark( $post_id ) )
+		return $args;
+		
+	$args['watermark_options'] = wpthumb_wm_get_options( $post_id );	
+	$args['watermark_options']['pre_resize'] = false;
+
+	return $args;
+	
+}
+add_filter( 'wpthumb_post_image_args', 'wpthumb_add_watermark_args_to_post_images', 10, 2 );
+
 function wpthumb_post_resize_generate_watermark( $args, $thumb ) {
 
 	extract ( $args );
@@ -87,9 +100,9 @@ function wpthumb_post_resize_generate_watermark( $args, $thumb ) {
 add_action( 'wpthumb_post_resize', 'wpthumb_post_resize_generate_watermark', 10, 2 );
 
 function wpthumb_pre_resize_generate_watermark( $args, $thumb ) {
-
+	
 	extract ( $args );
-
+	
     // Watermarking (pre resizing)
     if ( isset( $watermark_options['mask'] ) && $watermark_options['mask'] && isset( $watermark_options['pre_resize'] ) && $watermark_options['pre_resize'] === true ) {
 
@@ -148,6 +161,7 @@ function wpthumb_wm_position( $image_id ) {
 	// Legacy
 	if ( $pos = get_post_meta( $image_id, 'wm_position', true ) )
 		 return $pos;
+
 }
 
 /**
@@ -165,6 +179,7 @@ function wpthumb_wm_padding( $image_id ) {
 	// Legacy
 	if ( $padding = (int) get_post_meta( $image_id, 'wm_padding', true ) )
 		 return $padding;
+
 }
 
 function wpthumb_wm_pre_resize( $image_id ) {
@@ -174,7 +189,7 @@ function wpthumb_wm_pre_resize( $image_id ) {
 		
 	// Legacy
 	if ( $pre = (bool) get_post_meta( $image_id, 'wm_pre_resize', true ) )
-		 return $pre;
+		return $pre;
 
 }
 
@@ -185,7 +200,7 @@ function wpthumb_wm_mask( $image_id ) {
 		
 	// Legacy
 	if ( $pre = (string) get_post_meta( $image_id, 'wm_mask', true ) )
-		 return $pre;
+		return $pre;
 
 }
 
@@ -249,14 +264,12 @@ function wpthumb_wm_register_watermark( $name, $file, $label ) {
  */
 function wpthumb_wm_get_options( $id ) {
 
-	if ( !wpthumb_wm_image_has_watermark( $id ) )
+	if ( ! wpthumb_wm_image_has_watermark( $id ) )
 		return array();
-
-	$options['mask'] = get_template_directory() . '/images/watermark.png';
 	
 	$mask = wpthumb_wm_mask( $id );
 	
-	if ( !empty( $mask ) ) {
+	if ( ! empty( $mask ) ) {
 		$options['mask'] = wpthumb_wm_get_watermark_mask_file( $mask );
   
 	} else {
@@ -503,7 +516,7 @@ function wpthumb_media_form_watermark_save( $post, $attachment ) {
 	update_post_meta( $post['ID'], 'use_watermark', ! empty( $attachment['wpthumb_wm_use_watermark'] ) );
 	update_post_meta( $post['ID'], 'wpthumb_wm_position', $attachment['wpthumb_wm_watermark_position'] );
 	update_post_meta( $post['ID'], 'wpthumb_wm_padding', (int) $attachment['wpthumb_wm_watermark_padding'] );
-	update_post_meta( $post['ID'], 'wpthumb_wm_pre_resize', '0' );
+	update_post_meta( $post['ID'], 'wpthumb_wm_pre_resize', 0 );
 	update_post_meta( $post['ID'], 'wpthumb_wm_mask', $attachment['wm_watermark_mask'] );
 	
 	return $post;
@@ -526,7 +539,7 @@ function wpthumb_save_watermark_ajax_action() {
 	update_post_meta( $attachment_id, 'use_watermark', true );
 	update_post_meta( $attachment_id, 'wpthumb_wm_position', $position );
 	update_post_meta( $attachment_id, 'wpthumb_wm_padding', $padding );
-	update_post_meta( $attachment_id, 'wpthumb_wm_pre_resize', '0' );
+	update_post_meta( $attachment_id, 'wpthumb_wm_pre_resize', 0 );
 	update_post_meta( $attachment_id, 'wpthumb_wm_mask', $mask );
 	
 	// If the attachment is the post thumbnail, return the post thubmnail html
