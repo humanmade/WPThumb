@@ -350,13 +350,13 @@ class WP_Thumb {
 		if ( $this->getArg( 'output_file' ) )
 			return basename( $this->getArg( 'output_file' ) );
 
-		$path = $this->getFilePath();
+		$path = basename( $this->getFilePath() );
 
 		if ( ! $path )
 			return '';
 
 		// Generate a short unique filename
-		$serialize = crc32( serialize( array_merge( $this->getArgs(), array( $this->getFilePath() ) ) ) );
+		$serialize = crc32( serialize( array_merge( $this->getArgs(), array( $path ) ) ) );
 
 		// Gifs are converted to pngs
 		if ( $this->getFileExtension() == 'gif' )
