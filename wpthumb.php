@@ -103,6 +103,7 @@ class WP_Thumb {
 		if ( ( $this->getFilePath() && $this->getArgs() ) && ! $this->errored() ) {
 
 			if ( ! $this->isRemote() ) {
+				
 				$dimensions = array_slice( (array) @getimagesize( $this->getFilePath() ), 0, 2 );
 
 				if ( ( $this->getArg( 'width' ) != $dimensions[0] || $this->getArg( 'height' ) != $dimensions[1] ) && ( ! file_exists( $this->getCacheFilePath() ) || ! $this->args['cache'] ) )
@@ -350,8 +351,8 @@ class WP_Thumb {
 		if ( $this->getArg( 'output_file' ) )
 			return basename( $this->getArg( 'output_file' ) );
 
-		$path = basename( $this->getFilePath() );
-
+		$path = str_replace( array( ABSPATH, self::get_home_path() ), '', $this->getFilePath() );
+		
 		if ( ! $path )
 			return '';
 
