@@ -320,6 +320,9 @@ function wpthumb_wm_get_default_watermark_mask() {
  */
 function wpthumb_media_form_watermark( $fields, $post ) {
 
+	if ( ! wp_attachment_is_image( $post->ID ) )
+		return $fields;
+
 	$watermark_masks_options_html = '';
 
 	foreach( wpthumb_wm_get_watermark_masks() as $mask_id => $watermark_mask )
