@@ -15,7 +15,7 @@ function wpthumbGetDevicePixelRatio() {
 }
 
 
-/** 
+/**
  *	Enhance images if required.
  *
  *	If we are on a high res device and the image has a high res src available, load that in.
@@ -24,41 +24,41 @@ var wpthumbRetinaEnhanceAction = function( img ) {
 
 	// If passed an array of images loop through calling this function again for each.
 	if ( img.length ) {
-	
+
 		for ( var i = 0, len = img.length; i < len; i++ ) {
             wpthumbRetinaEnhanceAction( img[i] );
         }
- 
+
 	} else {
-	
-		// Only run once per image 		 		
+
+		// Only run once per image
  		if ( img.getAttribute( 'data-retina-src') !== undefined && ( ( ' ' + img.className + ' ' ).replace( /[\n\t]/g, ' ' ).indexOf( ' image-retina ' ) === -1 ) ) {
-	
+
 			// Create a new image from
 			// Once loaded, replace the original image src.
 			// Add class image-retina.
-			
-			var fullimg = new Image();	
-			fullimg.src = img.getAttribute( 'data-retina-src' );    	
- 
+
+			var fullimg = new Image();
+			fullimg.src = img.getAttribute( 'data-retina-src' );
+
   			wpthumbAddEvent( fullimg, 'load', function( e ) {
   				img.src = this.src;
 	  			img.src = this.src;
 				img.className += ' image-retina';
-				
+
 			} );
-			
+
 		}
-	
+
 	}
 
-}	
+}
 
 var wpthumbRetinaEnhance = function() {
-	
-	if( 1 <= wpthumbGetDevicePixelRatio() )
+
+	if( 1.5 <= wpthumbGetDevicePixelRatio() )
 		wpthumbRetinaEnhanceAction( document.getElementsByTagName( 'img' ) );
-	
+
 }
 
 window.onload = wpthumbRetinaEnhance();
