@@ -269,12 +269,12 @@ function wpthumb_media_form_watermark( $fields, $post ) {
     		
     		} ) 
     		
-    		jQuery(".wm-watermark-options a.preview-watermark").live("click", function(e) {
+    		jQuery("div[rel='<?php echo $post->ID ?>'].wm-watermark-options a.preview-watermark").live("click", function(e) {
     		    e.preventDefault();
     		    WMCreatePreview( jQuery(this).closest(".wm-watermark-options") );
     		});
     		
-    		jQuery(".wm-watermark-options a.save-watermark").live("click", function(e) {
+    		jQuery("div[rel='<?php echo $post->ID ?>'].wm-watermark-options a.save-watermark").live("click", function(e) {
     		    e.preventDefault();
     		    WMSaveWatermark( jQuery(this).closest(".wm-watermark-options"), this );
     		});
