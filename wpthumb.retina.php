@@ -11,8 +11,6 @@ add_action( 'init', function() {
 
 } );
 
-define( 'WPTHUMB_RETINA_ENABLED', true );
-
 /**
  *	Enqueue the retina JS script if the global setting is enabled.
  */
@@ -32,7 +30,7 @@ function wpthumb_retina_is_enabled() {
 	if( defined('WPTHUMB_RETINA_ENABLED') )
 		return (bool) WPTHUMB_RETINA_ENABLED;
 
-	return (bool) get_option( 'wpthumb_retina' );
+	return (bool) apply_filters( 'wpthumb_retina_is_enabled', get_option( 'wpthumb_retina' ) );
 
 }
 
