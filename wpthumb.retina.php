@@ -35,6 +35,21 @@ function wpthumb_retina_is_enabled() {
 }
 
 /**
+ * Return the retina multiplier.
+ *
+ * The return value is the multiplier used when calculating how many times larger the high res image should be compared to the original.
+ * Defaults to 2x
+ * e.g. can set to 1.5 to allow you server 1.5x images to retina screens for better quality images whilst saving a bit of bandwith.
+ * 
+ * @return int 
+ */
+function wpthumb_get_retina_multiplier() {
+
+	return apply_filters( 'wpthumb_retina_multiplier', 2 );
+
+}
+
+/**
  *	Generate the retina src attr. for WPThumb images.
  *	Hooks into wpthumb_action.
  */
@@ -64,11 +79,12 @@ function wpthumb_retina_action( $image, $id, $path, $args ) {
  	     	list( $orig_width, $orig_height ) = @getimagesize( $path );
 
  	     	// Make sure the original is big enough for a retina image
- 	     	if ( $orig_width < $width * 2 || $orig_height < $height * 2 )
+ 	     	// Currently fails if less than 2 times. This has to be done 
+ 	     	if ( $orig_width < $width * wpthumb_get_retina_multiplier() || $orig_height < $height * wpthumb_get_retina_multiplier() )
  	     		return $attr;
 
- 	     	$args['width'] = $width * 2;
- 	     	$args['height'] = $height * 2;
+ 	     	$args['width'] = $width * wpthumb_get_retina_multiplier();
+ 	     	$args['height'] = $height * wpthumb_get_retina_multiplier();
 
  	     	unset( $args['retina'] );
 
@@ -114,8 +130,8 @@ function wpthumb_retina_get_image_tag( $html, $id, $caption, $title, $align, $ur
 	} elseif ( is_array( $size ) ) {
 
 		// If an array of args.
-		$args['width']  = $size['width'] * 2;
-		$args['height'] = $size['height'] * 2;
+		$args['width']  = $size['width'] * wpthumb_get_retina_multiplier();
+		$args['height'] = $size['height'] * wpthumb_get_retina_multiplier();
 
 	}
 
@@ -134,11 +150,11 @@ function wpthumb_retina_get_image_tag( $html, $id, $caption, $title, $align, $ur
 
 	// Make sure the original is big enough for a retina image
 	// If not cropped - dont worry - just return the biggest possible.
-	if ( ! empty( $args['crop'] ) && ( $orig_width < $args['width'] * 2 || $orig_height < $args['height'] * 2 ) )
+	if ( ! empty( $args['crop'] ) && ( $orig_width < $args['width'] * wpthumb_get_retina_multiplier() || $orig_height < $args['height'] * wpthumb_get_retina_multiplier() ) )
 		return $html;
 
-	$args['width'] = $args['width'] * 2;
-	$args['height'] = $args['height'] * 2;
+	$args['width'] = $args['width'] * wpthumb_get_retina_multiplier();
+	$args['height'] = $args['height'] * wpthumb_get_retina_multiplier();
 
 	$retina_image_attr = ' data-retina-src="' . reset( wp_get_attachment_image_src( $id, $args ) ) . '" ';
 
