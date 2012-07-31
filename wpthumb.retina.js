@@ -56,7 +56,7 @@ var wpthumbRetinaEnhanceAction = function( img ) {
 
 var wpthumbRetinaEnhance = function() {
 
-	if( 1.5 <= wpthumbGetDevicePixelRatio() )
+	if ( 1.5 <= wpthumbGetDevicePixelRatio() )
 		wpthumbRetinaEnhanceAction( document.getElementsByTagName( 'img' ) );
 
 }

@@ -58,7 +58,6 @@ function wpthumb_retina_action( $image, $id, $path, $args ) {
 	extract( $args );
 
 	// Do these checks again.
-	// @todo - is this uneccessary duplication?
 	if ( ! file_exists( $path ) || $image->errored() || ! $image_meta = @getimagesize( $image->getCacheFilePath() ) )
 		return;
 
