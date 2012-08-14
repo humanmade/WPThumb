@@ -152,21 +152,22 @@ class WP_Thumb {
 	public function setArgs( $args ) {
 
 		 $arg_defaults = array(
-			'width' 				=> 0,
-			'height'				=> 0,
-			'crop'					=> false,
-			'crop_from_position' 	=> 'center,center',
-			'resize'				=> true,
-			'watermark_options' 	=> array(),
-			'cache'					=> true,
-			'skip_remote_check' 	=> false,
-			'default'				=> null,
-			'jpeg_quality' 			=> 90,
-			'resize_animations' 	=> true,
-			'return' 				=> 'url',
-			'custom' 				=> false,
-			'background_fill'		=> null,
-			'output_file'			=> false
+			'width' 				    => 0,
+			'height'				    => 0,
+			'crop'					    => false,
+			'crop_from_position' 	    => 'center,center',
+			'resize'				    => true,
+			'watermark_options' 	    => array(),
+			'cache'					    => true,
+			'skip_remote_check' 	    => false,
+			'default'				    => null,
+			'jpeg_quality' 			    => 90,
+			'resize_animations' 	    => true,
+			'return' 				    => 'url',
+			'custom' 				    => false,
+			'background_fill'		    => null,
+			'output_file'			    => false,
+            'cache_with_query_params'   => false
 		);
 
 		$args = wp_parse_args( $args, $arg_defaults );
@@ -222,6 +223,9 @@ class WP_Thumb {
 
 		if ( strpos( $this->file_path, '/' ) === 0 && ! file_exists( $this->file_path ) && $this->args['default'] )
 			$this->file_path = $this->args['default'];
+
+        if ( $this->getArg( 'cache_with_query_params' ) )
+            return $this->file_path;
 
 		return reset( explode( '?', $this->file_path ) );
 	}
