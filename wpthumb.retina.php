@@ -16,18 +16,18 @@ add_action( 'init', function() {
  */
 add_action( 'wp_enqueue_scripts', function() {
 
-	if( wpthumb_retina_is_enabled() )
+	if ( wpthumb_retina_is_enabled() )
 		wp_enqueue_script( 'wpthumb_retina' );
 
 } );
 
 
 /**
- *	Global setting for retina. Either set in media settings, or defined in wp-congig.php.
+ *	Global setting for retina. Either set in media settings, or defined in wp-config.php.
  */
 function wpthumb_retina_is_enabled() {
 
-	if( defined('WPTHUMB_RETINA_ENABLED') )
+	if ( defined('WPTHUMB_RETINA_ENABLED') )
 		return (bool) WPTHUMB_RETINA_ENABLED;
 
 	return (bool) apply_filters( 'wpthumb_retina_is_enabled', get_option( 'wpthumb_retina' ) );
@@ -107,7 +107,7 @@ add_action( 'wpthumb_action', 'wpthumb_retina_action', 10, 4 );
  */
 function wpthumb_retina_get_image_tag( $html, $id, $caption, $title, $align, $url, $size, $alt = '' ) {
 
-	if( ! wpthumb_retina_is_enabled() )
+	if ( ! wpthumb_retina_is_enabled() )
 		return $html;
 
 	global $_wp_additional_image_sizes;
@@ -174,7 +174,7 @@ add_filter( 'image_send_to_editor', 'wpthumb_retina_get_image_tag', 100, 8 );
  */
 function wpthumb_retina_change_mce_options( $init ) {
 
-	if( ! wpthumb_retina_is_enabled() )
+	if ( ! wpthumb_retina_is_enabled() )
 		return $html;
 
     // Command separated string of extended elements
