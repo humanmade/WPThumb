@@ -231,6 +231,9 @@ function wpthumb_the_post_thumbnail_picture( $size = 'post-thumbnail', $attr = '
  */
 function wpthumb_get_attachment_picture( $attachment_id, $size, $attr = '' ) {
 
+	if ( empty( $attachment_id ) )
+		return;
+
 	$picture = new WPThumb_Picture();
 	$picture->add_picture_source( $attachment_id, $size );
 	return $picture->get_picture();
