@@ -61,7 +61,9 @@ class WPThumb_Picture {
 		if ( empty( $this->images ) )
 			return;
 
-		$picture = "\n" . '<div data-picture data-alt="' . $this->get_alt() . '">' . "\n";
+		$default = $this->get_default_image();
+		
+		$picture = "\n" . '<div data-picture data-alt="' . $this->get_alt() . '" class="attachment-' . $default['size'] . '">' . "\n";
 		
 		foreach ( $this->images as $image ) {
 
@@ -69,7 +71,7 @@ class WPThumb_Picture {
 
 		}
 
-		$default = $this->get_default_image();
+		
 		$picture .= "\t" . '<noscript>' . wp_get_attachment_image( $default['attachment_id'], $default['size'] ) . '</noscript>' . "\n";
 
 		$picture .= '</div>';
