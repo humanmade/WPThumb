@@ -96,25 +96,34 @@ class WPThumb_Picture {
 
 		$image = wp_parse_args( $image, $image_defaults );
 		
+		// The original full size image that is uploaded.
+		$original = wp_get_attachment_image_src( $image['attachment_id'], 'full' );
+
 		// The source element for the requested image
 		$requested = wp_get_attachment_image_src( $image['attachment_id'], $image['size'] );
-		$r = "\t<div data-src=\"" . $requested[0] . "\" data-media=\"" . $this->get_picture_source_media_attr( $image['media_query'], false ) . "\"></div>\n";
+
+		$srcset = array();
+		$srcset[] = $requested[0] . ' 1x';
 
 		// The source element for the high res version of the requested image.
 		// Calculate the size args for the high resoloution image & If possible to create high res version.
-		$original = wp_get_attachment_image_src( $image['attachment_id'], 'full' );
 		$size_high_res = array(
 			0      => (int) $requested[1] * $this->multiplier,
 			1      => (int) $requested[2] * $this->multiplier,
 			'crop' => $requested[3]
 		);
 
+		//$r = "\t<div data-srcset=\"" . $requested[0] . " 1x,\" data-media=\"" . $this->get_picture_source_media_attr( $image['media_query'], false ) . "\"></div>\n";
+
 		if ( $original[1] >= $size_high_res[0] && $original[2] >= $size_high_res[1] ) {
 			
 			$requested_high_res = wp_get_attachment_image_src( $image['attachment_id'], $size_high_res );
-			$r .= "\t<div data-src=\"" . $requested_high_res[0] . "\" data-media=\"" . $this->get_picture_source_media_attr( $image['media_query'], true ) . "\"></div>\n";
+			//$r .= "\t<div data-src=\"" . $requested_high_res[0] . "\" data-media=\"" . $this->get_picture_source_media_attr( $image['media_query'], true ) . "\"></div>\n";
+			$srcset[] = $requested_high_res[0] . ' ' . $this->multiplier . 'x';
 
 		}
+
+		$r = "\t<div data-srcset=\"" . implode( ', ', $srcset ). "\" data-media=\"" . $this->get_picture_source_media_attr( $image['media_query'], false ) . "\"></div>\n";
 
 		return $r;
 		
@@ -128,6 +137,8 @@ class WPThumb_Picture {
 	 * @return string               full string to add as data-media attribute.
 	 */
 	private function get_picture_source_media_attr( $media_query, $high_res = false ) {
+
+		return $media_query;
 
 		if ( $high_res )
 			if ( empty( $media_query ) )
@@ -148,7 +159,8 @@ class WPThumb_Picture {
  */
 add_action( 'wp_enqueue_scripts', function() {
 
-	wp_enqueue_script( 'wpthumb_picturefill', WP_THUMB_URL . 'picturefill/picturefill.js', false, false, true );
+	//wp_enqueue_script( 'wpthumb_picturefill', WP_THUMB_URL . 'picturefill/picturefill.js', false, false, true );
+	wp_enqueue_script( 'wpthumb_picturefill', WP_THUMB_URL . 'pitcurefill-fix.js', false, false, true );
 
 } );
 
