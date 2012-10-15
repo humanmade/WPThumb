@@ -148,8 +148,8 @@ class WPThumb_Picture {
  */
 add_action( 'wp_enqueue_scripts', function() {
 
-	wp_enqueue_script( 'wpthumb_matchmedia', WP_THUMB_URL . 'picturefill/picturefill.js', false, false, true );
-	wp_enqueue_script( 'wpthumb_picturefill', WP_THUMB_URL . 'picturefill/external/matchmedia.js', array('wpthumb_matchmedia' ), false, true );
+	wp_enqueue_script( 'wpthumb_matchmedia', WP_THUMB_URL . 'picturefill/external/matchmedia.js', false, false, true );
+	wp_enqueue_script( 'wpthumb_picturefill', WP_THUMB_URL . 'picturefill/picturefill.js', array('wpthumb_matchmedia' ), false, true );
 
 } );
 
