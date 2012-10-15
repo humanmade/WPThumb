@@ -163,10 +163,7 @@ function wpthumb_get_picture( $images ) {
 	$picture = new WPThumb_Picture();
 
 	foreach ( $images as $image )
-		$picture->add_image( $image['attachment_id'], $image['size'], $image['media_query'] );
-	
-	if ( $alt )
-		$picture->set_alt_attr( $alt );
+		$picture->add_picture_source( $image['attachment_id'], $image['size'], $image['media_query'] );
 
 	return $picture->get_picture();
 
