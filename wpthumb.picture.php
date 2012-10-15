@@ -137,7 +137,8 @@ class WPThumb_Picture {
  */
 add_action( 'wp_enqueue_scripts', function() {
 
-	wp_enqueue_script( 'wpthumb_picturefill', WP_THUMB_URL . 'picturefill-fix.js', false, false, true );
+	wp_enqueue_script( 'wpthumb_matchmedia', WP_THUMB_URL . 'picturefill/external/matchmedia.js', false, false, true );
+	wp_enqueue_script( 'wpthumb_picturefill', WP_THUMB_URL . 'picturefill-fix.js', array('wpthumb_matchmedia' ), false, true );
 
 } );
 
@@ -152,10 +153,7 @@ function wpthumb_get_picture( $images ) {
 	$picture = new WPThumb_Picture();
 
 	foreach ( $images as $image )
-		$picture->add_image( $image['attachment_id'], $image['size'], $image['media_query'] );
-	
-	if ( $alt )
-		$picture->set_alt_attr( $alt );
+		$picture->add_picture_source( $image['attachment_id'], $image['size'], $image['media_query'] );
 
 	return $picture->get_picture();
 
