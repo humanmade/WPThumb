@@ -55,7 +55,11 @@ class WPThumb_Picture {
 
 	}
 
-
+	/**
+	 * Construct the picture element.
+	 * 
+	 * @return string the whole picture element.
+	 */
 	public function get_picture() {
 
 		if ( empty( $this->images ) )
@@ -71,7 +75,7 @@ class WPThumb_Picture {
 
 		}
 
-		
+		// Fallback/default image in noscript.
 		$picture .= "\t" . '<noscript>' . wp_get_attachment_image( $default['attachment_id'], $default['size'] ) . '</noscript>' . "\n";
 
 		$picture .= '</div>';
@@ -83,8 +87,8 @@ class WPThumb_Picture {
 	/**
 	 * Get the source element for each image.
 	 *
-	 * @param  [type] $image [description]
-	 * @return [type]        [description]
+	 * @param  array $image - args. Must contain at least attachment_id
+	 * @return source element
 	 */
 	private function get_picture_source( $image ) {
 
@@ -99,68 +103,41 @@ class WPThumb_Picture {
 		// The original full size image that is uploaded.
 		$original = wp_get_attachment_image_src( $image['attachment_id'], 'full' );
 
-		// The source element for the requested image
+		// The src for the requested image
 		$requested = wp_get_attachment_image_src( $image['attachment_id'], $image['size'] );
 
+		// Start constructing the srcset.
 		$srcset = array();
 		$srcset[] = $requested[0] . ' 1x';
 
-		// The source element for the high res version of the requested image.
-		// Calculate the size args for the high resoloution image & If possible to create high res version.
+		// Calculate the size args for the high resoloution image
 		$size_high_res = array(
 			0      => (int) $requested[1] * $this->multiplier,
 			1      => (int) $requested[2] * $this->multiplier,
 			'crop' => $requested[3]
 		);
 
-		//$r = "\t<div data-srcset=\"" . $requested[0] . " 1x,\" data-media=\"" . $this->get_picture_source_media_attr( $image['media_query'], false ) . "\"></div>\n";
-
+		// If possible to create high res version.
 		if ( $original[1] >= $size_high_res[0] && $original[2] >= $size_high_res[1] ) {
 			
+			// The src for the high res version of the requested image.
 			$requested_high_res = wp_get_attachment_image_src( $image['attachment_id'], $size_high_res );
-			//$r .= "\t<div data-src=\"" . $requested_high_res[0] . "\" data-media=\"" . $this->get_picture_source_media_attr( $image['media_query'], true ) . "\"></div>\n";
 			$srcset[] = $requested_high_res[0] . ' ' . $this->multiplier . 'x';
 
 		}
 
-		$r = "\t<div data-srcset=\"" . implode( ', ', $srcset ). "\" data-media=\"" . $this->get_picture_source_media_attr( $image['media_query'], false ) . "\"></div>\n";
-
-		return $r;
+		return "\t<div data-srcset=\"" . implode( ', ', $srcset ). "\" data-media=\"" . $image['media_query'] . "\"></div>\n";
 		
-	}
-
-	/**
-	 * Process the media attribute value. Adds retina args if required.
-	 * 
-	 * @param  string  $media_query media query. Currently only supports a single query. ('and' is ok, but ',' is not)
-	 * @param  boolean $retina      If this is for a high res image source, pass true to append the high res media query args.
-	 * @return string               full string to add as data-media attribute.
-	 */
-	private function get_picture_source_media_attr( $media_query, $high_res = false ) {
-
-		return $media_query;
-
-		if ( $high_res )
-			if ( empty( $media_query ) )
-				return "(min-device-pixel-ratio: $this->multiplier)";
-			else 
-				return "$media_query and (min-device-pixel-ratio: $this->multiplier), $media_query and (-webkit-min-device-pixel-ratio: $this->multiplier)"; 
-		
-		else 
-			return $media_query;
-
 	}
 
 }
-
 
 /**
  *	Enqueue the picturefill scripts
  */
 add_action( 'wp_enqueue_scripts', function() {
 
-	//wp_enqueue_script( 'wpthumb_picturefill', WP_THUMB_URL . 'picturefill/picturefill.js', false, false, true );
-	wp_enqueue_script( 'wpthumb_picturefill', WP_THUMB_URL . 'pitcurefill-fix.js', false, false, true );
+	wp_enqueue_script( 'wpthumb_picturefill', WP_THUMB_URL . 'picturefill-fix.js', false, false, true );
 
 } );
 
@@ -196,7 +173,7 @@ function wpthumb_get_picture( $images ) {
  */
 function _wpthumb_picture_post_thumbnail_html( $html, $post_id, $post_thumbnail_id, $size, $attr ) {
 
-	$html = wpthumb_get_the_post_thumbnail_picture( $post_id, 'thumbnail', $attr );
+	$html = wpthumb_get_the_post_thumbnail_picture( $post_id, $size, $attr );
 
 	return $html;
 
