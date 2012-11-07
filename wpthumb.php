@@ -106,7 +106,8 @@ class WP_Thumb {
 
 				$dimensions = array_slice( (array) @getimagesize( $this->getFilePath() ), 0, 2 );
 
-				if ( ( $this->getArg( 'width' ) != $dimensions[0] || $this->getArg( 'height' ) != $dimensions[1] ) && ( ! file_exists( $this->getCacheFilePath() ) || ! $this->args['cache'] ) )
+				// Don't generate a cache file if the dimensions are the same as the source
+				if ( ( $this->getArg( 'width' ) != $dimensions[0] || $this->getArg( 'height' ) != $dimensions[1] || $this->getArg( 'watermark_options' ) || $this->getArg( 'jpeg_quality' ) != 90 ) && ( ! file_exists( $this->getCacheFilePath() ) || ! $this->args['cache'] ) )
 					$this->generateCacheFile();
 
 			} elseif ( ! file_exists( $this->getCacheFilePath() ) || ! $this->args['cache'] ) {
@@ -529,7 +530,7 @@ class WP_Thumb {
 
 			if ( ! $this->isRemote() ) {
 
-				if ( ( $dimensions = array_slice( (array) @getimagesize( $this->getFilePath() ), 0, 2 ) ) && $this->getArg( 'width' ) == $dimensions[0] && $this->getArg( 'height' ) == $dimensions[1] )
+				if ( ( $dimensions = array_slice( (array) @getimagesize( $this->getFilePath() ), 0, 2 ) ) && $this->getArg( 'width' ) == $dimensions[0] && $this->getArg( 'height' ) == $dimensions[1] && ! $this->getArg( 'watermark_options' ) && $this->getArg( 'jpeg_quality' ) == 90 )
 					$path = $this->getFilePath();
 
 				else
