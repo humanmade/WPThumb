@@ -230,7 +230,7 @@ function wpthumb_media_form_watermark( $fields, $post ) {
 	else
 		$calling_post_id = false;
 
-    $html = '<style>.watermark_pos { } .watermark_pos input { margin: 5px; } .wpthumb_wrap { display: inline-block; padding: 0 5px; }</style>';
+    $html = '<style>.wm-watermark-options { padding-top: 8px; } .wm-watermark-options input.wpthumb_apply_watermark { width: auto; margin-right: 5px; } .watermark_pos { } .watermark_pos input { margin: 5px; } .wpthumb_wrap { display: inline-block; padding: 0 5px; }</style>';
     $html .= '<div rel="' . $post->ID . '" class="wm-watermark-options"><label><input class="wpthumb_apply_watermark" name="attachments[' . $post->ID . '][wpthumb_wm_use_watermark]" type="checkbox"' . checked( wpthumb_wm_image_has_watermark( $post->ID ), true, false ) . ' /> Apply Watermark</label>';
     $html .= '<div class="watermark_pos" style="display:' . ( wpthumb_wm_image_has_watermark( $post->ID ) ? 'block' : 'none' ) . '; ">';
     $html .= '<br /><span class="wpthumb_wrap"><label>Position</label><select class="wm_watermark_position" name="attachments[' . $post->ID . '][wpthumb_wm_watermark_position]">
