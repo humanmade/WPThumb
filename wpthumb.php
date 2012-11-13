@@ -76,7 +76,7 @@ class WP_Thumb {
 
 		return self::$wp_upload_dir;
 	}
-	
+
 	private static function get_home_path() {
 		return str_replace( str_replace( home_url(), '', site_url() ), '', ABSPATH );
 	}
@@ -126,16 +126,16 @@ class WP_Thumb {
 	public function setFilePath( $file_path ) {
 
 		$upload_dir = self::uploadDir();
-		
+
 		if ( strpos( $file_path, self::get_home_path() ) === 0 ) {
 			  $this->file_path = $file_path;
 			  return;
 		}
-		
+
 		// If it's an uploaded file
 		if ( strpos( $file_path, $upload_dir['baseurl'] ) !== false )
 			$this->file_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $file_path );
-		
+
 		else
 			$this->file_path = str_replace( trailingslashit( home_url() ), self::get_home_path(), $file_path );
 
