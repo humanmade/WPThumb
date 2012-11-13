@@ -655,7 +655,7 @@ function wpthumb_media_form_crop_position( $fields, $post ) {
 	if ( ! $current_position )
 		$current_position = 'center,center';
 
-	$html = '<style>#wpthumb_crop_pos input { margin: 5px; }</style>';
+	$html = '<style>#wpthumb_crop_pos { padding: 5px; } #wpthumb_crop_pos input { margin: 5px; width: auto; }</style>';
 	$html .= '<div id="wpthumb_crop_pos">';
 	$html .= '<input type="radio" name="attachments[' . $post->ID . '][wpthumb_crop_pos]" value="left,top" title="Left, Top" ' . checked( 'left,top', $current_position, false ) . '/>';
 	$html .= '<input type="radio" name="attachments[' . $post->ID . '][wpthumb_crop_pos]" value="center,top" title="Center, Top" ' . checked( 'center,top', $current_position, false ) . '/>';
