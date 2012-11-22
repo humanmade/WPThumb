@@ -1,6 +1,6 @@
 <?php
 
-include_once( '../../../../../wp-load.php' );
+include_once( '../../../../../wordpress/wp-load.php' );
 include_once( '../../wpthumb.php' );
 
 $args = array(

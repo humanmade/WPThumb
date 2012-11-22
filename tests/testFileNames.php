@@ -24,7 +24,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$image->setFilePath( $path );
 
 		$this->assertFalse( $image->errored() );
-		$this->assertContains( ABSPATH, $image->getCacheFileDirectory() );
+		$this->assertContains( WP_CONTENT_DIR, $image->getCacheFileDirectory() );
 	}
 
 	function testFileWithDoubleSlashUrl() {
@@ -35,7 +35,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$image->setFilePath( $path );
 
 		$this->assertFalse( $image->errored() );
-		$this->assertContains( ABSPATH, $image->getCacheFileDirectory() );
+		$this->assertContains( WP_CONTENT_DIR, $image->getCacheFileDirectory() );
 		$this->assertContains( 'remote', $image->getCacheFileDirectory() );
 	}
 
@@ -47,7 +47,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$image->setFilePath( $path );
 
 		$this->assertFalse( $image->errored() );
-		$this->assertContains( ABSPATH, $image->getCacheFileDirectory() );
+		$this->assertContains( WP_CONTENT_DIR, $image->getCacheFileDirectory() );
 		$this->assertContains( 'remote', $image->getCacheFileDirectory() );
 		$this->assertEquals( 'jpg', $image->getFileExtension() );
 
@@ -61,7 +61,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$image->setFilePath( $path );
 
 		$this->assertFalse( $image->errored() );
-		$this->assertContains( ABSPATH, $image->getCacheFileDirectory() );
+		$this->assertContains( WP_CONTENT_DIR, $image->getCacheFileDirectory() );
 		$this->assertNotContains( '~', $image->getCacheFileDirectory() );
 
 	}
@@ -87,7 +87,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$image->setFilePath( $path );
 
 		$this->assertFalse( $image->errored() );
-		$this->assertContains( ABSPATH, $image->getCacheFileDirectory() );
+		$this->assertContains( WP_CONTENT_DIR, $image->getCacheFileDirectory() );
 		$this->assertEquals( 'png', $image->getFileExtension() );
 
 	}
@@ -100,7 +100,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$image->setFilePath( $path );
 
 		$this->assertFalse( $image->errored() );
-		$this->assertContains( ABSPATH, $image->getCacheFileDirectory() );
+		$this->assertContains( WP_CONTENT_DIR, $image->getCacheFileDirectory() );
 		$this->assertEquals( 'jpg', $image->getFileExtension() );
 
 	}
@@ -108,11 +108,10 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 	function testFileWithLocalURL() {
 
 		$path = dirname( __FILE__ ) . '/images/google.png';
-		$url = str_replace( ABSPATH, get_bloginfo( 'url' ) . '/', $path );
+		$url = str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $path );
 
 		$image = new WP_Thumb;
 		$image->setFilePath( $url );
-
 		$this->assertFalse( $image->errored() );
 		$this->assertEquals( $path, $image->getFilePath() );
 
@@ -154,7 +153,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 	function testGifIsConvertedToPNGInCacheFileName() {
 
 		$path = dirname( __FILE__ ) . '/images/google.gif';
-		$url = str_replace( ABSPATH, get_bloginfo( 'url' ) . '/', $path );
+		$url = str_replace( WP_CONTENT_DIR, WP_CONTENT_URL . '/', $path );
 
 		$image = new WP_Thumb;
 		$image->setFilePath( $path );
@@ -167,7 +166,7 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 	function testLocalFileCacheFilePath() {
 
 		$image = new WP_Thumb;
-		$image->setFilePath( ABSPATH . 'foo.jpg' );
+		$image->setFilePath( WP_CONTENT_DIR . 'foo.jpg' );
 
 		$this->assertFalse( strpos( $image->getCacheFilePath(), '//' ) );
 
