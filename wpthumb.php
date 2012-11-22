@@ -31,19 +31,11 @@ define( 'WP_THUMB_URL', plugin_dir_url( __FILE__ ) );
 
 // TODO wpthumb_create_args_from_size filter can pass string or array which makes it difficult to hook into
 
-// Don't activate on anything less than PHP 5.2.4
-if ( version_compare( phpversion(), '5.2.4', '<' ) ) {
-
-	require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-	deactivate_plugins( WP_THUMB_PATH . '/plugin.php' );
-
-	if ( isset( $_GET['action'] ) && ( $_GET['action'] == 'activate' || $_GET['action'] == 'error_scrape' ) )
-		die( __( 'WP Thumb requires PHP version 5.2.4 or greater.', 'wpthumb' ) );
-
-}
 
 // Load the watermarking class
-include_once( WP_THUMB_PATH . '/wpthumb.watermark.php' );
+//include_once( WP_THUMB_PATH . '/wpthumb.watermark.php' );
+include_once( WP_THUMB_PATH . '/wpthumb.image-editor.php' );
+include_once( WP_THUMB_PATH . '/wpthumb.background-fill.php' );
 
 /**
  * Base WP_Thumb class
@@ -89,10 +81,6 @@ class WP_Thumb {
 	 * @param array $args. (default: array())
 	 */
 	public function __construct( $file_path = null, $args = array() ) {
-
-		// Load PHPThumb if it isn't already defined
-		if ( ! class_exists( 'PhpThumbFactory' ) )
-			include_once( WP_THUMB_PATH . '/phpthumb/src/ThumbLib.inc.php' );
 
 		if ( $file_path )
 			$this->setFilePath( $file_path );
@@ -309,10 +297,6 @@ class WP_Thumb {
 
 		$original_filename = basename( $this->getFilePath() );
 
-		// If the image was remote, we want to store them in the remote images folder, not it's name
-		if ( strpos( $original_filename, '0_0_resize' ) === 0 )
-			$original_filename = end( explode( '/', str_replace( '/' . $original_filename, '', $this->getFilePath() ) ) );
-
 		// TODO use pathinfo
 		$parts = explode( '.', $original_filename );
 
@@ -385,10 +369,6 @@ class WP_Thumb {
 	 */
 	public function generateCacheFile() {
 
-		// Performance testing
-		do_action( 'start_operation', 'generateCacheFile' );
-		do_action( 'add_event', $this->getFilePath() );
-
 		$new_filepath = $this->getCacheFilePath();
 		$file_path = $this->getFilePath();
 
@@ -396,110 +376,67 @@ class WP_Thumb {
 		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', '256M' ) );
 
 		// Create the image
-		try {
+		$editor = WP_Image_Editor::get_instance( $file_path, array( 'get_image' ) );
 
-			$thumb = phpThumbFactory::create( $file_path, array( 'jpegQuality' => $this->args['jpeg_quality'] ) );
+		if ( is_wp_error( $editor ) ) {
+			$this->error = $editor;
 
-		} catch ( Exception $e ) {
-
-			$this->error = $e;
-
-			do_action( 'end_operation', 'generateCacheFile' );
 			return $this->returnImage();
-
 		}
-
-		$thumb = apply_filters( 'wpthumb_image_filter', $thumb, $this->args );
-
-		extract( $this->args );
-
+		
 		wp_mkdir_p( $this->getCacheFileDirectory() );
 
 		// Convert gif images to png before resizing
 		if ( $this->getFileExtension() == 'gif' ) :
 
-			// Don't resize animated gifs as the animations will be broken
-			if ( ! empty( $resize_animations ) !== true && $this->isAnimatedGif() ) {
-
-				$this->error = new WP_Error( 'animated-gif' );
-
-				do_action( 'end_operation', 'generateCacheFile' );
-				return $this->returnImage();
-
-			}
-
 			// Save the converted image
-			$thumb->save( $new_filepath, 'png' );
-
-			// tell everyone
-			do_action( 'wpthumb_save_file', $new_filepath, $this );
-
-			unset( $thumb );
-
-			do_action( 'end_operation', 'generateCacheFile' );
+			$editor->save( $new_filepath, 'image/png' );
 
 			// Pass the new file back through the function so they are resized
 			return new WP_Thumb( $new_filepath, array_merge( $this->args, array( 'output_file' => $new_filepath, 'cache' => false ) ) );
 
 		endif;
 
-		// Watermarking (pre resizing)
-		if ( isset( $watermark_options['mask'] ) && $watermark_options['mask'] && isset( $watermark_options['pre_resize'] ) && $watermark_options['pre_resize'] === true ) {
+		apply_filters( 'wpthumb_image_pre', $editor, $this->args );
 
-			// TODO why?
-			$thumb->resize( 99999, 99999 );
-
-			$thumb->createWatermark( $watermark_options['mask'], $watermark_options['position'], $watermark_options['padding'] );
-
-		}
+		extract( $this->args );
 
 		// Cropping
 		if ( $crop === true && $resize === true ) :
 
-			if ( $crop_from_position && count( $crop_from_position ) == 2 && method_exists( $thumb, 'adaptiveResizeFromPoint' ) && empty( $background_fill ) ) {
-				$thumb->adaptiveResizeFromPoint( $width, $height, $crop_from_position[0], $crop_from_position[1] );
-			}
-
-			// Background file auto
-			elseif ( $background_fill === 'auto' && $thumb->canBackgroundFillSolidColorWithResize( $width, $height ) ) {
-				$thumb->resize( $width, $height );
-				$thumb->backgroundFillAutoColor( $width, $height );
-			}
-
-			// Background fill with color
-			elseif ( ! empty( $background_fill ) && $background_fill !== 'auto' ) {
-				$thumb->resize( $width, $height );
-				$thumb->backgroundFillWithColor( $width, $height, $background_fill );
-			}
-
-			elseif ( $crop_from_position && count( $crop_from_position ) == 2 ) {
-				$thumb->adaptiveResizeFromPoint( $width, $height, $crop_from_position[0], $crop_from_position[1] );
-
-			} else {
-				$thumb->adaptiveResize( $width, $height );
-			}
+			$editor->resize( $width, $height, true );			
 
 		elseif ( $crop === true && $resize === false ) :
 
-			$thumb->cropFromCenter( $width, $height );
+			$this->crop_from_center( $editor, $width, $height );
 
 		else :
-
-			$thumb->resize( $width, $height );
-
+			
+			$editor->resize( $width, $height );
 		endif;
 
-		// Watermarking (post resizing)
-		if ( isset( $watermark_options['mask'] ) && $watermark_options['mask'] && isset( $watermark_options['pre_resize'] ) && $watermark_options['pre_resize'] === false )
-			$thumb->createWatermark($watermark_options['mask'], $watermark_options['position'], $watermark_options['padding']);
+		apply_filters( 'wpthumb_image_post', $editor, $this->args );
 
-		$thumb->save( $new_filepath );
+		$editor->save( $new_filepath );
+	}
 
-		// Destroy the image
-		unset( $thumb );
+	private function crop_from_center( $editor, $width, $height ) {
 
-		do_action( 'end_operation', 'generateCacheFile' );
+		$size = $editor->get_size();
 
+		$crop = array( 'x' => 0, 'y' => 0, 'width' => $size['width'], 'height' => $size['height'] );
+
+		if ( $width < $size['width'] ) {
+			$crop['x'] = intval( ( $size['width'] - $width ) / 2 );
+			$crop['width'] = $width;
+		}
+
+		if ( $height < $size['height'] ) {
+			$crop['y'] = intval( ( $size['height'] - $height ) / 2 );
+			$crop['height'] = $height;
+		}
+
+		return $editor->crop( $crop['x'], $crop['y'], $crop['width'], $crop['height'] );
 	}
 
 	/**
