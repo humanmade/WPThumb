@@ -33,8 +33,7 @@ define( 'WP_THUMB_URL', plugin_dir_url( __FILE__ ) );
 
 
 // Load the watermarking class
-//include_once( WP_THUMB_PATH . '/wpthumb.watermark.php' );
-include_once( WP_THUMB_PATH . '/wpthumb.image-editor.php' );
+include_once( WP_THUMB_PATH . '/wpthumb.watermark.php' );
 include_once( WP_THUMB_PATH . '/wpthumb.background-fill.php' );
 
 /**
@@ -376,7 +375,7 @@ class WP_Thumb {
 		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', '256M' ) );
 
 		// Create the image
-		$editor = WP_Image_Editor::get_instance( $file_path, array( 'get_image' ) );
+		$editor = wp_get_image_editor( $file_path, array( 'methods' => array( 'get_image' ) ) );
 
 		if ( is_wp_error( $editor ) ) {
 			$this->error = $editor;
@@ -1011,3 +1010,14 @@ function wpthumb_test() {
 
 if ( isset( $_GET['wpthumb_test'] ) )
 	add_action( 'init', 'wpthumb_test' );
+
+function wpthumb_add_image_editors( $editors ) {
+
+	require_once( WP_THUMB_PATH . '/wpthumb.image-editor.php' );
+
+	$editors[] = 'WP_Thumb_Image_Editor_GD';
+	$editors[] = 'WP_Thumb_Image_Editor_Imagick';
+
+	return $editors;
+}
+add_filter( 'wp_image_editors', 'wpthumb_add_image_editors' );

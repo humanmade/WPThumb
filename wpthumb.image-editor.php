@@ -29,11 +29,3 @@ class WP_Thumb_Image_Editor_Imagick extends WP_Image_Editor_Imagick {
 		parent::update_size( $width, $height);
 	}
 }
-
-function wpthumb_add_image_editors( $editors ) {
-	$editors[] = 'WP_Thumb_Image_Editor_GD';
-	$editors[] = 'WP_Thumb_Image_Editor_Imagick';
-
-	return $editors;
-}
-add_filter( 'wp_image_editors', 'wpthumb_add_image_editors' );
