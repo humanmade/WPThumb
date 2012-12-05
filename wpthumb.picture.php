@@ -8,22 +8,22 @@ class WPThumb_Picture {
 
 	// Array of all the different images used to build the picture element.
 	private $images = array();
-	
-	public $multiplier = 2;	
+
+	public $multiplier = 2;
 
 	/**
 	 * Helper function for adding image sources for picture element.
-	 * 
+	 *
 	 * @param int $attachment_id 	The ID of the wordpress attachment.
 	 * @param string $size          string or array. The image size of the required source.
 	 * @param string $media_query   The media query used by this souce.
 	 */
 	public function add_picture_source( $attachment_id, $size = 'post-thumbnail', $media_query = '' ) {
 
-		$this->images[] = array( 
-			'attachment_id' => $attachment_id, 
-			'size'          => $size, 
-			'media_query'	=> $media_query 
+		$this->images[] = array(
+			'attachment_id' => $attachment_id,
+			'size'          => $size,
+			'media_query'	=> $media_query
 		);
 
 	}
@@ -36,14 +36,14 @@ class WPThumb_Picture {
 
 		$default = $this->get_default_image();
 		return trim( strip_tags( get_post_meta( $default['attachment_id'], '_wp_attachment_image_alt', true ) ) );
-	
+
 	}
 
 
 	/**
 	 * Get the default picture source image. Used for default/fallback when picture is not supported.
 	 * Defaults to the first.
-	 * 
+	 *
 	 * @return string the def
 	 */
 	public function get_default_image() {
@@ -57,7 +57,7 @@ class WPThumb_Picture {
 
 	/**
 	 * Construct the picture element.
-	 * 
+	 *
 	 * @return string the whole picture element.
 	 */
 	public function get_picture() {
@@ -66,9 +66,11 @@ class WPThumb_Picture {
 			return;
 
 		$default = $this->get_default_image();
-		
-		$picture = "\n" . '<div data-picture data-alt="' . $this->get_alt() . '" class="attachment-' . $default['size'] . '">' . "\n";
-		
+
+		$size_class = ( is_array( $default['size'] ) ) ? join( 'x', $default['size'] ) : $default['size'];
+
+		$picture = "\n" . '<div data-picture data-alt="' . $this->get_alt() . '" class="wpthumb-picture attachment-' . $size_class . '">' . "\n";
+
 		foreach ( $this->images as $image ) {
 
 			$picture .= $this->get_picture_source( $image );
@@ -96,10 +98,10 @@ class WPThumb_Picture {
 			//'attachment_id' => (int),
 			'size' => 'thumbnail',
 			'media_query' => null
-		); 
+		);
 
 		$image = wp_parse_args( $image, $image_defaults );
-		
+
 		// The original full size image that is uploaded.
 		$original = wp_get_attachment_image_src( $image['attachment_id'], 'full' );
 
@@ -119,15 +121,21 @@ class WPThumb_Picture {
 
 		// If possible to create high res version.
 		if ( $original[1] >= $size_high_res[0] && $original[2] >= $size_high_res[1] ) {
-			
+
 			// The src for the high res version of the requested image.
 			$requested_high_res = wp_get_attachment_image_src( $image['attachment_id'], $size_high_res );
 			$srcset[] = $requested_high_res[0] . ' ' . $this->multiplier . 'x';
 
 		}
 
-		return "\t<div data-srcset=\"" . implode( ', ', $srcset ). "\" data-media=\"" . $image['media_query'] . "\"></div>\n";
-		
+		$attr   = array();
+		$attr[] = 'data-srcset="'. implode( ', ', $srcset ) . '"';
+
+ 		if ( $image['media_query'] )
+ 			$attr[] = 'data-media="' . $image['media_query'] . '"';
+
+		return "\t<div " . implode( ' ', $attr ) . "></div>\n";
+
 	}
 
 }
@@ -138,13 +146,13 @@ class WPThumb_Picture {
 add_action( 'wp_enqueue_scripts', function() {
 
 	wp_enqueue_script( 'wpthumb_matchmedia', WP_THUMB_URL . 'picturefill/external/matchmedia.js', false, false, true );
-	wp_enqueue_script( 'wpthumb_picturefill', WP_THUMB_URL . 'picturefill-fix.js', array('wpthumb_matchmedia' ), false, true );
+	wp_enqueue_script( 'wpthumb_picturefill', WP_THUMB_URL . 'picturefill/picturefill.js', array('wpthumb_matchmedia' ), false, true );
 
 } );
 
 /**
  * Returns a picture element for the passed args.
- * 
+ *
  * @param  array $images An array of image args. Each image should be passed as an array of args: array( 'attachment_id' => int, 'size' => string or array, 'media_query' => string )
  * @return [type]         [description]
  */
@@ -153,7 +161,11 @@ function wpthumb_get_picture( $images ) {
 	$picture = new WPThumb_Picture();
 
 	foreach ( $images as $image )
-		$picture->add_picture_source( $image['attachment_id'], $image['size'], $image['media_query'] );
+		$picture->add_picture_source(
+			$image['attachment_id'],
+			$image['size'],
+			isset( $image['media_query'] ) ? $image['media_query'] : null
+		);
 
 	return $picture->get_picture();
 
@@ -161,7 +173,7 @@ function wpthumb_get_picture( $images ) {
 
 /**
  * Filter the post thumbnail output.
- * 
+ *
  * @param  string       $html
  * @param  int          $post_id
  * @param  int          $post_thumbnail_id
@@ -190,8 +202,8 @@ function wpthumb_get_the_post_thumbnail_picture( $post_id = null, $size = 'post-
 	$post_id = ( null === $post_id ) ? get_the_ID() : $post_id;
 	$post_thumbnail_id = get_post_thumbnail_id( $post_id );
 	$size = apply_filters( 'post_thumbnail_size', $size );
-	
-	return wpthumb_get_attachment_picture( $post_thumbnail_id, $size, $attr );	
+
+	return wpthumb_get_attachment_picture( $post_thumbnail_id, $size, $attr );
 
 }
 
@@ -209,7 +221,7 @@ function wpthumb_the_post_thumbnail_picture( $size = 'post-thumbnail', $attr = '
 }
 
 /**
- * Returns the <picture> element for the attachment. 
+ * Returns the <picture> element for the attachment.
  *
  * Return the markup required for the proposed picture html element as implemented by the picturefill polyfill.
  * https://github.com/scottjehl/picturefill
