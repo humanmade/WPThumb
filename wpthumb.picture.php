@@ -67,7 +67,13 @@ class WPThumb_Picture {
 
 		$default = $this->get_default_image();
 
+<<<<<<< HEAD
 		$picture = "\n" . '<div data-picture data-alt="' . $this->get_alt() . '" class="attachment-' . $default['size'] . '">' . "\n";
+=======
+		$size_class = ( is_array( $default['size'] ) ) ? join( 'x', $default['size'] ) : $default['size'];
+
+		$picture = "\n" . '<div data-picture data-alt="' . $this->get_alt() . '" class="wpthumb-picture attachment-' . $size_class . '">' . "\n";
+>>>>>>> 0361fda12369fc38d17778b0ae5c307f10f49625
 
 		foreach ( $this->images as $image ) {
 
@@ -126,7 +132,17 @@ class WPThumb_Picture {
 
 		}
 
+<<<<<<< HEAD
 		return "\t<div data-srcset=\"" . implode( ', ', $srcset ). "\" data-media=\"" . $image['media_query'] . "\"></div>\n";
+=======
+		$attr   = array();
+		$attr[] = 'data-srcset="'. implode( ', ', $srcset ) . '"';
+
+ 		if ( $image['media_query'] )
+ 			$attr[] = 'data-media="' . $image['media_query'] . '"';
+
+		return "\t<div " . implode( ' ', $attr ) . "></div>\n";
+>>>>>>> 0361fda12369fc38d17778b0ae5c307f10f49625
 
 	}
 
@@ -153,7 +169,11 @@ function wpthumb_get_picture( $images ) {
 	$picture = new WPThumb_Picture();
 
 	foreach ( $images as $image )
-		$picture->add_picture_source( $image['attachment_id'], $image['size'], $image['media_query'] );
+		$picture->add_picture_source(
+			$image['attachment_id'],
+			$image['size'],
+			isset( $image['media_query'] ) ? $image['media_query'] : null
+		);
 
 	return $picture->get_picture();
 
