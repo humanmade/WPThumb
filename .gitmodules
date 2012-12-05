@@ -1,6 +1,3 @@
 [submodule "phpthumb"]
 	path = phpthumb
 	url = https://github.com/joehoyle/PHPThumb.git
-[submodule "picturefill"]
-	path = picturefill
-	url = https://github.com/scottjehl/picturefill.git
