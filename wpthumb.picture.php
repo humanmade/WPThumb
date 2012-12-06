@@ -9,6 +9,8 @@ class WPThumb_Picture {
 	// Array of all the different images used to build the picture element.
 	private $images = array();
 
+	public $classes = array();
+
 	public $multiplier = 2;
 
 	/**
@@ -60,14 +62,20 @@ class WPThumb_Picture {
 	 *
 	 * @return string the whole picture element.
 	 */
-	public function get_picture() {
+	public function get_picture( ) {
 
 		if ( empty( $this->images ) )
 			return;
 
 		$default = $this->get_default_image();
 
-		$picture = "\n" . '<div data-picture data-alt="' . $this->get_alt() . '" class="attachment-' . $default['size'] . '">' . "\n";
+		// Allow classes to be passed to the picture element
+		$classes = $this->classes;
+		$classes[] = 'wpthumb-picture';
+		$classes[] = 'size-' . ( ( is_array( $default['size'] ) ) ? join( 'x', $default['size'] ) : $default['size'] );
+		$classes = array_unique( $classes );
+
+		$picture = "\n" . '<div data-picture data-alt="' . $this->get_alt() . '" class="' . implode( ' ', $classes ) . '">' . "\n";
 
 		foreach ( $this->images as $image ) {
 
@@ -148,9 +156,12 @@ add_action( 'wp_enqueue_scripts', function() {
  * @param  array $images An array of image args. Each image should be passed as an array of args: array( 'attachment_id' => int, 'size' => string or array, 'media_query' => string )
  * @return [type]         [description]
  */
-function wpthumb_get_picture( $images ) {
+function wpthumb_get_picture( $images, $args = array() ) {
 
 	$picture = new WPThumb_Picture();
+
+	if ( ! empty( $args['classes'] ) )
+		$picture->classes = $args['classes'];
 
 	foreach ( $images as $image )
 		$picture->add_picture_source( $image['attachment_id'], $image['size'], $image['media_query'] );
