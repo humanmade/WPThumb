@@ -47,13 +47,11 @@ class WP_Thumb_Background_Fill {
 
 		$current_size = $this->editor->get_size();
 
-		hm_log( $current_size);
-
 		$size = array( 'width' => $this->args['width'], 'height' => $this->args['height'] );
 
 		$offsetLeft = ( $size['width'] - $current_size['width'] ) / 2;
 		$offsetTop = ( $size['height'] - $current_size['height'] ) / 2;
-		error_log( $offsetTop );
+
 		$new_image = imagecreatetruecolor( $size['width'], $size['height'] );
 
 		// This is needed to support alpha

@@ -7,7 +7,6 @@ class WPThumbWatermarkTestCase extends WP_UnitTestCase {
 		// black 100 x 100 image
 		$path = dirname( __FILE__ ) . '/images/black.png';
 		$white = dirname( __FILE__ ) . '/images/white-10.png';
-		list( $width, $height ) = getimagesize( $path );
 				
 		$image = new WP_Thumb( $path, array( 'width' => 100, 'height' => 100, 'cache' => false, 'return' => 'path', 'watermarking_options' => array(
 			'mask' => $white,
@@ -16,7 +15,8 @@ class WPThumbWatermarkTestCase extends WP_UnitTestCase {
 		) ) );
 		
 		$file = $image->returnImage();
-		
+
+		$this->assertFalse( $image->errored());
 		$this->assertImageRGBAtPoint( $file, array(0,0), array(255,255,255) );
 		$this->assertImageRGBAtPoint( $file, array(10,0), array(0,0,0) );
 		$this->assertImageRGBAtPoint( $file, array(0,10), array(0,0,0) );
@@ -27,7 +27,6 @@ class WPThumbWatermarkTestCase extends WP_UnitTestCase {
 		// black 100 x 100 image
 		$path = dirname( __FILE__ ) . '/images/black.png';
 		$white = dirname( __FILE__ ) . '/images/white-10.png';
-		list( $width, $height ) = getimagesize( $path );
 				
 		$image = new WP_Thumb( $path, array( 'width' => 100, 'height' => 100, 'cache' => false, 'return' => 'path', 'watermarking_options' => array(
 			'mask' => $white,
@@ -45,7 +44,6 @@ class WPThumbWatermarkTestCase extends WP_UnitTestCase {
 		// black 100 x 100 image
 		$path = dirname( __FILE__ ) . '/images/black.png';
 		$white = dirname( __FILE__ ) . '/images/white-10.png';
-		list( $width, $height ) = getimagesize( $path );
 				
 		$image = new WP_Thumb( $path, array( 'width' => 100, 'height' => 100, 'cache' => false, 'return' => 'path', 'watermarking_options' => array(
 			'mask' => $white,
@@ -64,7 +62,6 @@ class WPThumbWatermarkTestCase extends WP_UnitTestCase {
 		// black 100 x 100 image
 		$path = dirname( __FILE__ ) . '/images/black.png';
 		$white = dirname( __FILE__ ) . '/images/white-10.png';
-		list( $width, $height ) = getimagesize( $path );
 				
 		$image = new WP_Thumb( $path, array( 'width' => 100, 'height' => 100, 'cache' => false, 'return' => 'path', 'watermarking_options' => array(
 			'mask' => $white,
@@ -84,7 +81,6 @@ class WPThumbWatermarkTestCase extends WP_UnitTestCase {
 		// black 100 x 100 image
 		$path = dirname( __FILE__ ) . '/images/black.png';
 		$white = dirname( __FILE__ ) . '/images/white-10.png';
-		list( $width, $height ) = getimagesize( $path );
 				
 		$image = new WP_Thumb( $path, array( 'width' => 100, 'height' => 100, 'cache' => false, 'return' => 'path', 'watermarking_options' => array(
 			'mask' => $white,
@@ -105,7 +101,6 @@ class WPThumbWatermarkTestCase extends WP_UnitTestCase {
 		// black 100 x 100 image
 		$path = dirname( __FILE__ ) . '/images/black.png';
 		$white = dirname( __FILE__ ) . '/images/white-10.png';
-		list( $width, $height ) = getimagesize( $path );
 				
 		$image = new WP_Thumb( $path, array( 'width' => 100, 'height' => 100, 'cache' => false, 'return' => 'path', 'watermarking_options' => array(
 			'mask' => $white,
@@ -126,7 +121,6 @@ class WPThumbWatermarkTestCase extends WP_UnitTestCase {
 		// black 100 x 100 image
 		$path = dirname( __FILE__ ) . '/images/black.png';
 		$white = dirname( __FILE__ ) . '/images/white-10.png';
-		list( $width, $height ) = getimagesize( $path );
 				
 		$image = new WP_Thumb( $path, array( 'width' => 10, 'height' => 10, 'cache' => false, 'return' => 'path', 'watermarking_options' => array(
 			'mask' => $white,
@@ -145,7 +139,6 @@ class WPThumbWatermarkTestCase extends WP_UnitTestCase {
 		// black 100 x 100 image
 		$path = dirname( __FILE__ ) . '/images/black.png';
 		$white = dirname( __FILE__ ) . '/images/white-10.png';
-		list( $width, $height ) = getimagesize( $path );
 				
 		$image = new WP_Thumb( $path, array( 'width' => 10, 'height' => 10, 'cache' => false, 'return' => 'path', 'watermarking_options' => array(
 			'mask' => $white,
@@ -165,7 +158,6 @@ class WPThumbWatermarkTestCase extends WP_UnitTestCase {
 		// black 100 x 100 image
 		$path = dirname( __FILE__ ) . '/images/black.png';
 		$white = dirname( __FILE__ ) . '/images/white-10.png';
-		list( $width, $height ) = getimagesize( $path );
 				
 		$image = new WP_Thumb( $path, array( 'width' => 10, 'height' => 10, 'cache' => false, 'return' => 'path', 'watermarking_options' => array(
 			'mask' => $white,

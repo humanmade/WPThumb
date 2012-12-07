@@ -8,8 +8,8 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 
 		$image = new WP_Thumb;
 		$image->setFilePath( $path );
-
 		$this->assertFalse( $image->errored() );
+
 		$this->assertContains( 'google', $image->getCacheFilePath() );
 
 		$this->assertEquals( 'png', $image->getFileExtension() );
@@ -190,22 +190,6 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 			$this->assertNotContains( $url, $wp_thumb_files );
 
 		}
-
-	}
-
-	function testResizeWithSameDimensions() {
-
-		$path = dirname( __FILE__ ) . '/images/google';
-
-		$dimensions = getimagesize( $path );
-
-		$image = new WP_Thumb( $path, array( 'width' => $dimensions[0], 'height' => $dimensions[1], 'return' => 'path' ) );
-
-		$this->assertFalse( $image->errored() );
-
-		$this->assertEquals( $path, $image->returnImage() );
-
-		$this->assertFileNotExists( $image->getCacheFilePath() );
 
 	}
 
