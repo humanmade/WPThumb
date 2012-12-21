@@ -198,7 +198,20 @@ function wpthumb_media_form_watermark_position( $fields, $post ) {
 	return $fields;
 
 }
-add_filter( 'attachment_fields_to_edit', 'wpthumb_media_form_watermark_position', 10, 2 );
+
+/**
+ * Only add the watermkaring admin optins if the current theme suports it, as we don;t want to clutter
+ * for poeple who don't care
+ * 
+ */
+function wpthumb_add_watermarking_admin_hooks() {
+
+	if ( current_theme_supports( 'wpthumb-watermarking' ) ) {
+		add_filter( 'attachment_fields_to_edit', 'wpthumb_media_form_watermark_position', 10, 2 );
+		add_filter( 'attachment_fields_to_save', 'wpthumb_media_form_watermark_save', 10, 2);
+	}
+}
+add_action( 'init', 'wpthumb_add_watermarking_admin_hooks' );
 
 /**
  * wpthumb_media_form_watermark_save function.
@@ -228,9 +241,7 @@ function wpthumb_media_form_watermark_save( $post, $attachment ){
 	}
 	
 	return $post;
-}
-add_filter( 'attachment_fields_to_save', 'wpthumb_media_form_watermark_save', 10, 2);
-
+}	
 
 /**
  * wpthumb_wm_get_options function.

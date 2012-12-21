@@ -1,6 +1,20 @@
 <?php
 
 /**
+ * Only add the watermkaring admin optins if the current theme suports it, as we don;t want to clutter
+ * for poeple who don't care
+ * 
+ */
+function wpthumb_add_crop_from_position_admin_hooks() {
+
+	if ( current_theme_supports( 'wpthumb-crop-from-position' ) ) {
+		add_filter( 'attachment_fields_to_edit', 'wpthumb_media_form_crop_position', 10, 2 );
+		add_filter( 'attachment_fields_to_save', 'wpthumb_media_form_crop_position_save', 10, 2);
+	}
+}
+add_action( 'init', 'wpthumb_add_crop_from_position_admin_hooks' );
+
+/**
  * wpthumb_media_form_crop_position function.
  *
  * Adds a back end for selecting the crop position of images.
@@ -42,8 +56,6 @@ function wpthumb_media_form_crop_position( $fields, $post ) {
 	return $fields;
 
 }
-add_filter( 'attachment_fields_to_edit', 'wpthumb_media_form_crop_position', 10, 2 );
-
 
 /**
  * wpthumb_media_form_crop_position_save function.
@@ -66,4 +78,3 @@ function wpthumb_media_form_crop_position_save( $post, $attachment ){
 	return $post;
 
 }
-add_filter( 'attachment_fields_to_save', 'wpthumb_media_form_crop_position_save', 10, 2);
