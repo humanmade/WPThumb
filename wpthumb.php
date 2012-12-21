@@ -183,15 +183,6 @@ class WP_Thumb {
 		if ( is_string( $args['crop_from_position'] ) && $args['crop_from_position'] )
 			$args['crop_from_position'] = explode( ',', $args['crop_from_position'] );
 
-		// Sort out the watermark args
-		if ( ! empty( $args['watermark_options']['mask'] ) ) {
-			$wpthumb_wm_defaults = array( 'padding' => 0, 'position' => 'cc', 'pre_resize' => false );
-			$args['watermark_options'] = wp_parse_args( $args['watermark_options'], $wpthumb_wm_defaults );
-		}
-
-		if ( $args['background_fill'] === 'solid' && $args['background_fill'] = 'auto' )
-			_deprecated_argument( __FUNCTION__, '0.8.3', 'Use "auto" instead.' );
-
 		$this->args = $args;
 
 	}
@@ -370,6 +361,14 @@ class WP_Thumb {
 		// Create the image
 		$editor = wp_get_image_editor( $file_path, array( 'methods' => array( 'get_image' ) ) );
 
+		/**
+		 * Workaround to preserve image blending when images are not specifically resized (smaller than dimentions for example)
+		 */
+		if ( is_a( $editor, 'WP_Thumb_Image_Editor_GD' ) ) {
+			imagealphablending( $editor->get_image(), false);
+			imagesavealpha( $editor->get_image(), true );
+		}
+
 		if ( is_wp_error( $editor ) ) {
 			$this->error = $editor;
 
@@ -400,7 +399,7 @@ class WP_Thumb {
 
 		elseif ( $crop === true && $resize === true ) :
 
-			$editor->resize( $width, $height, true );			
+			$editor->resize( $width, $height, true );
 
 		elseif ( $crop === true && $resize === false ) :
 			$this->crop_from_center( $editor, $width, $height );
@@ -626,7 +625,8 @@ function wpthumb_post_image( $null, $id, $args ) {
 		$path = get_attached_file( $id );
 
 	$path = apply_filters( 'wpthumb_post_image_path', $path, $id, $args );
-
+	$args = apply_filters( 'wpthumb_post_image_args', $args, $id );
+	
 	$image = new WP_Thumb( $path, $args );
 
 	$args = $image->getArgs();

@@ -70,6 +70,21 @@ class WP_Thumb_Watermark {
 
 }
 
+function wpthumb_watermark_add_args_to_post_image( $args, $id ) {
+
+	if ( wpthumb_wm_image_has_watermark( $id ) )
+		$args['watermarking_options'] = wpthumb_wm_get_options( $id );
+
+	return $args;
+}
+add_filter( 'wpthumb_post_image_args', 'wpthumb_watermark_add_args_to_post_image', 10, 2 );
+
+/**
+ * Hook into WP Thumb before it resizes an image to possible apply a watermatk 
+ * 
+ * @param  WP_IMageEditor $editor
+ * @param  array $args
+ */
 function wpthumb_watermark_pre( $editor, $args ) {
 
 	// currently only supports GD
@@ -80,7 +95,7 @@ function wpthumb_watermark_pre( $editor, $args ) {
 	if ( empty( $args['watermarking_options']['pre_resize'] ) )
 		return;
 
-	$bg = new WP_Thumb_Watermark( $editor, $args );
+	new WP_Thumb_Watermark( $editor, $args );
 
 	return $editor;
 }
@@ -96,7 +111,7 @@ function wpthumb_watermark_post( $editor, $args ) {
 	if ( isset( $args['watermarking_options']['pre_resize'] ) && $args['watermarking_options']['pre_resize'] === true )
 		return;
 
-	$bg = new WP_Thumb_Watermark( $editor, $args );
+	new WP_Thumb_Watermark( $editor, $args );
 
 	return $editor;
 }
@@ -243,17 +258,7 @@ function wpthumb_wm_get_options( $id ) {
 	$options['padding'] = wpthumb_wm_padding($id);
 	$position = wpthumb_wm_position( $id );
 
-	if ( $position == 'top-left' )
-		$options['position'] = 'lt';
-
-	if ( $position == 'top-right' )
-		$options['position'] = 'rt';
-
-	if ( $position == 'bottom-left' )
-		$options['position'] = 'lb';
-
-	if ( $position == 'bottom-right' )
-		$options['position'] = 'rb';
+	$options['position'] = $position;
 
 	return $options;
 }
