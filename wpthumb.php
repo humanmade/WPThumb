@@ -1,5 +1,4 @@
 <?php
-
 /*
 Plugin Name: WP Thumb
 Plugin URI: https://github.com/humanmade/WPThumb
@@ -576,12 +575,14 @@ function wpthumb( $url, $args = array() ) {
  */
 function wpthumb_post_image( $null, $id, $args ) {
 
-	if ( ( ! strpos( (string) $args, '=' ) ) && ! ( is_array( $args ) && isset( $args[0] ) && $args[0] == $args[1] ) ) {
+	// check if $args is a WP Thumb argument list, or native WordPress one
+	// wp thumb looks like this: 'width=300&height=120&crop=1'
+	// native looks like 'thumbnail'...|array( 300, 300 )
+	if ( is_string( $args ) && ! strpos( (string) $args, '=' ) ) {
 
 		global $_wp_additional_image_sizes;
 
-		// Convert keyword sizes to heights & widths. Will still use file wordpress saved unless you change the thumbnail dimensions.
-		// TODO Might be ok to delete as I think it has been duplicated.  Needs testing.
+		// Convert keyword sizes to heights & widths.
 		if ( $args == 'thumbnail' )
 			$new_args = array( 'width' => get_option('thumbnail_size_w'), 'height' => get_option('thumbnail_size_h'), 'crop' => get_option('thumbnail_crop') );
 
@@ -591,14 +592,11 @@ function wpthumb_post_image( $null, $id, $args ) {
 		elseif ( $args == 'large' )
 			$new_args = array( 'width' => get_option('large_size_w'), 'height' => get_option('large_size_h') );
 
-		elseif( is_string( $args ) && isset( $_wp_additional_image_sizes ) && count( $_wp_additional_image_sizes ) && array_key_exists( $args, $_wp_additional_image_sizes ) )
+		elseif( ! empty( $_wp_additional_image_sizes ) && array_key_exists( $args, $_wp_additional_image_sizes ) )
 			$new_args = array( 'width' => $_wp_additional_image_sizes[$args]['width'], 'height' => $_wp_additional_image_sizes[$args]['height'], 'crop' => $_wp_additional_image_sizes[$args]['crop'], 'image_size' => $args );
 
-		elseif ( is_string( $args ) && ( $args != ( $new_filter_args = apply_filters( 'wpthumb_create_args_from_size', $args ) ) ) )
+		elseif ( $args != ( $new_filter_args = apply_filters( 'wpthumb_create_args_from_size', $args ) ) )
 			$new_args = $new_filter_args;
-
-		elseif ( is_array( $args ) )
-			$new_args = $args;
 
 		else
 			$new_args = null;
