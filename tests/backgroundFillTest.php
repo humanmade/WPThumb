@@ -13,8 +13,6 @@ class WPThumbBackgroundFillTestCase extends WP_UnitTestCase {
 		$image = new WP_Thumb( $path, "width=100&height=100&cache=0&return=path&background_fill=255255255" );
 		
 		$file = $image->returnImage();
-
-		error_log($file);
 		
 		$this->assertContains( '/cache/', $file );
 		$this->assertContains( WP_CONTENT_DIR, $file );
