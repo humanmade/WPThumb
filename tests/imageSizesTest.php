@@ -8,7 +8,7 @@ class WPThumbImageSizesTestCase extends WP_UnitTestCase {
 
 		copy( dirname( __FILE__ ) . '/images/transparent.png', $this->file );
 
-		$this->attachment = wp_insert_attachment( array( 'post_title' => 'test attachment', 'post_type' => 'attachment', 'post_status' => 'publish', 'post_mime_type' => 'image/png' ), $this->file );
+		$this->attachment = wp_insert_attachment( array( 'post_title' => 'test attachment', 'post_content' => 'test content', 'post_type' => 'attachment', 'post_status' => 'publish', 'post_mime_type' => 'image/png' ), $this->file );
 
 		update_option( 'thumbnail_size_w', 100 );
 		update_option( 'thumbnail_size_h', 100 );
