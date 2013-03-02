@@ -412,6 +412,8 @@ class WP_Thumb {
 		apply_filters( 'wpthumb_image_post', $editor, $this->args );
 
 		$editor->save( $new_filepath );
+
+		do_action( 'wpthumb_saved_cache_image', $this );
 	}
 
 	private function crop_from_center( $editor, $width, $height ) {

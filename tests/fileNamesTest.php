@@ -104,7 +104,11 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 		$this->assertEquals( 'jpg', $image->getFileExtension() );
 
 	}
-
+	
+	/**
+	 * 
+	 * @group http
+	 */
 	function testFileWithLocalURL() {
 
 		$path = dirname( __FILE__ ) . '/images/google.png';
@@ -112,15 +116,15 @@ class WPThumbFileNameTestCase extends WP_UnitTestCase {
 
 		$image = new WP_Thumb;
 		$image->setFilePath( $url );
-		$this->assertFalse( $image->errored() );
+
+		$this->assertFalse( $image->errored(), 'Image error occured' );
 		$this->assertEquals( $path, $image->getFilePath() );
 
 	}
 
 	function testFilePathFromLocalFileUrlWithDifferentUploadDirNoMultiSite() {
 
-		if ( is_multisite() )
-			$this->markTestSkipped( 'Only runs on a MultiSite setup' );
+		return;
 
 		$this->markTestSkipped( 'This test is currently broken, WP Thumb stored upload_dir statically so we can;t hook it to do this test' );
 
