@@ -12,7 +12,7 @@
  */
 
 $GLOBALS['wp_tests_options'] = array(
-	'active_plugins' => array( 'wpthumb/wpthumb.php' ),
+	'active_plugins' => array( 'WPThumb/wpthumb.php' ),
 );
 
 require dirname( __FILE__ ) . '/lib/bootstrap.php';
@@ -39,5 +39,5 @@ class WP_Thumb_UnitTestCase extends WP_UnitTestCase {
 
 		$this->assertEquals( $colors['alpha'], $alpha );
 	}
-	
+
 }
