@@ -4,7 +4,7 @@ Plugin Name: WP Thumb
 Plugin URI: https://github.com/humanmade/WPThumb
 Description: An on-demand image generation replacement for WordPress' image resizing.
 Author: Human Made Limited
-Version: 0.8.2
+Version: 0.9
 Author URI: http://www.hmn.md/
 */
 
@@ -108,7 +108,8 @@ class WP_Thumb {
 	public function setFilePath( $file_path ) {
 
 		$upload_dir = self::uploadDir();
-
+		$this->_file_path = null;
+		
 		if ( strpos( $file_path, self::get_home_path() ) === 0 ) {
 			  $this->file_path = $file_path;
 			  return;
@@ -194,13 +195,21 @@ class WP_Thumb {
 	 */
 	public function getFilePath() {
 
+		if ( ! empty( $this->_file_path ) )
+			return $this->_file_path;
+
 		if ( strpos( $this->file_path, '/' ) === 0 && ! file_exists( $this->file_path ) && $this->args['default'] )
 			$this->file_path = $this->args['default'];
+
+		elseif ( ( ! $this->file_path ) && $this->args['default'] && file_exists( $this->args['default'] ) )
+			$this->file_path = $this->args['default'];			
 
         if ( $this->getArg( 'cache_with_query_params' ) )
             return $this->file_path;
 
-		return reset( explode( '?', $this->file_path ) );
+        $this->_file_path = reset( explode( '?', $this->file_path ) );
+
+		return $this->_file_path;
 	}
 
 	/**

@@ -1,6 +1,9 @@
 <?php
 
-class WPThumbCropFromPositionTestCase extends WP_UnitTestCase {
+/**
+ * @group WPThumbCropFromPositionTestCase
+ */
+class WPThumbCropFromPositionTestCase extends WP_Thumb_UnitTestCase {
 
 	function testCropFromTopLeftNoResize() {
 		

@@ -1,6 +1,6 @@
 <?php
 
-class WPThumbPostThumbnailTestCase extends WP_UnitTestCase {
+class WPThumbPostThumbnailTestCase extends WP_Thumb_UnitTestCase {
 
 	function testPostThumbnailResize() {
 		

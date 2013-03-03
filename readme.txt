@@ -1,15 +1,15 @@
 === WPThumb ===
 Contributors: humanmade, joehoyle, mattheu, tcrsavage, willmot
 Tags: image, resize, thumbnail, crop, phpthumb
-Requires at least: 3.0
-Tested up to: 3.3.1
-Stable tag: 0.8.1
+Requires at least: 3.5
+Tested up to: 3.5.1
+Stable tag: 0.9
 
 An on-demand image generation replacement for WordPress' image resizing.
 
 == Description ==
 
-WP Thumb is a simple plugin that makes use of the PHPThumb library. It seamlessly intergrates with the WordPress image functions. You can specify height, width and crop values, and an image will be generated, which is then cached for future use.
+WP Thumb is a simple plugin that seamlessly intergrates with the WordPress image functions. You can specify height, width and crop values, and an image will be generated, which is then cached for future use.
 
 = Features =
 
@@ -18,6 +18,12 @@ WP Thumb is a simple plugin that makes use of the PHPThumb library. It seamlessl
 * Can extend using filters to make use of any of the phpThumb Library functions by manipulating the image object.
 
 == Changelog ==
+
+#### 0.9
+
+* Removed dependancy on PHP Thumb GD Library, much smaller now!
+* Use the new WordPress 3.5 Image classes
+* Will now use Image Magick if available (though not for watermarking and background_fill currently)
 
 #### 0.8
 

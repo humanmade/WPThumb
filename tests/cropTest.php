@@ -1,6 +1,9 @@
 <?php
 
-class WPThumbCropTestCase extends WP_UnitTestCase {
+/**
+ * @group WPThumbCropTestCase
+ */
+class WPThumbCropTestCase extends WP_Thumb_UnitTestCase {
 
 	function testCropStandard() {
 	
