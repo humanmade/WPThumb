@@ -1,6 +1,6 @@
 <?php
 
-class WPThumbRemoteImageTestCase extends WP_UnitTestCase {
+class WPThumbRemoteImageTestCase extends WP_Thumb_UnitTestCase {
 
 	function testFetchRemoteImage() {
 		

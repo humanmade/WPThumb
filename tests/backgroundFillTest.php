@@ -1,6 +1,9 @@
 <?php
 
-class WPThumbBackgroundFillTestCase extends WP_UnitTestCase {
+/**
+ * @group WPThumbBackgroundFillTestCase
+ */
+class WPThumbBackgroundFillTestCase extends WP_Thumb_UnitTestCase {
 
 	function testBackgroundFillOnWhiteImage() {
 		

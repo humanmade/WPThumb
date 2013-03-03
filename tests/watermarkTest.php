@@ -1,6 +1,6 @@
 <?php
 
-class WPThumbWatermarkTestCase extends WP_UnitTestCase {
+class WPThumbWatermarkTestCase extends WP_Thumb_UnitTestCase {
 
 	function testWatermarkTopLeft() {
 		

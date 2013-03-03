@@ -1,6 +1,6 @@
 <?php
 
-class WPThumbResizeTestCase extends WP_UnitTestCase {
+class WPThumbResizeTestCase extends WP_Thumb_UnitTestCase {
 
 	function testResizeProportional() {
 	

@@ -1,6 +1,9 @@
 <?php
 
-class WPThumbFileNameTestCase extends WP_UnitTestCase {
+/**
+ * @group WPThumbFileNameTestCase
+ */
+class WPThumbFileNameTestCase extends WP_Thumb_UnitTestCase {
 
 	function testFileURLWithQueryParam() {
 
