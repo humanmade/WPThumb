@@ -298,7 +298,10 @@ class WP_Thumb {
 		$upload_dir = self::uploadDir();
 
 		if ( strpos( $this->getFilePath(), $upload_dir['basedir'] ) === 0 ) :
-			$new_dir = $upload_dir['basedir'] . '/cache' . $upload_dir['subdir'] . '/' . $filename_nice;
+			
+			$subdir = dirname( str_replace( $upload_dir['basedir'], '', $this->getFilePath() ) );
+			$new_dir = $upload_dir['basedir'] . '/cache' . $subdir . '/' . $filename_nice;
+
 
 		elseif ( strpos( $this->getFilePath(), self::get_home_path() ) === 0 ) :
 			$new_dir = $upload_dir['basedir'] . '/cache/local';
