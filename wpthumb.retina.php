@@ -175,7 +175,7 @@ add_filter( 'image_send_to_editor', 'wpthumb_retina_get_image_tag', 100, 8 );
 function wpthumb_retina_change_mce_options( $init ) {
 
 	if ( ! wpthumb_retina_is_enabled() )
-		return $html;
+		return $init;
 
     // Command separated string of extended elements
     // I've set it to all - but maybe can modify defaults? If I only set the one I want, doesn't allow any others.
