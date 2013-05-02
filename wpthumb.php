@@ -408,7 +408,7 @@ class WP_Thumb {
 		extract( $this->args );
 
 		// Cropping
-		if ( $crop_from_position && $crop_from_position !== array( 'center', 'center' ) ) :
+		if ( $crop && $crop_from_position && $crop_from_position !== array( 'center', 'center' ) ) :
 
 			$this->crop_from_position( $editor, $width, $height, $crop_from_position, $resize );
 
@@ -634,7 +634,7 @@ function wpthumb_post_image( $null, $id, $args ) {
 	if ( ! empty( $args[1] ) )
 		$args['height'] = $args[1];
 
-	if ( empty( $args['crop_from_position'] ) )
+	if ( ! empty( $args['crop'] ) && $args['crop'] && empty( $args['crop_from_position'] ) )
 		 $args['crop_from_position'] = get_post_meta( $id, 'wpthumb_crop_pos', true );
 
 	if ( empty( $path ) )
