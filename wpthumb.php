@@ -474,16 +474,17 @@ class WP_Thumb {
 		$size = $editor->get_size();
 		$crop = array( 'x' => 0, 'y' => 0 );
 
-		if ( $position[0] == 'bottom' )
-			$crop['y'] = absint( $size['height'] - $height );
-		else if ( $position[0] == 'center' )
-			$crop['y'] = intval( absint( $size['height'] - $height ) / 2 );
-
-		if ( $position[1] == 'right' )
+		if ( $position[0] == 'right' )
 			$crop['x'] = absint( $size['width'] - $width );
-		else if ( $position[1] == 'center' )
+		else if ( $position[0] == 'center' )
 			$crop['x'] = intval( absint( $size['width'] - $width ) / 2 );
 
+		if ( $position[1] == 'bottom' )
+			$crop['y'] = absint( $size['height'] - $height );
+		else if ( $position[1] == 'center' )
+			$crop['y'] = intval( absint( $size['height'] - $height ) / 2 );
+
+		
 		return $editor->crop( $crop['x'], $crop['y'], $width, $height );
 	}
 

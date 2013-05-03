@@ -16,7 +16,7 @@ class WPThumbCropFromPositionTestCase extends WP_Thumb_UnitTestCase {
 			'cache' => false, 
 			'return' => 'path',
 			'crop' => true,
-			'crop_from_position' => 'top,left',
+			'crop_from_position' => 'left,top',
 			'resize' => false ) );
 		
 		$file = $image->returnImage();
@@ -36,7 +36,7 @@ class WPThumbCropFromPositionTestCase extends WP_Thumb_UnitTestCase {
 			'cache' => false, 
 			'return' => 'path',
 			'crop' => true,
-			'crop_from_position' => 'top,left',
+			'crop_from_position' => 'left,top',
 			'resize' => true ) );
 		
 		$file = $image->returnImage();
@@ -57,7 +57,7 @@ class WPThumbCropFromPositionTestCase extends WP_Thumb_UnitTestCase {
 			'cache' => false, 
 			'return' => 'path',
 			'crop' => true,
-			'crop_from_position' => 'bottom,right',
+			'crop_from_position' => 'right,bottom',
 			'resize' => false ) );
 		
 		$file = $image->returnImage();
@@ -77,7 +77,7 @@ class WPThumbCropFromPositionTestCase extends WP_Thumb_UnitTestCase {
 			'cache' => false, 
 			'return' => 'path',
 			'crop' => true,
-			'crop_from_position' => 'bottom,right',
+			'crop_from_position' => 'right,bottom',
 			'resize' => true ) );
 		
 		$file = $image->returnImage();
