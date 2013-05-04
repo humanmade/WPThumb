@@ -131,7 +131,7 @@ class WPThumb_Picture {
 
 		if ( $high_res )
 			if ( empty( $media_query ) )
-				return "(min-device-pixel-ratio: $this->multiplier)";
+				return "(min-device-pixel-ratio: $this->multiplier), (-webkit-min-device-pixel-ratio: $this->multiplier)";
 			else 
 				return "$media_query and (min-device-pixel-ratio: $this->multiplier), $media_query and (-webkit-min-device-pixel-ratio: $this->multiplier)"; 
 		
