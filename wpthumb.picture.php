@@ -5,11 +5,23 @@ class WPThumb_Picture {
 
 	// The default image - used as a default/fallback.
 	private $default;
+	
+	// Image attrs including class and alt.
+	private $attr;
 
 	// Array of all the different images used to build the picture element.
 	private $images = array();
 	
 	public $multiplier = 2;	
+
+	public function __construct( $attr = array() ) {
+
+		$attr = wp_parse_args( $attr, array(
+			'class' => ''
+		) );
+
+		$this->attr = $attr;
+	}
 
 	/**
 	 * Helper function for adding image sources for picture element.
@@ -62,13 +74,11 @@ class WPThumb_Picture {
 			return;
 
 		$default = $this->get_default_image();
-		
-		$class = is_array( $default['size'] ) ? implode( '-', $default['size'] ) : $default['size'];
 
 		$picture = sprintf( 
-			"\n<div data-picture data-alt=\"%s\" class=\"attachment-%s\">\n", 
+			"\n<div data-picture data-alt=\"%s\" class=\"%s\">\n", 
 			esc_attr( $this->get_alt() ), 
-			sanitize_html_class( $class ) 
+			implode( ' ', array_map( 'sanitize_html_class', explode( ' ', $this->attr['class'] ) ) )
 		);
 		
 		foreach ( $this->images as $image )
@@ -176,9 +186,9 @@ add_action( 'wp_enqueue_scripts', function() {
  * @param  array $images An array of image args. Each image should be passed as an array of args: array( 'attachment_id' => int, 'size' => string or array, 'media_query' => string )
  * @return [type]         [description]
  */
-function wpthumb_get_picture( $images ) {
+function wpthumb_get_picture( $images, $attr = array() ) {
 
-	$picture = new WPThumb_Picture();
+	$picture = new WPThumb_Picture( $attr );
 
 	foreach ( $images as $image )
 		$picture->add_picture_source( $image['attachment_id'], $image['size'], $image['media_query'] );
@@ -251,7 +261,7 @@ function wpthumb_get_attachment_picture( $attachment_id, $size, $attr = '' ) {
 	if ( empty( $attachment_id ) )
 		return;
 
-	$picture = new WPThumb_Picture();
+	$picture = new WPThumb_Picture( $attr );
 	$picture->add_picture_source( $attachment_id, $size );
 	return $picture->get_picture();
 
