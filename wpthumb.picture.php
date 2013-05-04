@@ -182,7 +182,7 @@ function wpthumb_get_picture( $images ) {
  */
 function _wpthumb_picture_post_thumbnail_html( $html, $post_id, $post_thumbnail_id, $size, $attr ) {
 
-	$html = wpthumb_get_the_post_thumbnail_picture( $post_id, 'thumbnail', $attr );
+	$html = wpthumb_get_the_post_thumbnail_picture( $post_id, $size, $attr );
 
 	return $html;
 
