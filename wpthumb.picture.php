@@ -63,16 +63,21 @@ class WPThumb_Picture {
 
 		$default = $this->get_default_image();
 		
-		$picture = "\n" . '<div data-picture data-alt="' . $this->get_alt() . '" class="attachment-' . $default['size'] . '">' . "\n";
-		
-		foreach ( $this->images as $image ) {
+		$class = is_array( $default['size'] ) ? implode( '-', $default['size'] ) : $default['size'];
 
+		$picture = sprintf( 
+			"\n<div data-picture data-alt=\"%s\" class=\"attachment-%s\">\n", 
+			esc_attr( $this->get_alt() ), 
+			sanitize_html_class( $class ) 
+		);
+		
+		foreach ( $this->images as $image )
 			$picture .= $this->get_picture_source( $image );
-
-		}
-
 		
-		$picture .= "\t" . '<noscript>' . wp_get_attachment_image( $default['attachment_id'], $default['size'] ) . '</noscript>' . "\n";
+		$picture .= sprintf( 
+			"\t<noscript>%s</noscript>\n", 
+			wp_get_attachment_image( $default['attachment_id'], $default['size'] ) 
+		);
 
 		$picture .= '</div>';
 
@@ -98,11 +103,18 @@ class WPThumb_Picture {
 		
 		// The source element for the requested image
 		$requested = wp_get_attachment_image_src( $image['attachment_id'], $image['size'] );
-		$r = "\t<div data-src=\"" . $requested[0] . "\" data-media=\"" . $this->get_picture_source_media_attr( $image['media_query'], false ) . "\"></div>\n";
+		$data_media = esc_attr( $this->get_picture_source_media_attr( $image['media_query'] ) ); 
 
+		$r = sprintf( 
+			"\t<div data-src=\"%s\" data-media=\"%s\"></div>\n", 
+			esc_attr( $requested[0] ), 
+			! empty( $data_media ) ? sprintf( 'data-media="%s"', esc_attr( $data_media ) ) : null
+		);
+		
 		// The source element for the high res version of the requested image.
 		// Calculate the size args for the high resoloution image & If possible to create high res version.
 		$original = wp_get_attachment_image_src( $image['attachment_id'], 'full' );
+		
 		$size_high_res = array(
 			0      => (int) $requested[1] * $this->multiplier,
 			1      => (int) $requested[2] * $this->multiplier,
@@ -112,7 +124,12 @@ class WPThumb_Picture {
 		if ( $original[1] >= $size_high_res[0] && $original[2] >= $size_high_res[1] ) {
 			
 			$requested_high_res = wp_get_attachment_image_src( $image['attachment_id'], $size_high_res );
-			$r .= "\t<div data-src=\"" . $requested_high_res[0] . "\" data-media=\"" . $this->get_picture_source_media_attr( $image['media_query'], true ) . "\"></div>\n";
+			$data_media = esc_attr( $this->get_picture_source_media_attr( $image['media_query'], true ) ); 
+			$r .= sprintf(
+				"\t<div data-src=\"%s\"%s></div>\n", 
+				esc_attr( $requested_high_res[0] ), 
+				! empty( $data_media ) ? sprintf( 'data-media="%s"', esc_attr( $data_media ) ) : null
+			);
 
 		}
 
