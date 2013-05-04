@@ -424,6 +424,9 @@ class WP_Thumb {
 			$editor->resize( $width, $height );
 		endif;
 
+		if ( isset( $jpeg_quality ) )
+			$editor->set_quality( $jpeg_quality );
+
 		apply_filters( 'wpthumb_image_post', $editor, $this->args );
 
 		$editor->save( $new_filepath );
