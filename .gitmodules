@@ -1,3 +1,0 @@
-[submodule "tests/lib"]
-	path = tests/lib
-	url = https://github.com/scribu/wp-tests-lib.git
