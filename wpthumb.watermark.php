@@ -20,7 +20,7 @@ function wpthumb_wm_watermark_preview_image( $position, $padding, $image_id, $ma
 
     $image_src = wpthumb_get_image_with_scaled_watermark( $image_id, $args, 560, 0 );
 
-    return '<img src="' . $image_src . '" /><a target="_blank" href="' . wpthumb( $image, array( 'width' => 1000, 'height' => 0, 'crop' => false, 'resize'  => true, 'watermark_options' => $large_watermark, 'cache' => false ) ) . '">View Large</a>';
+    return '<img src="' . $image_src . '" /><a target="_blank" href="' . wpthumb( $image, array( 'width' => 650, 'height' => 0, 'crop' => false, 'resize'  => true, 'watermark_options' => $large_watermark, 'cache' => false ) ) . '">View Large</a>';
 }
 
 
@@ -248,7 +248,7 @@ function wpthumb_media_form_watermark( $fields, $post ) {
 			</select></span>
 
 			<span class="wpthumb_wrap">
-				<a class="button preview-watermark" href="' . str_replace( ABSPATH, get_bloginfo('url') . '/', dirname( __FILE__ )) . '/watermark-actions.php">Preview</a>
+				<a class="button preview-watermark" href="' . str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, dirname( __FILE__ )) . '/watermark-actions.php">Preview</a>
 				' . ( $calling_post_id ? '<a class="button-primary save-watermark" href="#">Save</a>' : '' ) . '
 			</span>
 
