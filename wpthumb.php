@@ -206,7 +206,8 @@ class WP_Thumb {
         if ( $this->getArg( 'cache_with_query_params' ) )
             return $this->file_path;
 
-        $this->_file_path = reset( explode( '?', $this->file_path ) );
+        $path_bits = explode( '?', $this->file_path );
+        $this->_file_path = reset( $path_bits );
 
 		return $this->_file_path;
 	}
