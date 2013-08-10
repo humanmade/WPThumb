@@ -76,7 +76,7 @@ class WPThumb_Picture {
 		$default = $this->get_default_image();
 
 		$picture = sprintf( 
-			"\n<div data-picture data-alt=\"%s\" class=\"%s\">\n", 
+			"\n<span data-picture data-alt=\"%s\" class=\"%s\">\n", 
 			esc_attr( $this->get_alt() ), 
 			implode( ' ', array_map( 'sanitize_html_class', explode( ' ', $this->attr['class'] ) ) )
 		);
@@ -89,7 +89,7 @@ class WPThumb_Picture {
 			wp_get_attachment_image( $default['attachment_id'], $default['size'] ) 
 		);
 
-		$picture .= '</div>';
+		$picture .= '</span>';
 
 		return $picture;
 
@@ -116,7 +116,7 @@ class WPThumb_Picture {
 		$data_media = esc_attr( $this->get_picture_source_media_attr( $image['media_query'] ) ); 
 
 		$r = sprintf( 
-			"\t<div data-src=\"%s\" data-media=\"%s\"></div>\n", 
+			"\t<span data-src=\"%s\" %s></span>\n", 
 			esc_attr( $requested[0] ), 
 			! empty( $data_media ) ? sprintf( 'data-media="%s"', esc_attr( $data_media ) ) : null
 		);
@@ -136,7 +136,7 @@ class WPThumb_Picture {
 			$requested_high_res = wp_get_attachment_image_src( $image['attachment_id'], $size_high_res );
 			$data_media = esc_attr( $this->get_picture_source_media_attr( $image['media_query'], true ) ); 
 			$r .= sprintf(
-				"\t<div data-src=\"%s\"%s></div>\n", 
+				"\t<span data-src=\"%s\" %s></span>\n", 
 				esc_attr( $requested_high_res[0] ), 
 				! empty( $data_media ) ? sprintf( 'data-media="%s"', esc_attr( $data_media ) ) : null
 			);
