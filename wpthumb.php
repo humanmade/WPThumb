@@ -111,7 +111,7 @@ class WP_Thumb {
 
 		$upload_dir = self::uploadDir();
 		$this->_file_path = null;
-		
+
 		if ( strpos( $file_path, self::get_home_path() ) === 0 ) {
 			  $this->file_path = $file_path;
 			  return;
@@ -204,12 +204,13 @@ class WP_Thumb {
 			$this->file_path = $this->args['default'];
 
 		elseif ( ( ! $this->file_path ) && $this->args['default'] && file_exists( $this->args['default'] ) )
-			$this->file_path = $this->args['default'];			
+			$this->file_path = $this->args['default'];
 
         if ( $this->getArg( 'cache_with_query_params' ) )
             return $this->file_path;
 
-        $this->_file_path = reset( explode( '?', $this->file_path ) );
+        $path_bits = explode( '?', $this->file_path );
+        $this->_file_path = reset( $path_bits );
 
 		return $this->_file_path;
 	}
@@ -301,7 +302,7 @@ class WP_Thumb {
 		$upload_dir = self::uploadDir();
 
 		if ( strpos( $this->getFilePath(), $upload_dir['basedir'] ) === 0 ) :
-			
+
 			$subdir = dirname( str_replace( $upload_dir['basedir'], '', $this->getFilePath() ) );
 			$new_dir = $upload_dir['basedir'] . '/cache' . $subdir . '/' . $filename_nice;
 
@@ -392,7 +393,7 @@ class WP_Thumb {
 
 			return $this->returnImage();
 		}
-		
+
 		wp_mkdir_p( $this->getCacheFileDirectory() );
 
 		// Convert gif images to png before resizing
@@ -423,7 +424,7 @@ class WP_Thumb {
 			$this->crop_from_center( $editor, $width, $height );
 
 		else :
-			
+
 			$editor->resize( $width, $height );
 		endif;
 
@@ -473,7 +474,7 @@ class WP_Thumb {
 				$_height = $height;
 			    $_width = $height * $ratio1;
 			}
-			
+
 			$editor->resize( $_width, $_height );
 		}
 
@@ -490,7 +491,7 @@ class WP_Thumb {
 		else if ( $position[1] == 'center' )
 			$crop['y'] = intval( absint( $size['height'] - $height ) / 2 );
 
-		
+
 		return $editor->crop( $crop['x'], $crop['y'], $width, $height );
 	}
 
@@ -649,7 +650,7 @@ function wpthumb_post_image( $null, $id, $args ) {
 
 	$path = apply_filters( 'wpthumb_post_image_path', $path, $id, $args );
 	$args = apply_filters( 'wpthumb_post_image_args', $args, $id );
-	
+
 	$image = new WP_Thumb( $path, $args );
 
 	$args = $image->getArgs();
