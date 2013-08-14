@@ -35,6 +35,7 @@ define( 'WP_THUMB_URL', plugin_dir_url( __FILE__ ) );
 include_once( WP_THUMB_PATH . '/wpthumb.watermark.php' );
 include_once( WP_THUMB_PATH . '/wpthumb.background-fill.php' );
 include_once( WP_THUMB_PATH . '/wpthumb.crop-from-position.php' );
+include_once( WP_THUMB_PATH . '/wpthumb.shortcodes.php' );
 
 /**
  * Base WP_Thumb class
