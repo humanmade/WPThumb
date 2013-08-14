@@ -109,7 +109,7 @@ class WP_Thumb {
 
 		$upload_dir = self::uploadDir();
 		$this->_file_path = null;
-		
+
 		if ( strpos( $file_path, self::get_home_path() ) === 0 ) {
 			  $this->file_path = $file_path;
 			  return;
@@ -202,12 +202,13 @@ class WP_Thumb {
 			$this->file_path = $this->args['default'];
 
 		elseif ( ( ! $this->file_path ) && $this->args['default'] && file_exists( $this->args['default'] ) )
-			$this->file_path = $this->args['default'];			
+			$this->file_path = $this->args['default'];
 
         if ( $this->getArg( 'cache_with_query_params' ) )
             return $this->file_path;
 
-        $this->_file_path = reset( explode( '?', $this->file_path ) );
+        $path_bits = explode( '?', $this->file_path );
+        $this->_file_path = reset( $path_bits );
 
 		return $this->_file_path;
 	}
@@ -299,7 +300,14 @@ class WP_Thumb {
 		$upload_dir = self::uploadDir();
 
 		if ( strpos( $this->getFilePath(), $upload_dir['basedir'] ) === 0 ) :
-			$new_dir = $upload_dir['basedir'] . '/cache' . $upload_dir['subdir'] . '/' . $filename_nice;
+
+			$subdir = dirname( str_replace( $upload_dir['basedir'], '', $this->getFilePath() ) );
+			$new_dir = $upload_dir['basedir'] . '/cache' . $subdir . '/' . $filename_nice;
+
+		elseif ( strpos( $this->getFilePath(), WP_CONTENT_DIR ) === 0 ) :
+
+			$subdir = dirname( str_replace( WP_CONTENT_DIR, '', $this->getFilePath() ) );
+			$new_dir = $upload_dir['basedir'] . '/cache' . $subdir . '/' . $filename_nice;
 
 		elseif ( strpos( $this->getFilePath(), self::get_home_path() ) === 0 ) :
 			$new_dir = $upload_dir['basedir'] . '/cache/local';
@@ -383,7 +391,7 @@ class WP_Thumb {
 
 			return $this->returnImage();
 		}
-		
+
 		wp_mkdir_p( $this->getCacheFileDirectory() );
 
 		// Convert gif images to png before resizing
@@ -402,7 +410,7 @@ class WP_Thumb {
 		extract( $this->args );
 
 		// Cropping
-		if ( $crop_from_position && $crop_from_position !== array( 'center', 'center' ) ) :
+		if ( $crop && $crop_from_position && $crop_from_position !== array( 'center', 'center' ) ) :
 
 			$this->crop_from_position( $editor, $width, $height, $crop_from_position, $resize );
 
@@ -414,7 +422,7 @@ class WP_Thumb {
 			$this->crop_from_center( $editor, $width, $height );
 
 		else :
-			
+
 			$editor->resize( $width, $height );
 		endif;
 
@@ -461,22 +469,23 @@ class WP_Thumb {
 				$_height = $height;
 			    $_width = $height * $ratio1;
 			}
-			
+
 			$editor->resize( $_width, $_height );
 		}
 
 		$size = $editor->get_size();
 		$crop = array( 'x' => 0, 'y' => 0 );
 
-		if ( $position[0] == 'bottom' )
-			$crop['y'] = absint( $size['height'] - $height );
+		if ( $position[0] == 'right' )
+			$crop['x'] = absint( $size['width'] - $width );
 		else if ( $position[0] == 'center' )
+			$crop['x'] = intval( absint( $size['width'] - $width ) / 2 );
+
+		if ( $position[1] == 'bottom' )
+			$crop['y'] = absint( $size['height'] - $height );
+		else if ( $position[1] == 'center' )
 			$crop['y'] = intval( absint( $size['height'] - $height ) / 2 );
 
-		if ( $position[1] == 'right' )
-			$crop['x'] = absint( $size['width'] - $width );
-		else if ( $position[1] == 'center' )
-			$crop['x'] = intval( absint( $size['width'] - $width ) / 2 );
 
 		return $editor->crop( $crop['x'], $crop['y'], $width, $height );
 	}
@@ -628,7 +637,7 @@ function wpthumb_post_image( $null, $id, $args ) {
 	if ( ! empty( $args[1] ) )
 		$args['height'] = $args[1];
 
-	if ( empty( $args['crop_from_position'] ) )
+	if ( ! empty( $args['crop'] ) && $args['crop'] && empty( $args['crop_from_position'] ) )
 		 $args['crop_from_position'] = get_post_meta( $id, 'wpthumb_crop_pos', true );
 
 	if ( empty( $path ) )
@@ -636,7 +645,7 @@ function wpthumb_post_image( $null, $id, $args ) {
 
 	$path = apply_filters( 'wpthumb_post_image_path', $path, $id, $args );
 	$args = apply_filters( 'wpthumb_post_image_args', $args, $id );
-	
+
 	$image = new WP_Thumb( $path, $args );
 
 	$args = $image->getArgs();
