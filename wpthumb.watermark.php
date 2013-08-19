@@ -15,8 +15,7 @@ class WP_Thumb_Watermark {
 			'mask' => ''
 		);
 
-		$this->args = wp_parse_args( $args['watermarking_options'], $defaults );
-
+		$this->args = wp_parse_args( $args['watermark_options'], $defaults );
 		$this->fill_watermark();
 	}
 
@@ -73,7 +72,7 @@ class WP_Thumb_Watermark {
 function wpthumb_watermark_add_args_to_post_image( $args, $id ) {
 
 	if ( wpthumb_wm_image_has_watermark( $id ) )
-		$args['watermarking_options'] = wpthumb_wm_get_options( $id );
+		$args['watermark_options'] = wpthumb_wm_get_options( $id );
 
 	return $args;
 }
@@ -88,11 +87,11 @@ add_filter( 'wpthumb_post_image_args', 'wpthumb_watermark_add_args_to_post_image
 function wpthumb_watermark_pre( $editor, $args ) {
 
 	// currently only supports GD
-	if ( ! is_a( $editor, 'WP_Thumb_Image_Editor_GD') || empty( $args['watermarking_options'] ) )
+	if ( ! is_a( $editor, 'WP_Thumb_Image_Editor_GD') || empty( $args['watermark_options'] ) )
 		return $editor;
 
 	// we only want pre
-	if ( empty( $args['watermarking_options']['pre_resize'] ) )
+	if ( empty( $args['watermark_options']['pre_resize'] ) )
 		return;
 
 	new WP_Thumb_Watermark( $editor, $args );
@@ -104,11 +103,11 @@ add_filter( 'wpthumb_image_pre', 'wpthumb_watermark_pre', 10, 2 );
 function wpthumb_watermark_post( $editor, $args ) {
 
 	// currently only supports GD
-	if ( ! is_a( $editor, 'WP_Thumb_Image_Editor_GD') || empty( $args['watermarking_options'] ) )
+	if ( ! is_a( $editor, 'WP_Thumb_Image_Editor_GD') || empty( $args['watermark_options'] ) )
 		return $editor;
 
 	// we only want pre
-	if ( isset( $args['watermarking_options']['pre_resize'] ) && $args['watermarking_options']['pre_resize'] === true )
+	if ( isset( $args['watermark_options']['pre_resize'] ) && $args['watermark_options']['pre_resize'] === true )
 		return;
 
 	new WP_Thumb_Watermark( $editor, $args );
