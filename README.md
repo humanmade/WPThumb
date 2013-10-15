@@ -1,4 +1,5 @@
 === WPThumb ===
+
 Contributors: humanmade, joehoyle, mattheu, tcrsavage, willmot
 Tags: image, resize, thumbnail, crop, phpthumb
 Requires at least: 3.5
