@@ -69,3 +69,8 @@ WP Thumb is a simple plugin that seamlessly intergrates with the WordPress image
 = The plugin doesn't work, what do I do? =
 
 Visit the Issues page of the plugin homepage at: https://github.com/humanmade/WPThumb
+
+## Contribution guidelines ##
+
+see https://github.com/humanmade/WPThumb/blob/master/CONTRIBUTING.md
+
