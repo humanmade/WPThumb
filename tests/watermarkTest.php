@@ -8,7 +8,7 @@ class WPThumbWatermarkTestCase extends WP_Thumb_UnitTestCase {
 		$path = dirname( __FILE__ ) . '/images/black.png';
 		$white = dirname( __FILE__ ) . '/images/white-10.png';
 				
-		$image = new WP_Thumb( $path, array( 'width' => 100, 'height' => 100, 'cache' => false, 'return' => 'path', 'watermarking_options' => array(
+		$image = new WP_Thumb( $path, array( 'width' => 100, 'height' => 100, 'cache' => false, 'return' => 'path', 'watermark_options' => array(
 			'mask' => $white,
 			'position' => 'top,left',
 			'padding' => 0
@@ -28,7 +28,7 @@ class WPThumbWatermarkTestCase extends WP_Thumb_UnitTestCase {
 		$path = dirname( __FILE__ ) . '/images/black.png';
 		$white = dirname( __FILE__ ) . '/images/white-10.png';
 				
-		$image = new WP_Thumb( $path, array( 'width' => 100, 'height' => 100, 'cache' => false, 'return' => 'path', 'watermarking_options' => array(
+		$image = new WP_Thumb( $path, array( 'width' => 100, 'height' => 100, 'cache' => false, 'return' => 'path', 'watermark_options' => array(
 			'mask' => $white,
 			'position' => 'bottom,left',
 			'padding' => 0
@@ -45,7 +45,7 @@ class WPThumbWatermarkTestCase extends WP_Thumb_UnitTestCase {
 		$path = dirname( __FILE__ ) . '/images/black.png';
 		$white = dirname( __FILE__ ) . '/images/white-10.png';
 				
-		$image = new WP_Thumb( $path, array( 'width' => 100, 'height' => 100, 'cache' => false, 'return' => 'path', 'watermarking_options' => array(
+		$image = new WP_Thumb( $path, array( 'width' => 100, 'height' => 100, 'cache' => false, 'return' => 'path', 'watermark_options' => array(
 			'mask' => $white,
 			'position' => 'bottom,right',
 			'padding' => 0
@@ -63,7 +63,7 @@ class WPThumbWatermarkTestCase extends WP_Thumb_UnitTestCase {
 		$path = dirname( __FILE__ ) . '/images/black.png';
 		$white = dirname( __FILE__ ) . '/images/white-10.png';
 				
-		$image = new WP_Thumb( $path, array( 'width' => 100, 'height' => 100, 'cache' => false, 'return' => 'path', 'watermarking_options' => array(
+		$image = new WP_Thumb( $path, array( 'width' => 100, 'height' => 100, 'cache' => false, 'return' => 'path', 'watermark_options' => array(
 			'mask' => $white,
 			'position' => 'top,right',
 			'padding' => 0
@@ -82,7 +82,7 @@ class WPThumbWatermarkTestCase extends WP_Thumb_UnitTestCase {
 		$path = dirname( __FILE__ ) . '/images/black.png';
 		$white = dirname( __FILE__ ) . '/images/white-10.png';
 				
-		$image = new WP_Thumb( $path, array( 'width' => 100, 'height' => 100, 'cache' => false, 'return' => 'path', 'watermarking_options' => array(
+		$image = new WP_Thumb( $path, array( 'width' => 100, 'height' => 100, 'cache' => false, 'return' => 'path', 'watermark_options' => array(
 			'mask' => $white,
 			'position' => 'top,left',
 			'padding' => 10
@@ -102,7 +102,7 @@ class WPThumbWatermarkTestCase extends WP_Thumb_UnitTestCase {
 		$path = dirname( __FILE__ ) . '/images/black.png';
 		$white = dirname( __FILE__ ) . '/images/white-10.png';
 				
-		$image = new WP_Thumb( $path, array( 'width' => 100, 'height' => 100, 'cache' => false, 'return' => 'path', 'watermarking_options' => array(
+		$image = new WP_Thumb( $path, array( 'width' => 100, 'height' => 100, 'cache' => false, 'return' => 'path', 'watermark_options' => array(
 			'mask' => $white,
 			'position' => 'bottom,right',
 			'padding' => 10
@@ -122,7 +122,7 @@ class WPThumbWatermarkTestCase extends WP_Thumb_UnitTestCase {
 		$path = dirname( __FILE__ ) . '/images/black.png';
 		$white = dirname( __FILE__ ) . '/images/white-10.png';
 				
-		$image = new WP_Thumb( $path, array( 'width' => 10, 'height' => 10, 'cache' => false, 'return' => 'path', 'watermarking_options' => array(
+		$image = new WP_Thumb( $path, array( 'width' => 10, 'height' => 10, 'cache' => false, 'return' => 'path', 'watermark_options' => array(
 			'mask' => $white,
 			'position' => 'top,left',
 			'padding' => 0
@@ -140,7 +140,7 @@ class WPThumbWatermarkTestCase extends WP_Thumb_UnitTestCase {
 		$path = dirname( __FILE__ ) . '/images/black.png';
 		$white = dirname( __FILE__ ) . '/images/white-10.png';
 				
-		$image = new WP_Thumb( $path, array( 'width' => 10, 'height' => 10, 'cache' => false, 'return' => 'path', 'watermarking_options' => array(
+		$image = new WP_Thumb( $path, array( 'width' => 10, 'height' => 10, 'cache' => false, 'return' => 'path', 'watermark_options' => array(
 			'mask' => $white,
 			'position' => 'top,left',
 			'padding' => 0,
@@ -159,7 +159,7 @@ class WPThumbWatermarkTestCase extends WP_Thumb_UnitTestCase {
 		$path = dirname( __FILE__ ) . '/images/black.png';
 		$white = dirname( __FILE__ ) . '/images/white-10.png';
 				
-		$image = new WP_Thumb( $path, array( 'width' => 10, 'height' => 10, 'cache' => false, 'return' => 'path', 'watermarking_options' => array(
+		$image = new WP_Thumb( $path, array( 'width' => 10, 'height' => 10, 'cache' => false, 'return' => 'path', 'watermark_options' => array(
 			'mask' => $white,
 			'position' => 'top,left',
 			'padding' => 0,
