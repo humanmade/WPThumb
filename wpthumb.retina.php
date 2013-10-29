@@ -1,38 +1,29 @@
 <?php
 
 /**
- *	Setup.
- *
- *	Register scripts.
- */
-add_action( 'init', function() {
-
-	wp_register_script( 'wpthumb_retina', WP_THUMB_URL . 'wpthumb.retina.js', false, false, true );
-
-} );
-
-/**
- *	Enqueue the retina JS script if the global setting is enabled.
- */
-add_action( 'wp_enqueue_scripts', function() {
-
-	if ( wpthumb_retina_is_enabled() )
-		wp_enqueue_script( 'wpthumb_retina' );
-
-} );
-
-
-/**
  *	Global setting for retina. Either set in media settings, or defined in wp-config.php.
  */
 function wpthumb_retina_is_enabled() {
-
+	
 	if ( defined('WPTHUMB_RETINA_ENABLED') )
 		return (bool) WPTHUMB_RETINA_ENABLED;
 
 	return (bool) apply_filters( 'wpthumb_retina_is_enabled', get_option( 'wpthumb_retina' ) );
 
 }
+
+/**
+ * Enqueue Retina-fy scripts.
+ */
+function wpthumb_retina_scripts() {
+
+	wp_register_script( 'wpthumb_retina', WP_THUMB_URL . 'wpthumb.retina.js', false, false, true );
+	
+	if ( wpthumb_retina_is_enabled() )
+		wp_enqueue_script( 'wpthumb_retina' );
+
+}
+add_action( 'wp_enqueue_scripts', 'wpthumb_retina_scripts' );
 
 /**
  * Return the retina multiplier.
@@ -43,7 +34,7 @@ function wpthumb_retina_is_enabled() {
  * 
  * @return int 
  */
-function wpthumb_get_retina_multiplier() {
+function wpthumb_retina_get_multiplier() {
 
 	return apply_filters( 'wpthumb_retina_multiplier', 2 );
 
@@ -55,6 +46,9 @@ function wpthumb_get_retina_multiplier() {
  */
 function wpthumb_retina_action( $image, $id, $path, $args ) {
 
+	if ( ! wpthumb_retina_is_enabled() )
+		return;
+
 	extract( $args );
 
 	// Do these checks again.
@@ -62,50 +56,45 @@ function wpthumb_retina_action( $image, $id, $path, $args ) {
 		return;
 
 	// If the retina arg is true or the global option is set and the retina arg isn't false
-	if ( ! empty( $retina ) || ( wpthumb_retina_is_enabled() && ( ! isset( $retina ) || $retina ) ) ) {
+    add_filter( 'wp_get_attachment_image_attributes', $closure = function( $attr, $attachment ) use ( $args, $path, &$closure ) {
 
-	    add_filter( 'wp_get_attachment_image_attributes', $closure = function( $attr, $attachment ) use ( $args, $path, &$closure ) {
+     	remove_filter( 'wp_get_attachment_image_attributes', $closure );
 
- 	     	remove_filter( 'wp_get_attachment_image_attributes', $closure );
+     	extract ( $args );
 
- 	     	extract ( $args );
+     	// Only continue if we have a width or a height
+     	if ( empty( $width ) && empty( $height ) )
+		 	 return $attr;
 
- 	     	// Only continue if we have a width or a height
- 	     	if ( empty( $width ) && empty( $height ) )
-	 		 	 return $attr;
+     	// Get the original image with and height
+     	list( $orig_width, $orig_height ) = @getimagesize( $path );
 
- 	     	// Get the original image with and height
- 	     	list( $orig_width, $orig_height ) = @getimagesize( $path );
+     	// Make sure the original is big enough for a retina image
+     	// Currently fails if less than 2 times. This has to be done 
+     	if ( $orig_width < $width * wpthumb_retina_get_multiplier() || $orig_height < $height * wpthumb_retina_get_multiplier() )
+     		return $attr;
 
- 	     	// Make sure the original is big enough for a retina image
- 	     	// Currently fails if less than 2 times. This has to be done 
- 	     	if ( $orig_width < $width * wpthumb_get_retina_multiplier() || $orig_height < $height * wpthumb_get_retina_multiplier() )
- 	     		return $attr;
+     	$args['width'] = $width * wpthumb_retina_get_multiplier();
+     	$args['height'] = $height * wpthumb_retina_get_multiplier();
 
- 	     	$args['width'] = $width * wpthumb_get_retina_multiplier();
- 	     	$args['height'] = $height * wpthumb_get_retina_multiplier();
+     	unset( $args['retina'] );
 
- 	     	unset( $args['retina'] );
+     	$retina_image = new WP_Thumb( $path, $args );
 
- 	     	$retina_image = new WP_Thumb( $path, $args );
+     	if ( ! $retina_image->errored() )
+     		$attr['data-retina-src'] = $retina_image->returnImage();
 
- 	     	if ( ! $retina_image->errored() )
- 	     		$attr['data-retina-src'] = $retina_image->returnImage();
+     	return $attr;
 
- 	     	return $attr;
-
-	    }, 10, 2 );
-
-	}
+    }, 10, 2 );
 
 }
 add_action( 'wpthumb_action', 'wpthumb_retina_action', 10, 4 );
 
-
 /**
  *	Add retina image attr to content images on insert
  */
-function wpthumb_retina_get_image_tag( $html, $id, $caption, $title, $align, $url, $size, $alt = '' ) {
+function wpthumb_retina_get_image_html( $html, $id, $caption, $title, $align, $url, $size, $alt = '' ) {
 
 	if ( ! wpthumb_retina_is_enabled() )
 		return $html;
@@ -129,8 +118,8 @@ function wpthumb_retina_get_image_tag( $html, $id, $caption, $title, $align, $ur
 	} elseif ( is_array( $size ) ) {
 
 		// If an array of args.
-		$args['width']  = $size['width'] * wpthumb_get_retina_multiplier();
-		$args['height'] = $size['height'] * wpthumb_get_retina_multiplier();
+		$args['width']  = $size['width'] * wpthumb_retina_get_multiplier();
+		$args['height'] = $size['height'] * wpthumb_retina_get_multiplier();
 
 	}
 
@@ -149,11 +138,11 @@ function wpthumb_retina_get_image_tag( $html, $id, $caption, $title, $align, $ur
 
 	// Make sure the original is big enough for a retina image
 	// If not cropped - dont worry - just return the biggest possible.
-	if ( ! empty( $args['crop'] ) && ( $orig_width < $args['width'] * wpthumb_get_retina_multiplier() || $orig_height < $args['height'] * wpthumb_get_retina_multiplier() ) )
+	if ( ! empty( $args['crop'] ) && ( $orig_width < $args['width'] * wpthumb_retina_get_multiplier() || $orig_height < $args['height'] * wpthumb_retina_get_multiplier() ) )
 		return $html;
 
-	$args['width'] = $args['width'] * wpthumb_get_retina_multiplier();
-	$args['height'] = $args['height'] * wpthumb_get_retina_multiplier();
+	$args['width'] = $args['width'] * wpthumb_retina_get_multiplier();
+	$args['height'] = $args['height'] * wpthumb_retina_get_multiplier();
 
 	$retina_image_attr = ' data-retina-src="' . reset( wp_get_attachment_image_src( $id, $args ) ) . '" ';
 
@@ -162,8 +151,7 @@ function wpthumb_retina_get_image_tag( $html, $id, $caption, $title, $align, $ur
 	return str_replace( '/>', $retina_image_attr . ' />', $html );	;
 
 }
-add_filter( 'image_send_to_editor', 'wpthumb_retina_get_image_tag', 100, 8 );
-
+add_filter( 'image_send_to_editor', 'wpthumb_retina_get_image_html', 100, 8 );
 
 
 /**
