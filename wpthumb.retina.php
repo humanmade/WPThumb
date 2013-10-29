@@ -144,7 +144,8 @@ function wpthumb_retina_get_image_html( $html, $id, $caption, $title, $align, $u
 	$args['width'] = $args['width'] * wpthumb_retina_get_multiplier();
 	$args['height'] = $args['height'] * wpthumb_retina_get_multiplier();
 
-	$retina_image_attr = ' data-retina-src="' . reset( wp_get_attachment_image_src( $id, $args ) ) . '" ';
+	$image = wp_get_attachment_image_src( $id, $args );
+	$retina_image_attr = ' data-retina-src="' . reset( $image ) . '" ';
 
 	wp_enqueue_script( 'wpthumb_retina' );
 
