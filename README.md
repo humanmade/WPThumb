@@ -1,4 +1,5 @@
 === WPThumb ===
+
 Contributors: humanmade, joehoyle, mattheu, tcrsavage, willmot
 Tags: image, resize, thumbnail, crop, phpthumb
 Requires at least: 3.5
@@ -73,4 +74,3 @@ Visit the Issues page of the plugin homepage at: https://github.com/humanmade/WP
 ## Contribution guidelines ##
 
 see https://github.com/humanmade/WPThumb/blob/master/CONTRIBUTING.md
-

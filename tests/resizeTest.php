@@ -1,6 +1,6 @@
 <?php
 
-class WPThumbResizeTestCase extends WP_UnitTestCase {
+class WPThumbResizeTestCase extends WP_Thumb_UnitTestCase {
 
 	function testResizeProportional() {
 	
@@ -17,7 +17,7 @@ class WPThumbResizeTestCase extends WP_UnitTestCase {
 		$file = $image->returnImage();
 		
 		$this->assertContains( '/cache/', $file );
-		$this->assertContains( ABSPATH, $file );
+		$this->assertContains( WP_CONTENT_DIR, $file );
 		
 		list( $new_width, $new_height ) = getimagesize( $file );
 		
@@ -40,7 +40,7 @@ class WPThumbResizeTestCase extends WP_UnitTestCase {
 		$file = $image->returnImage();
 		
 		$this->assertContains( '/cache/', $file );
-		$this->assertContains( ABSPATH, $file );
+		$this->assertContains( WP_CONTENT_DIR, $file );
 		
 		list( $new_width, $new_height ) = getimagesize( $file );
 		
