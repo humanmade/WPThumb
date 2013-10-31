@@ -598,35 +598,12 @@ function wpthumb_post_image( $null, $id, $args ) {
 
 	// check if $args is a WP Thumb argument list, or native WordPress one
 	// wp thumb looks like this: 'width=300&height=120&crop=1'
-	// native looks like 'thumbnail'...|array( 300, 300 )
+	// native looks like 'thumbnail'
 	if ( is_string( $args ) && ! strpos( (string) $args, '=' ) ) {
 
-		global $_wp_additional_image_sizes;
-
-		// Convert keyword sizes to heights & widths.
-		if ( $args == 'thumbnail' )
-			$new_args = array( 'width' => get_option('thumbnail_size_w'), 'height' => get_option('thumbnail_size_h'), 'crop' => get_option('thumbnail_crop') );
-
-		elseif ( $args == 'medium' )
-			$new_args = array( 'width' => get_option('medium_size_w'), 'height' => get_option('medium_size_h') );
-
-		elseif ( $args == 'large' )
-			$new_args = array( 'width' => get_option('large_size_w'), 'height' => get_option('large_size_h') );
-
-		elseif( ! empty( $_wp_additional_image_sizes ) && array_key_exists( $args, $_wp_additional_image_sizes ) )
-			$new_args = array( 'width' => $_wp_additional_image_sizes[$args]['width'], 'height' => $_wp_additional_image_sizes[$args]['height'], 'crop' => $_wp_additional_image_sizes[$args]['crop'], 'image_size' => $args );
-
-		elseif ( $args != ( $new_filter_args = apply_filters( 'wpthumb_create_args_from_size', $args ) ) )
-			$new_args = $new_filter_args;
-
-		else
-			$new_args = null;
-
-		if ( ! $new_args )
+		// if there are no "special" wpthumb args, then we shouldn' bother creating a WP Thumb, just use the WordPress one
+		if ( $args === ( $args = apply_filters( 'wpthumb_create_args_from_size', $args ) ) )
 			return $null;
-
-		$args = $new_args;
-
 	}
 
 	$args = wp_parse_args( $args );
