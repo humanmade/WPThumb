@@ -71,7 +71,9 @@ class WP_Thumb_Background_Fill {
 			// Fill right color
 	        imagefilledrectangle( $new_image, $offsetLeft + $current_size['width'] - 5, 0, $size['width'], $size['height'], $colorToPaint );
 
-		} elseif ( $current_size['height'] != $size['height'] ) {
+		}
+
+		if ( $current_size['height'] != $size['height'] ) {
 
 			$colorToPaint = imagecolorallocatealpha( $new_image, substr( $colors['top'], 0, 3 ), substr( $colors['top'], 3, 3 ), substr( $colors['top'], 6, 3 ), substr( $colors['left'], 9, 3 ) );
 
