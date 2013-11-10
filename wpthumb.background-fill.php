@@ -18,6 +18,10 @@ class WP_Thumb_Background_Fill {
 		if ( $this->args['background_fill'] && $this->args['background_fill'] !== 'auto' ) {
 
 			$this->fill_with_color( $this->args['background_fill'] );
+		} else if ( $this->args['background_fill'] && $this->args['background_fill'] === 'auto' ) {
+
+			if ( $color = $this->get_background_color() )
+				$this->fill_with_color( $color );
 		}
 	}
 
@@ -71,7 +75,9 @@ class WP_Thumb_Background_Fill {
 			// Fill right color
 	        imagefilledrectangle( $new_image, $offsetLeft + $current_size['width'] - 5, 0, $size['width'], $size['height'], $colorToPaint );
 
-		} elseif ( $current_size['height'] != $size['height'] ) {
+		}
+
+		if ( $current_size['height'] != $size['height'] ) {
 
 			$colorToPaint = imagecolorallocatealpha( $new_image, substr( $colors['top'], 0, 3 ), substr( $colors['top'], 3, 3 ), substr( $colors['top'], 6, 3 ), substr( $colors['left'], 9, 3 ) );
 
@@ -89,6 +95,35 @@ class WP_Thumb_Background_Fill {
 
 		$this->editor->update_image( $new_image );
 		$this->editor->update_size();
+	}
+
+	public function get_background_color() {
+
+		$current_size = $this->editor->get_size();
+
+		$coords = array( 
+			array( 0, 0 ),
+			array( $current_size['width'] - 1, 0 ),
+			array( $current_size['width'] - 1, $current_size['height'] - 1 ),
+			array( 0, $current_size['height'] - 1 ),
+		);
+
+		$colors = array();
+		$color = 0;
+
+		foreach ( $coords as $coord ) {
+			$rgb = imagecolorat( $this->editor->get_image(), $coord[0], $coord[1] );
+			$c = imagecolorsforindex( $this->editor->get_image(), $rgb );
+
+			$colors[] = $c['red'] + $c['green'] + $c['blue'] + $c['alpha'];
+			$color = $c['red'] . $c['green'] . $c['blue'] . $c['alpha']; 
+		}
+
+		if ( max( $colors ) > min( $colors ) + 15 )
+			return false;
+
+		return $color;
+
 	}
 
 }
