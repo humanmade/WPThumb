@@ -58,8 +58,8 @@ class WPThumbBackgroundFillAutoTestCase extends WP_Thumb_UnitTestCase {
 		$image = new WP_Thumb( $path, 'width=400&height=100&crop=1&background_fill=auto&cache=0&return=path' );
 		
 		$file = $image->returnImage();
-
-		$this->assertImageAlphaAtPoint( $file, array( 0, 0 ), 126 );
+		
+		$this->assertImageAlphaAtPoint( $file, array( 0, 0 ), 127 );
 	
 	}
 
