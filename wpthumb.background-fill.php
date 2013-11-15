@@ -116,7 +116,7 @@ class WP_Thumb_Background_Fill {
 			$c = imagecolorsforindex( $this->editor->get_image(), $rgb );
 
 			$colors[] = $c['red'] + $c['green'] + $c['blue'] + $c['alpha'];
-			$color = $c['red'] . $c['green'] . $c['blue'] . $c['alpha']; 
+			$color = str_pad( $c['red'], 3, '0', STR_PAD_LEFT ) . str_pad( $c['green'], 3, '0', STR_PAD_LEFT ) . str_pad( $c['blue'], 3, '0', STR_PAD_LEFT ) . str_pad( $c['alpha'], 3, '0', STR_PAD_LEFT ); 
 		}
 
 		if ( max( $colors ) > min( $colors ) + 15 )
