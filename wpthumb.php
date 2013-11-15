@@ -36,6 +36,8 @@ include_once( WP_THUMB_PATH . '/wpthumb.watermark.php' );
 include_once( WP_THUMB_PATH . '/wpthumb.background-fill.php' );
 include_once( WP_THUMB_PATH . '/wpthumb.crop-from-position.php' );
 include_once( WP_THUMB_PATH . '/wpthumb.shortcodes.php' );
+include_once( WP_THUMB_PATH . '/inc/class-wpthumb-save-location.php' );
+include_once( WP_THUMB_PATH . '/inc/class-wpthumb-save-location-cache-directory.php' );
 
 /**
  * Base WP_Thumb class
@@ -60,8 +62,9 @@ class WP_Thumb {
 	private $file_path;
 
 	private static $wp_upload_dir;
+	private $save_location;
 
-	private static function uploadDir() {
+	public static function uploadDir() {
 
 		if ( empty( self::$wp_upload_dir ) )
 			self::$wp_upload_dir = wp_upload_dir();
@@ -71,6 +74,18 @@ class WP_Thumb {
 
 	private static function get_home_path() {
 		return str_replace( str_replace( home_url(), '', site_url() ), '', ABSPATH );
+	}
+
+	public function getSaveLocation() {
+
+		if ( empty( $this->save_location ) )
+			$this->save_location = new WP_Thumb_Save_Location_Cache_Directory( $this );
+
+		return $this->save_location;
+	}
+
+	public function setSaveLocation() {
+
 	}
 
 	/**
@@ -90,9 +105,9 @@ class WP_Thumb {
 
 		if ( $this->getFilePath() && ! $this->errored() ) {
 
-			if ( ! file_exists( $this->getCacheFilePath() ) || ! $this->args['cache'] ) {
+			if ( ! $this->getSaveLocation()->fileExists() || ! $this->args['cache'] ) {
 
-				$this->generateCacheFile();
+				$this->generateFile();
 			}
 		}
 
@@ -256,106 +271,6 @@ class WP_Thumb {
 
 	}
 
-	/**
-	 * Get the filepath to the cache file
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getCacheFilePath() {
-
-		$path = $this->getFilePath();
-
-		if ( ! $path )
-			return '';
-
-		return apply_filters( 'wpthumb_cache_file_path', trailingslashit( $this->getCacheFileDirectory() ) . $this->getCacheFileName(), $this );
-
-	}
-
-	/**
-	 * Get the directory that the cache file should be saved too
-	 *
-	 * @return string
-	 */
-	public function getCacheFileDirectory() {
-
-		if ( $this->getArg( 'output_file' ) )
-			return dirname( $this->getArg( 'output_file' ) );
-
-		$path = $this->getFilePath();
-
-		if ( ! $path )
-			return '';
-
-		$original_filename = basename( $this->getFilePath() );
-
-		// TODO use pathinfo
-		$parts = explode( '.', $original_filename );
-
-		array_pop( $parts );
-
-		$filename_nice = implode( '_', $parts );
-
-		$upload_dir = self::uploadDir();
-
-		if ( strpos( $this->getFilePath(), $upload_dir['basedir'] ) === 0 ) :
-
-			$subdir = dirname( str_replace( $upload_dir['basedir'], '', $this->getFilePath() ) );
-			$new_dir = $upload_dir['basedir'] . '/cache' . $subdir . '/' . $filename_nice;
-
-		elseif ( strpos( $this->getFilePath(), WP_CONTENT_DIR ) === 0 ) :
-
-			$subdir = dirname( str_replace( WP_CONTENT_DIR, '', $this->getFilePath() ) );
-			$new_dir = $upload_dir['basedir'] . '/cache' . $subdir . '/' . $filename_nice;
-
-		elseif ( strpos( $this->getFilePath(), self::get_home_path() ) === 0 ) :
-			$new_dir = $upload_dir['basedir'] . '/cache/local';
-
-		else :
-
-			$parts = parse_url( $this->getFilePath() );
-
-			if ( ! empty( $parts['host'] ) )
-				$new_dir = $upload_dir['basedir'] . '/cache/remote/' . sanitize_title( $parts['host'] );
-
-			else
-				$new_dir = $upload_dir['basedir'] . '/cache/remote';
-
-		endif;
-
-		// TODO unit test for whether this is needed or not
-		$new_dir = str_replace( '/cache/cache', '/cache', $new_dir );
-
-		return $new_dir;
-	}
-
-	/**
-	 * Get the filename of the cache file
-	 *
-	 * @return string
-	 */
-	public function getCacheFileName() {
-
-		if ( $this->getArg( 'output_file' ) )
-			return basename( $this->getArg( 'output_file' ) );
-
-		$path = $this->getFilePath();
-
-		if ( ! $path )
-			return '';
-
-		// Generate a short unique filename
-		$serialize = crc32( serialize( array_merge( $this->getArgs(), array( $this->getFilePath() ) ) ) );
-
-		// Gifs are converted to pngs
-		if ( $this->getFileExtension() == 'gif' )
-			return $serialize . '.png';
-
-		return $serialize . '.' . $this->getFileExtension();
-
-	}
-
 	public function isRemote() {
 
 		return strpos( $this->getFilePath(), self::get_home_path() ) !== 0;
@@ -367,9 +282,9 @@ class WP_Thumb {
 	 *
 	 * @return string new filepath
 	 */
-	public function generateCacheFile() {
+	public function generateFile() {
 
-		$new_filepath = $this->getCacheFilePath();
+		$new_filepath = '/tmp/' . rand(1,9999) . '.' . $this->getFileExtension();
 		$file_path = $this->getFilePath();
 
 		// Up the php memory limit
@@ -391,8 +306,6 @@ class WP_Thumb {
 
 			return $this->returnImage();
 		}
-
-		wp_mkdir_p( $this->getCacheFileDirectory() );
 
 		// Convert gif images to png before resizing
 		if ( $this->getFileExtension() == 'gif' ) :
@@ -428,7 +341,11 @@ class WP_Thumb {
 
 		apply_filters( 'wpthumb_image_post', $editor, $this->args );
 
-		$editor->save( $new_filepath );
+		$save = $editor->save( $new_filepath );
+
+		$this->getSaveLocation()->save( $save['path'] );
+
+		unlink( $save['path'] );
 
 		do_action( 'wpthumb_saved_cache_image', $this );
 	}
@@ -516,22 +433,13 @@ class WP_Thumb {
 
 		} else {
 
-			$path = $this->getCacheFilePath();
+			$path = $this->getSaveLocation()->getPath();
 		}
 
 		if ( $this->args['return'] == 'path' )
 			return $path;
 
 		return $path ? $this->getFileURLForFilePath( $path ) : $path;
-	}
-
-	/**
-	 * Get the url for the cache file
-	 *
-	 * @return string
-	 */
-	public function getCacheFileURL() {
-		return $this->getFileURLForFilePath( $this->getCacheFilePath() );
 	}
 
 	/**
@@ -635,7 +543,7 @@ function wpthumb_post_image( $null, $id, $args ) {
 
 		$crop = (bool) ( empty( $crop ) ) ? false : $crop;
 
-		if ( ! $image->errored() && $image_meta = @getimagesize( $image->getCacheFilePath() ) ) :
+		if ( ! $image->errored() && $image_meta = @getimagesize( $image->getSaveLocation()->getPath() ) ) :
 
 			$html_width = $image_meta[0];
 			$html_height = $image_meta[1];
@@ -668,49 +576,12 @@ function wpthumb_delete_cache_for_file( $file ) {
 	$upload_dir = wp_upload_dir();
 
 	$wpthumb = new WP_Thumb( $upload_dir['basedir'] . $file );
-
-	wpthumb_rmdir_recursive( $wpthumb->getCacheFileDirectory() );
+	$wpthumb->getSaveLocation()->delete();
 
 	return $file;
 
 }
 add_filter( 'wp_delete_file', 'wpthumb_delete_cache_for_file' );
-
-/**
- * Removes a dir tree. I.e. recursive rmdir
- *
- * @param string $dir
- * @return bool - success / failure
- */
-function wpthumb_rmdir_recursive( $dir ) {
-
-	if ( ! is_dir( $dir ) )
-		return false;
-
-	$dir = trailingslashit( $dir );
-
-	$handle = opendir( $dir );
-
-	while ( false !== ( $file = readdir( $handle ) ) ) {
-
-		if ( $file == '.' || $file == '..' )
-			continue;
-
-		$path = $dir . $file;
-
-		if ( is_dir( $path ) )
-			wpthumb_rmdir_recursive( $path );
-
-		else
-			unlink( $path );
-
-	}
-
-	closedir( $handle );
-
-	rmdir( $dir );
-
-}
 
 /**
  * wpthumb_errors function.
