@@ -89,12 +89,3 @@ function wpthumb_upscale( $editor, $args ) {
 	return $editor;
 }
 add_filter( 'wpthumb_image_pre', 'wpthumb_upscale', 9, 2 );
-
-add_action( 'init', function() {
-
-	echo '<img src="';
-	echo wpthumb( dirname( __FILE__ ) . '/tests/images/google.png', 'width=1000&height=1000&upscale=1&crop=1&cache=0&crop_from_position=right,bottom' );
-	echo '" />';
-
-	exit;
-});
