@@ -4,6 +4,7 @@ class WP_Thumb_Save_Location_Cache_Directory extends WP_Thumb_Save_Location {
 
 	public function fileExists() {
 
+		return file_exists( $this->getPath() );
 	}
 
 	public function save( $file_path ) {
