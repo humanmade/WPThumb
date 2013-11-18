@@ -72,7 +72,7 @@ class WP_Thumb {
 		return self::$wp_upload_dir;
 	}
 
-	private static function get_home_path() {
+	public static function get_home_path() {
 		return str_replace( str_replace( home_url(), '', site_url() ), '', ABSPATH );
 	}
 
