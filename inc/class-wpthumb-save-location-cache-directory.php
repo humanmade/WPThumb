@@ -60,7 +60,7 @@ class WP_Thumb_Save_Location_Cache_Directory extends WP_Thumb_Save_Location {
 			$subdir = dirname( str_replace( WP_CONTENT_DIR, '', $this->wp_thumb->getFilePath() ) );
 			$new_dir = $upload_dir['basedir'] . '/cache' . $subdir . '/' . $filename_nice;
 
-		elseif ( strpos( $this->wp_thumb->getFilePath(), $this->wp_thumb::get_home_path() ) === 0 ) :
+		elseif ( strpos( $this->wp_thumb->getFilePath(), $this->wp_thumb->get_home_path() ) === 0 ) :
 			$new_dir = $upload_dir['basedir'] . '/cache/local';
 
 		else :
