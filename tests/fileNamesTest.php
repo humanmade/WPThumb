@@ -178,7 +178,7 @@ class WPThumbFileNameTestCase extends WP_Thumb_UnitTestCase {
 
 	function testFileNameWithUppercaseExtension() {
 
-		$path = dirname( __FILE__ ) . '/images/uppercase-entension.PNG';
+		$path = dirname( __FILE__ ) . '/images/uppercase-extension.PNG';
 
 		$image = new WP_Thumb( $path, array( 'width' => 10, 'height' => 10 ) );
 
