@@ -175,4 +175,22 @@ class WPThumbFileNameTestCase extends WP_Thumb_UnitTestCase {
 
 		$this->assertTrue( $image->errored() );
 	}
+
+	function testFileNameWithUppercaseExtension() {
+
+		$path = dirname( __FILE__ ) . '/images/uppercase-entension.PNG';
+
+		$image = new WP_Thumb( $path, array( 'width' => 10, 'height' => 10 ) );
+
+		$this->assertTrue( file_exists( $image->getCacheFilePath() ) );
+	}
+
+	function testFileNameWithUppercaseFileName() {
+
+		$path = dirname( __FILE__ ) . '/images/UpperCase.png';
+
+		$image = new WP_Thumb( $path, array( 'width' => 10, 'height' => 10 ) );
+
+		$this->assertTrue( file_exists( $image->getCacheFilePath() ) );
+	}
 }
