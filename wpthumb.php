@@ -252,7 +252,7 @@ class WP_Thumb {
 			$ext = 'jpg';
 		}
 
-		return $ext;
+		return strtolower( $ext );
 
 	}
 
