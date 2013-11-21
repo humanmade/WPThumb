@@ -38,6 +38,8 @@ include_once( WP_THUMB_PATH . '/wpthumb.crop-from-position.php' );
 include_once( WP_THUMB_PATH . '/wpthumb.shortcodes.php' );
 include_once( WP_THUMB_PATH . '/inc/class-wpthumb-save-location.php' );
 include_once( WP_THUMB_PATH . '/inc/class-wpthumb-save-location-cache-directory.php' );
+include_once( WP_THUMB_PATH . '/inc/class-wpthumb-save-location-database.php' );
+include_once( WP_THUMB_PATH . '/inc/class-wpthumb-save-location-s3.php' );
 
 /**
  * Base WP_Thumb class
@@ -165,7 +167,8 @@ class WP_Thumb {
 			'custom' 				    => false,
 			'background_fill'		    => null,
 			'output_file'			    => false,
-            'cache_with_query_params'   => false
+            'cache_with_query_params'   => false,
+			'attachment_id'				=> 0,
 		);
 
 		$args = wp_parse_args( $args, $arg_defaults );
@@ -528,6 +531,9 @@ function wpthumb_post_image( $null, $id, $args ) {
 	if ( empty( $path ) )
 		$path = get_attached_file( $id );
 
+	if ( empty( $args['attachment_id'] ) )
+		$args['attachment_id'] = $id;
+
 	$path = apply_filters( 'wpthumb_post_image_path', $path, $id, $args );
 	$args = apply_filters( 'wpthumb_post_image_args', $args, $id );
 
@@ -610,3 +616,4 @@ function wpthumb_add_image_editors( $editors ) {
 	return $editors;
 }
 add_filter( 'wp_image_editors', 'wpthumb_add_image_editors' );
+
