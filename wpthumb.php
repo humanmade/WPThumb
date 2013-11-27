@@ -39,7 +39,6 @@ include_once( WP_THUMB_PATH . '/wpthumb.shortcodes.php' );
 include_once( WP_THUMB_PATH . '/inc/class-wpthumb-save-location.php' );
 include_once( WP_THUMB_PATH . '/inc/class-wpthumb-save-location-cache-directory.php' );
 include_once( WP_THUMB_PATH . '/inc/class-wpthumb-save-location-database.php' );
-include_once( WP_THUMB_PATH . '/inc/class-wpthumb-save-location-s3.php' );
 
 /**
  * Base WP_Thumb class
@@ -80,8 +79,11 @@ class WP_Thumb {
 
 	public function getSaveLocation() {
 
-		if ( empty( $this->save_location ) )
-			$this->save_location = new WP_Thumb_Save_Location_Cache_Directory( $this );
+		if ( empty( $this->save_location ) ) {
+			$class = apply_filters( 'wpthumb_save_location', 'WP_Thumb_Save_Location_Cache_Directory' );
+
+			$this->save_location = new $class( $this );
+		}
 
 		return $this->save_location;
 	}
