@@ -1,28 +1,33 @@
 <?php
 
-abstract class WP_Thumb_Save_Location_Database extends WP_Thumb_Save_Location {
+class WP_Thumb_Save_Location_Database extends WP_Thumb_Save_Location_Cache_Directory {
 
 	public function fileExists() {
+		
 
 		$args = $this->wp_thumb->getArgs();
 
-		$stored = ( $args['attachment_id'] ) ? get_post_meta( $args['attachment_id'], 'wp_thumb_saved_images', true ) : get_option( 'wp_thumb_saved_images', array() );
+		$stored = $args['attachment_id'] ? get_post_meta( $args['attachment_id'], 'wp_thumb_saved_images', true ) : get_option( 'wp_thumb_saved_images', array() );
 
 		if ( $args['attachment_id'] )
-			$cached_images = ( $stored ) ? $stored : array();
+			$cached_images = $stored ? $stored : array();
 		else
-			$cached_images = ( ! empty( $stored[$this->wp_thumb->getFileURL()] ) ) ? $stored[$this->wp_thumb->getFileURL()] : array();
+			$cached_images = ( ! empty( $stored[$this->wp_thumb->getFilePath()] ) ) ? $stored[$this->wp_thumb->getFilePath()] : array();
 
-		return ( ! empty ( $cached_images[md5( serialize( $args ))] ) );
+		//var_export( $cached_images[md5( serialize( $args ))] );
+		//exit;
+		return ! empty( $cached_images[md5( serialize( $args ))] );
 	}
 
 	public function save( $file_path ) {
 
-		$this->saveFileExists( $file_path, true );
+		parent::save( $file_path );
+		$this->saveFileExists( $this->getPath(), true );
 	}
 
 	public function delete() {
 
+		parent::delete();
 		$this->deleteFileExists();
 	}
 
@@ -40,10 +45,10 @@ abstract class WP_Thumb_Save_Location_Database extends WP_Thumb_Save_Location {
 
 		} else {
 
-			if ( empty( $cached_images[$this->wp_thumb->getFileURL()] ) )
-				$cached_images[$this->wp_thumb->getFileURL()] = array();
+			if ( empty( $cached_images[$this->wp_thumb->getFilePath()] ) )
+				$cached_images[$this->wp_thumb->getFilePath()] = array();
 
-			$cached_images[$this->wp_thumb->getFileURL()][md5( serialize( $args ))] = $file_path;
+			$cached_images[$this->wp_thumb->getFilePath()][md5( serialize( $args ))] = $file_path;
 
 			update_option( 'wp_thumb_saved_images', $cached_images );
 		}
@@ -64,8 +69,8 @@ abstract class WP_Thumb_Save_Location_Database extends WP_Thumb_Save_Location {
 
 		} else {
 
-			if ( ! empty( $cached_images[$this->wp_thumb->getFileURL()][md5( serialize( $args ))] ) )
-				unset( $cached_images[$this->wp_thumb->getFileURL()][md5( serialize( $args ))] );
+			if ( ! empty( $cached_images[$this->wp_thumb->getFilePath()][md5( serialize( $args ))] ) )
+				unset( $cached_images[$this->wp_thumb->getFilePath()][md5( serialize( $args ))] );
 
 			update_option( 'wp_thumb_saved_images', $cached_images );
 		}
