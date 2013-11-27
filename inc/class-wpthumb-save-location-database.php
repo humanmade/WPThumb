@@ -14,8 +14,6 @@ class WP_Thumb_Save_Location_Database extends WP_Thumb_Save_Location_Cache_Direc
 		else
 			$cached_images = ( ! empty( $stored[$this->wp_thumb->getFilePath()] ) ) ? $stored[$this->wp_thumb->getFilePath()] : array();
 
-		//var_export( $cached_images[md5( serialize( $args ))] );
-		//exit;
 		return ! empty( $cached_images[md5( serialize( $args ))] );
 	}
 
