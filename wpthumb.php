@@ -66,7 +66,19 @@ class WP_Thumb {
 		if ( empty( self::$wp_upload_dir ) )
 			self::$wp_upload_dir = wp_upload_dir();
 
+		// if blogs are ever switched we need to clear the cache
+		add_action( 'switch_blog', array( 'WP_Thumb', 'clearUploadDirCache' ) );
+
 		return self::$wp_upload_dir;
+	}
+
+	/**
+	 * Clear the internally cached upload dir. WP Thumb cached the results of wp_upload_dir()
+	 * for performance, however it's sometimes necessary to clear the internal cache, such as switching
+	 * blogs in multisite
+	 */
+	public static function clearUploadDirCache() {
+		self::$wp_upload_dir = null;		
 	}
 
 	private static function get_home_path() {
