@@ -9,7 +9,7 @@ An on-demand image generation replacement for WordPress' image resizing.
 
 == Description ==
 
-WP Thumb is a simple plugin that seamlessly intergrates with the WordPress image functions. You can specify height, width and crop values, and an image will be generated, which is then cached for future use.
+WP Thumb is a simple plugin that seamlessly integrates with the WordPress image functions. You can specify height, width and crop values, and an image will be generated, which is then cached for future use.
 
 = Features =
 
