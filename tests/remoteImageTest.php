@@ -17,7 +17,7 @@ class WPThumbRemoteImageTestCase extends WP_Thumb_UnitTestCase {
 		list( $new_width, $new_height ) = getimagesize( $file );
 		
 		$this->assertEquals( $new_width, 275, 'Width is not expected' );
-		$this->assertEquals( $new_height, 95, 'Height is not expcted' );
+		$this->assertEquals( $new_height, 95, 'Height is not expected' );
 	
 	}
 	
@@ -36,7 +36,7 @@ class WPThumbRemoteImageTestCase extends WP_Thumb_UnitTestCase {
 		list( $new_width, $new_height ) = getimagesize( $file );
 		
 		$this->assertEquals( $new_width, 80, 'Width is not expected' );
-		$this->assertEquals( $new_height, 80, 'Height is not expcted' );
+		$this->assertEquals( $new_height, 80, 'Height is not expected' );
 	
 	}
 	

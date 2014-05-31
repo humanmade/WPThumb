@@ -22,7 +22,7 @@ class WPThumbResizeTestCase extends WP_Thumb_UnitTestCase {
 		list( $new_width, $new_height ) = getimagesize( $file );
 		
 		$this->assertEquals( $new_width, $width, 'Width is not expected' );
-		$this->assertEquals( $new_height, floor( $height / 2 ), 'Height is not expcted' );
+		$this->assertEquals( $new_height, floor( $height / 2 ), 'Height is not expected' );
 	}
 	
 	function testResizeProportionalLargeThanSourceImage() {
@@ -45,7 +45,7 @@ class WPThumbResizeTestCase extends WP_Thumb_UnitTestCase {
 		list( $new_width, $new_height ) = getimagesize( $file );
 		
 		$this->assertEquals( $new_width, $width / 2, 'Width is not expected' );
-		$this->assertEquals( $new_height, floor( $height ), 'Height is not expcted' );
+		$this->assertEquals( $new_height, floor( $height ), 'Height is not expected' );
 	}
 
 }

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Only add the watermkaring admin optins if the current theme suports it, as we don;t want to clutter
- * for poeple who don't care
+ * Only add the watermarking admin options if the current theme supports it, as we don't want to clutter
+ * for people who don't care
  * 
  */
 function wpthumb_add_crop_from_position_admin_hooks() {

@@ -20,7 +20,7 @@ class WPThumbBackgroundFillAutoTestCase extends WP_Thumb_UnitTestCase {
 		list( $new_width, $new_height ) = getimagesize( $file );
 		
 		$this->assertEquals( $new_width, 1000, 'Width is not expected' );
-		$this->assertEquals( $new_height, 1000, 'Height is not expcted' );
+		$this->assertEquals( $new_height, 1000, 'Height is not expected' );
 
 		$this->assertImageRGBAtPoint( $file, array( 0, 0 ), array( 255, 255, 255 ) );
 	}
@@ -32,7 +32,7 @@ class WPThumbBackgroundFillAutoTestCase extends WP_Thumb_UnitTestCase {
 		
 		$path = dirname( __FILE__ ) . '/images/checked.png';
 		
-		// How bacbkground fill the cropped imageg (which is mixed colours)
+		// How background fill the cropped imageg (which is mixed colours)
 		
 		$image = new WP_Thumb( $path, "width=400&height=100&crop=1&cache=0&return=path&background_fill=auto" );
 			
@@ -44,7 +44,7 @@ class WPThumbBackgroundFillAutoTestCase extends WP_Thumb_UnitTestCase {
 		list( $new_width, $new_height ) = getimagesize( $file );
 		
 		$this->assertEquals( $new_width, 10, 'Width is not expected' );
-		$this->assertEquals( $new_height, 10, 'Height is not expcted' );
+		$this->assertEquals( $new_height, 10, 'Height is not expected' );
 	
 	}
 	
@@ -52,7 +52,7 @@ class WPThumbBackgroundFillAutoTestCase extends WP_Thumb_UnitTestCase {
 		
 		$path = dirname( __FILE__ ) . '/images/transparent.png';
 		
-		// check the iamge is transparent
+		// check the image is transparent
 		$this->assertImageAlphaAtPoint( $path, array( 0, 0 ), 127 );
 		
 		$image = new WP_Thumb( $path, 'width=400&height=100&crop=1&background_fill=auto&cache=0&return=path' );

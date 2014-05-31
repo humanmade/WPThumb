@@ -120,7 +120,7 @@ class WPThumbFileNameTestCase extends WP_Thumb_UnitTestCase {
 		$image = new WP_Thumb;
 		$image->setFilePath( $url );
 
-		$this->assertFalse( $image->errored(), 'Image error occured' );
+		$this->assertFalse( $image->errored(), 'Image error occurred' );
 		$this->assertEquals( $path, $image->getFilePath() );
 
 	}

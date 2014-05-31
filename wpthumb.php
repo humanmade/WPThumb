@@ -391,7 +391,7 @@ class WP_Thumb {
 		$editor = wp_get_image_editor( $file_path, array( 'methods' => array( 'get_image' ) ) );
 
 		/**
-		 * Workaround to preserve image blending when images are not specifically resized (smaller than dimentions for example)
+		 * Workaround to preserve image blending when images are not specifically resized (smaller than dimensions for example)
 		 */
 		if ( is_a( $editor, 'WP_Thumb_Image_Editor_GD' ) ) {
 			imagealphablending( $editor->get_image(), false);
@@ -613,7 +613,7 @@ function wpthumb_post_image( $null, $id, $args ) {
 	// native looks like 'thumbnail'
 	if ( is_string( $args ) && ! strpos( (string) $args, '=' ) ) {
 
-		// if there are no "special" wpthumb args, then we shouldn' bother creating a WP Thumb, just use the WordPress one
+		// if there are no "special" wpthumb args, then we shouldn't bother creating a WP Thumb, just use the WordPress one
 		if ( $args === ( $args = apply_filters( 'wpthumb_create_args_from_size', $args ) ) )
 			return $null;
 	}
@@ -670,7 +670,7 @@ function wpthumb_post_image( $null, $id, $args ) {
 add_filter( 'image_downsize', 'wpthumb_post_image', 99, 3 );
 
 /**
- * Hook into wp_delete_file and delete the assocated cache files
+ * Hook into wp_delete_file and delete the associated cache files
  *
  * @param string $file
  * @return string

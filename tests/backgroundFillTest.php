@@ -23,7 +23,7 @@ class WPThumbBackgroundFillTestCase extends WP_Thumb_UnitTestCase {
 		list( $new_width, $new_height ) = getimagesize( $file );
 		
 		$this->assertEquals( $new_width, 100, 'Width is not expected' );
-		$this->assertEquals( $new_height, 100, 'Height is not expcted' );
+		$this->assertEquals( $new_height, 100, 'Height is not expected' );
 		
 		$this->assertImageRGBAtPoint( $file, array(1,1), array(255,255,255) );
 	}
