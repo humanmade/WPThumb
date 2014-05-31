@@ -54,7 +54,7 @@ class WP_Thumb {
 	/**
 	 * The file path the original image
 	 *
-	 * @var strin
+	 * @var string
 	 * @access private
 	 */
 	private $file_path;
