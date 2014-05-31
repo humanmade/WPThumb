@@ -8,7 +8,7 @@ Version: 0.10
 Author URI: http://www.hmn.md/
 */
 
-/*  Copyright 2011 Human Made Limited  (email : hello@humanmade.co.uk)
+/*  Copyright 2014 Human Made Limited  (email : hello@humanmade.co.uk)
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
