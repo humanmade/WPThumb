@@ -356,7 +356,7 @@ function wpthumb_wm_get_watermark_masks() {
 }
 
 /**
- * Returns the watermaring image file for a given watermark name
+ * Returns the watermarking image file for a given watermark name
  *
  * @param string $mask
  * @return string
@@ -367,9 +367,9 @@ function wpthumb_wm_get_watermark_mask_file( $mask ) {
 }
 
 /**
- * Registers extr awatermark images for the suer to select in the admin
+ * Registers extra watermark images for the user to select in the admin
  *
- * @param string $name - sanetixed identifier
+ * @param string $name - sanitized identifier
  * @param string $file - full path to the watermarking image
  * @param string $label - test to be used for the watermarks name
  */
