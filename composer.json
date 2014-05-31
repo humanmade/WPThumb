@@ -1,0 +1,20 @@
+{
+	"name"       : "humanmade/wp-thumb",
+	"description": "An on-demand image generation replacement for WordPress image resizing.",
+	"keywords"   : ["wordpress"],
+	"homepage"   : "https://github.com/humanmade/WPThumb",
+	"license"    : "GPL-2.0+",
+	"authors"    : [
+		{
+			"name"    : "Human Made Limited",
+			"email"   : "hello@humanmade.co.uk",
+			"homepage": "http://humanmade.co.uk"
+		}
+	],
+	"support"    : {
+		"issues": "https://github.com/humanmade/WPThumb/issues"
+	},
+	"autoload"   : {
+		"classmap": ["wpthumb.php"]
+	}
+}
