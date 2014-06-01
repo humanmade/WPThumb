@@ -8,14 +8,14 @@ fi
 DB_NAME=$1
 DB_USER=$2
 DB_PASS=$3
-WP_VERSION=${4-master}
+WP_VERSION=${master}
 
 set -ex
 
 # set up a WP install
 WP_CORE_DIR=/tmp/wordpress/
 mkdir -p $WP_CORE_DIR
-wget -nv -O /tmp/wordpress.tar.gz https://github.com/WordPress/WordPress/tarball/$WP_VERSION
+wget -nv -O /tmp/wordpress.tar.gz https://github.com/WordPress/WordPress/archive/$WP_VERSION.tar.gz
 tar --strip-components=1 -zxmf /tmp/wordpress.tar.gz -C $WP_CORE_DIR
 
 # set up testing suite
