@@ -258,7 +258,7 @@ function wpthumb_wm_get_options( $id ) {
 
 	$mask = wpthumb_wm_mask( $id );
 
-	if( !empty( $mask ) ) {
+	if( ! empty( $mask ) ) {
 		$options['mask'] = wpthumb_wm_get_watermark_mask_file( $mask );
 	} else {
 		$mask =  wpthumb_wm_get_default_watermark_mask();
