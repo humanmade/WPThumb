@@ -8,7 +8,7 @@ fi
 DB_NAME=$1
 DB_USER=$2
 DB_PASS=$3
-WP_VERSION=${master}
+WP_VERSION=${4-master}
 
 set -ex
 
