@@ -20,8 +20,9 @@ class WP_Thumb_Background_Fill {
 			$this->fill_with_color( $this->args['background_fill'] );
 		} else if ( $this->args['background_fill'] && $this->args['background_fill'] === 'auto' ) {
 
-			if ( $color = $this->get_background_color() )
+			if ( $color = $this->get_background_color() ) {
 				$this->fill_with_color( $color );
+			}
 		}
 	}
 
@@ -30,11 +31,13 @@ class WP_Thumb_Background_Fill {
 	 */
 	public function fill_with_color( $color ) {
 
-		if ( ! is_array( $color ) && strlen( $color ) == 3 )
+		if ( ! is_array( $color ) && strlen( $color ) == 3 ) {
 			$color = (float) str_pad( (string) $color, 9, $color ) . '000';
+		}
 
-		if ( ! is_array( $color ) )
+		if ( ! is_array( $color ) ) {
 			$color = array( 'top' => $color, 'bottom' => $color, 'left' => $color, 'right' => $color );
+		}
 
 		$this->fill_color( $color );
 
@@ -43,9 +46,9 @@ class WP_Thumb_Background_Fill {
 	/**
 	 * Background fill an image using the provided color
 	 *
-	 * @param int $width The desired width of the new image
-	 * @param int $height The desired height of the new image
-	 * @param Array the desired pad colors in RGB format, array should be array( 'top' => '', 'right' => '', 'bottom' => '', 'left' => '' );
+	 * @param int   $width  The desired width of the new image
+	 * @param int   $height The desired height of the new image
+	 * @param Array $colors The desired pad colors in RGB format, array should be array( 'top' => '', 'right' => '', 'bottom' => '', 'left' => '' );
 	 */
 	private function fill_color( array $colors ) {
 
@@ -68,12 +71,12 @@ class WP_Thumb_Background_Fill {
 			$colorToPaint = imagecolorallocatealpha( $new_image, substr( $colors['left'], 0, 3 ), substr( $colors['left'], 3, 3 ), substr( $colors['left'], 6, 3 ), substr( $colors['left'], 9, 3 ) );
 
 			// Fill left color
-	        imagefilledrectangle( $new_image, 0, 0, $offsetLeft + 5, $size['height'], $colorToPaint );
+			imagefilledrectangle( $new_image, 0, 0, $offsetLeft + 5, $size['height'], $colorToPaint );
 
 			$colorToPaint = imagecolorallocatealpha( $new_image, substr( $colors['right'], 0, 3 ), substr( $colors['right'], 3, 3 ), substr( $colors['right'], 6, 3 ), substr( $colors['left'], 9, 3 ) );
 
 			// Fill right color
-	        imagefilledrectangle( $new_image, $offsetLeft + $current_size['width'] - 5, 0, $size['width'], $size['height'], $colorToPaint );
+			imagefilledrectangle( $new_image, $offsetLeft + $current_size['width'] - 5, 0, $size['width'], $size['height'], $colorToPaint );
 
 		}
 
@@ -82,12 +85,12 @@ class WP_Thumb_Background_Fill {
 			$colorToPaint = imagecolorallocatealpha( $new_image, substr( $colors['top'], 0, 3 ), substr( $colors['top'], 3, 3 ), substr( $colors['top'], 6, 3 ), substr( $colors['left'], 9, 3 ) );
 
 			// Fill top color
-	        imagefilledrectangle( $new_image, 0, 0, $size['width'], $offsetTop + 5, $colorToPaint );
+			imagefilledrectangle( $new_image, 0, 0, $size['width'], $offsetTop + 5, $colorToPaint );
 
 			$colorToPaint = imagecolorallocatealpha( $new_image, substr( $colors['bottom'], 0, 3 ), substr( $colors['bottom'], 3, 3 ), substr( $colors['bottom'], 6, 3 ), substr( $colors['left'], 9, 3 ) );
 
 			// Fill bottom color
-	        imagefilledrectangle( $new_image, 0, $offsetTop - 5 + $current_size['height'], $size['width'], $size['height'], $colorToPaint );
+			imagefilledrectangle( $new_image, 0, $offsetTop - 5 + $current_size['height'], $size['width'], $size['height'], $colorToPaint );
 
 		}
 
@@ -101,7 +104,7 @@ class WP_Thumb_Background_Fill {
 
 		$current_size = $this->editor->get_size();
 
-		$coords = array( 
+		$coords = array(
 			array( 0, 0 ),
 			array( $current_size['width'] - 1, 0 ),
 			array( $current_size['width'] - 1, $current_size['height'] - 1 ),
@@ -116,11 +119,12 @@ class WP_Thumb_Background_Fill {
 			$c = imagecolorsforindex( $this->editor->get_image(), $rgb );
 
 			$colors[] = $c['red'] + $c['green'] + $c['blue'] + $c['alpha'];
-			$color = str_pad( $c['red'], 3, '0', STR_PAD_LEFT ) . str_pad( $c['green'], 3, '0', STR_PAD_LEFT ) . str_pad( $c['blue'], 3, '0', STR_PAD_LEFT ) . str_pad( $c['alpha'], 3, '0', STR_PAD_LEFT ); 
+			$color = str_pad( $c['red'], 3, '0', STR_PAD_LEFT ) . str_pad( $c['green'], 3, '0', STR_PAD_LEFT ) . str_pad( $c['blue'], 3, '0', STR_PAD_LEFT ) . str_pad( $c['alpha'], 3, '0', STR_PAD_LEFT );
 		}
 
-		if ( max( $colors ) > min( $colors ) + 15 )
+		if ( max( $colors ) > min( $colors ) + 15 ) {
 			return false;
+		}
 
 		return $color;
 
@@ -131,8 +135,9 @@ class WP_Thumb_Background_Fill {
 function wpthumb_background_fill( $editor, $args ) {
 
 	// currently only supports GD
-	if ( ! is_a( $editor, 'WP_Thumb_Image_Editor_GD') )
+	if ( ! is_a( $editor, 'WP_Thumb_Image_Editor_GD' ) ) {
 		return $editor;
+	}
 
 	$bg = new WP_Thumb_Background_Fill( $editor, $args );
 

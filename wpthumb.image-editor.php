@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 class WP_Thumb_Image_Editor_GD extends WP_Image_Editor_GD {
 
@@ -11,7 +11,7 @@ class WP_Thumb_Image_Editor_GD extends WP_Image_Editor_GD {
 	}
 
 	public function update_size( $width = null, $height = null ) {
-		return parent::update_size( $width, $height);
+		return parent::update_size( $width, $height );
 	}
 }
 
@@ -26,6 +26,6 @@ class WP_Thumb_Image_Editor_Imagick extends WP_Image_Editor_Imagick {
 	}
 
 	public function update_size( $width = null, $height = null ) {
-		return parent::update_size( $width, $height);
+		return parent::update_size( $width, $height );
 	}
 }

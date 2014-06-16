@@ -3,13 +3,13 @@
 /**
  * Only add the watermarking admin options if the current theme supports it, as we don't want to clutter
  * for people who don't care
- * 
+ *
  */
 function wpthumb_add_crop_from_position_admin_hooks() {
 
 	if ( current_theme_supports( 'wpthumb-crop-from-position' ) ) {
 		add_filter( 'attachment_fields_to_edit', 'wpthumb_media_form_crop_position', 10, 2 );
-		add_filter( 'attachment_fields_to_save', 'wpthumb_media_form_crop_position_save', 10, 2);
+		add_filter( 'attachment_fields_to_save', 'wpthumb_media_form_crop_position_save', 10, 2 );
 	}
 }
 add_action( 'init', 'wpthumb_add_crop_from_position_admin_hooks' );
@@ -20,19 +20,22 @@ add_action( 'init', 'wpthumb_add_crop_from_position_admin_hooks' );
  * Adds a back end for selecting the crop position of images.
  *
  * @access public
+ *
  * @param array $fields
  * @param array $post
  * @return $post
  */
 function wpthumb_media_form_crop_position( $fields, $post ) {
 
-	if ( ! wp_attachment_is_image( $post->ID ) )
+	if ( ! wp_attachment_is_image( $post->ID ) ) {
 		return $fields;
+	}
 
 	$current_position = get_post_meta( $post->ID, 'wpthumb_crop_pos', true );
 
-	if ( ! $current_position )
+	if ( ! $current_position ) {
 		$current_position = 'center,center';
+	}
 
 	$html = '<style>#wpthumb_crop_pos { padding: 5px; } #wpthumb_crop_pos input { margin: 5px; width: auto; }</style>';
 	$html .= '<div id="wpthumb_crop_pos">';
@@ -50,7 +53,7 @@ function wpthumb_media_form_crop_position( $fields, $post ) {
 	$fields['crop-from-position'] = array(
 		'label' => __( 'Crop Position', 'wpthumb' ),
 		'input' => 'html',
-		'html' => $html
+		'html'  => $html
 	);
 
 	return $fields;
@@ -63,20 +66,22 @@ function wpthumb_media_form_crop_position( $fields, $post ) {
  * Saves crop position in post meta.
  *
  * @access public
+ *
  * @param array $post
  * @param array $attachment
  * @return $post
  */
-function wpthumb_media_form_crop_position_save( $post, $attachment ){
+function wpthumb_media_form_crop_position_save( $post, $attachment ) {
 
-	if ( ! isset( $attachment['wpthumb_crop_pos'] ) )
+	if ( ! isset( $attachment['wpthumb_crop_pos'] ) ) {
 		return;
-	
-	if ( $attachment['wpthumb_crop_pos'] == 'center,center' )
-		delete_post_meta( $post['ID'], 'wpthumb_crop_pos' );
+	}
 
-	else
+	if ( $attachment['wpthumb_crop_pos'] == 'center,center' ) {
+		delete_post_meta( $post['ID'], 'wpthumb_crop_pos' );
+	} else {
 		update_post_meta( $post['ID'], 'wpthumb_crop_pos', $attachment['wpthumb_crop_pos'] );
+	}
 
 	return $post;
 
