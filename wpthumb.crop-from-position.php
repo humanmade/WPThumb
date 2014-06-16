@@ -23,7 +23,6 @@ add_action( 'init', 'wpthumb_add_crop_from_position_admin_hooks' );
  *
  * @param array $fields
  * @param array $post
- *
  * @return $post
  */
 function wpthumb_media_form_crop_position( $fields, $post ) {
@@ -70,7 +69,6 @@ function wpthumb_media_form_crop_position( $fields, $post ) {
  *
  * @param array $post
  * @param array $attachment
- *
  * @return $post
  */
 function wpthumb_media_form_crop_position_save( $post, $attachment ) {
