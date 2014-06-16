@@ -46,9 +46,9 @@ class WP_Thumb_Background_Fill {
 	/**
 	 * Background fill an image using the provided color
 	 *
-	 * @param int $width  The desired width of the new image
-	 * @param int $height The desired height of the new image
-	 * @param     Array   the desired pad colors in RGB format, array should be array( 'top' => '', 'right' => '', 'bottom' => '', 'left' => '' );
+	 * @param int   $width  The desired width of the new image
+	 * @param int   $height The desired height of the new image
+	 * @param Array $colors The desired pad colors in RGB format, array should be array( 'top' => '', 'right' => '', 'bottom' => '', 'left' => '' );
 	 */
 	private function fill_color( array $colors ) {
 
@@ -57,7 +57,7 @@ class WP_Thumb_Background_Fill {
 		$size = array( 'width' => $this->args['width'], 'height' => $this->args['height'] );
 
 		$offsetLeft = ( $size['width'] - $current_size['width'] ) / 2;
-		$offsetTop  = ( $size['height'] - $current_size['height'] ) / 2;
+		$offsetTop = ( $size['height'] - $current_size['height'] ) / 2;
 
 		$new_image = imagecreatetruecolor( $size['width'], $size['height'] );
 
@@ -135,7 +135,7 @@ class WP_Thumb_Background_Fill {
 function wpthumb_background_fill( $editor, $args ) {
 
 	// currently only supports GD
-	if ( !is_a( $editor, 'WP_Thumb_Image_Editor_GD' ) ) {
+	if ( ! is_a( $editor, 'WP_Thumb_Image_Editor_GD' ) ) {
 		return $editor;
 	}
 
