@@ -104,9 +104,9 @@ class WP_Thumb {
 			$this->setArgs( $args );
 		}
 
-		if ( $this->getFilePath() && !$this->errored() ) {
+		if ( $this->getFilePath() && ! $this->errored() ) {
 
-			if ( !file_exists( $this->getCacheFilePath() ) || !$this->args['cache'] ) {
+			if ( ! file_exists( $this->getCacheFilePath() ) || ! $this->args['cache'] ) {
 
 				$this->generateCacheFile();
 			}
@@ -140,7 +140,7 @@ class WP_Thumb {
 		}
 
 		// if it's a local path, lets check it now
-		if ( strpos( $this->file_path, '/' ) === 0 && strpos( $this->file_path, '//' ) !== 0 && !file_exists( $this->file_path ) ) {
+		if ( strpos( $this->file_path, '/' ) === 0 && strpos( $this->file_path, '//' ) !== 0 && ! file_exists( $this->file_path ) ) {
 			$this->error = new WP_Error( 'file-not-found' );
 		}
 	}
@@ -215,13 +215,13 @@ class WP_Thumb {
 	 */
 	public function getFilePath() {
 
-		if ( !empty( $this->_file_path ) ) {
+		if ( ! empty( $this->_file_path ) ) {
 			return $this->_file_path;
 		}
 
-		if ( strpos( $this->file_path, '/' ) === 0 && !file_exists( $this->file_path ) && $this->args['default'] ) {
+		if ( strpos( $this->file_path, '/' ) === 0 && ! file_exists( $this->file_path ) && $this->args['default'] ) {
 			$this->file_path = $this->args['default'];
-		} elseif ( ( !$this->file_path ) && $this->args['default'] && file_exists( $this->args['default'] ) ) {
+		} elseif ( ( ! $this->file_path ) && $this->args['default'] && file_exists( $this->args['default'] ) ) {
 			$this->file_path = $this->args['default'];
 		}
 
@@ -250,7 +250,6 @@ class WP_Thumb {
 	 * @access public
 	 *
 	 * @param string $arg
-	 *
 	 * @return mixed
 	 */
 	public function getArg( $arg ) {
@@ -272,7 +271,7 @@ class WP_Thumb {
 
 		$ext = pathinfo( $this->getFilePath(), PATHINFO_EXTENSION );
 
-		if ( !$ext ) {
+		if ( ! $ext ) {
 			// Seems like we dont have an ext, lets guess at JPG
 			$ext = 'jpg';
 		}
@@ -291,7 +290,7 @@ class WP_Thumb {
 
 		$path = $this->getFilePath();
 
-		if ( !$path ) {
+		if ( ! $path ) {
 			return '';
 		}
 
@@ -312,8 +311,9 @@ class WP_Thumb {
 
 		$path = $this->getFilePath();
 
-		if ( !$path )
+		if ( ! $path ) {
 			return '';
+		}
 
 		$original_filename = basename( $this->getFilePath() );
 
@@ -343,7 +343,7 @@ class WP_Thumb {
 
 			$parts = parse_url( $this->getFilePath() );
 
-			if ( !empty( $parts['host'] ) )
+			if ( ! empty( $parts['host'] ) )
 				$new_dir = $upload_dir['basedir'] . '/cache/remote/' . sanitize_title( $parts['host'] );
 
 			else
@@ -369,7 +369,7 @@ class WP_Thumb {
 
 		$path = $this->getFilePath();
 
-		if ( !$path )
+		if ( ! $path )
 			return '';
 
 		// Generate a short unique filename
@@ -429,9 +429,9 @@ class WP_Thumb {
 
 			// Pass the new file back through the function so they are resized
 			return new WP_Thumb( $new_filepath, array_merge( $this->args, array(
-						'output_file' => $new_filepath,
-						'cache'       => false
-					) ) );
+				'output_file' => $new_filepath,
+				'cache'       => false
+			) ) );
 
 		endif;
 
@@ -527,7 +527,7 @@ class WP_Thumb {
 	 * @return null
 	 */
 	public function errored() {
-		return !empty( $this->error );
+		return ! empty( $this->error );
 	}
 
 	/**
@@ -578,7 +578,6 @@ class WP_Thumb {
 	 * Convert a path into a url
 	 *
 	 * @param string $path
-	 *
 	 * @return string url
 	 */
 	private function getFileURLForFilePath( $path ) {
@@ -604,7 +603,6 @@ class WP_Thumb {
  * @param int  $width  .
  * @param int  $height .
  * @param bool $crop   . (default: false)
- *
  * @return (string) url to the image
  */
 function wpthumb( $url, $args = array() ) {
@@ -624,7 +622,6 @@ function wpthumb( $url, $args = array() ) {
  * @param null  $null
  * @param int   $id
  * @param array $args
- *
  * @return null
  */
 function wpthumb_post_image( $null, $id, $args ) {
@@ -641,7 +638,7 @@ function wpthumb_post_image( $null, $id, $args ) {
 
 	$args = wp_parse_args( $args );
 
-	if (  empty( $args[0] ) )
+	if ( empty( $args[0] ) )
 		$args['width'] = $args[0];
 
 	if ( ! empty( $args[1] ) )
@@ -716,7 +713,6 @@ add_filter( 'wp_delete_file', 'wpthumb_delete_cache_for_file' );
  * Removes a dir tree. I.e. recursive rmdir
  *
  * @param string $dir
- *
  * @return bool - success / failure
  */
 function wpthumb_rmdir_recursive( $dir ) {
@@ -776,4 +772,5 @@ function wpthumb_add_image_editors( $editors ) {
 
 	return $editors;
 }
+
 add_filter( 'wp_image_editors', 'wpthumb_add_image_editors' );
