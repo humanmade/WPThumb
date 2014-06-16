@@ -112,14 +112,14 @@ class WP_Thumb_Background_Fill {
 		);
 
 		$colors = array();
-		$color  = 0;
+		$color = 0;
 
 		foreach ( $coords as $coord ) {
 			$rgb = imagecolorat( $this->editor->get_image(), $coord[0], $coord[1] );
-			$c   = imagecolorsforindex( $this->editor->get_image(), $rgb );
+			$c = imagecolorsforindex( $this->editor->get_image(), $rgb );
 
 			$colors[] = $c['red'] + $c['green'] + $c['blue'] + $c['alpha'];
-			$color    = str_pad( $c['red'], 3, '0', STR_PAD_LEFT ) . str_pad( $c['green'], 3, '0', STR_PAD_LEFT ) . str_pad( $c['blue'], 3, '0', STR_PAD_LEFT ) . str_pad( $c['alpha'], 3, '0', STR_PAD_LEFT );
+			$color = str_pad( $c['red'], 3, '0', STR_PAD_LEFT ) . str_pad( $c['green'], 3, '0', STR_PAD_LEFT ) . str_pad( $c['blue'], 3, '0', STR_PAD_LEFT ) . str_pad( $c['alpha'], 3, '0', STR_PAD_LEFT );
 		}
 
 		if ( max( $colors ) > min( $colors ) + 15 ) {

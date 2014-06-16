@@ -123,7 +123,7 @@ class WP_Thumb {
 	 */
 	public function setFilePath( $file_path ) {
 
-		$upload_dir       = self::uploadDir();
+		$upload_dir = self::uploadDir();
 		$this->_file_path = null;
 
 		if ( strpos( $file_path, self::get_home_path() ) === 0 ) {
@@ -171,7 +171,7 @@ class WP_Thumb {
 			'cache_with_query_params' => false
 		);
 
-		$args     = wp_parse_args( $args, $arg_defaults );
+		$args = wp_parse_args( $args, $arg_defaults );
 		$new_args = array();
 
 		if ( $args['width'] === 'thumbnail' ) {
@@ -229,7 +229,7 @@ class WP_Thumb {
 			return $this->file_path;
 		}
 
-		$path_bits        = explode( '?', $this->file_path );
+		$path_bits = explode( '?', $this->file_path );
 		$this->_file_path = reset( $path_bits );
 
 		return $this->_file_path;
@@ -328,12 +328,12 @@ class WP_Thumb {
 
 		if ( strpos( $this->getFilePath(), $upload_dir['basedir'] ) === 0 ) :
 
-			$subdir  = dirname( str_replace( $upload_dir['basedir'], '', $this->getFilePath() ) );
+			$subdir = dirname( str_replace( $upload_dir['basedir'], '', $this->getFilePath() ) );
 			$new_dir = $upload_dir['basedir'] . '/cache' . $subdir . '/' . $filename_nice;
 
 		elseif ( strpos( $this->getFilePath(), WP_CONTENT_DIR ) === 0 ) :
 
-			$subdir  = dirname( str_replace( WP_CONTENT_DIR, '', $this->getFilePath() ) );
+			$subdir = dirname( str_replace( WP_CONTENT_DIR, '', $this->getFilePath() ) );
 			$new_dir = $upload_dir['basedir'] . '/cache' . $subdir . '/' . $filename_nice;
 
 		elseif ( strpos( $this->getFilePath(), self::get_home_path() ) === 0 ) :
@@ -397,7 +397,7 @@ class WP_Thumb {
 	public function generateCacheFile() {
 
 		$new_filepath = $this->getCacheFilePath();
-		$file_path    = $this->getFilePath();
+		$file_path = $this->getFilePath();
 
 		// Up the php memory limit
 		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', '256M' ) );
@@ -470,12 +470,12 @@ class WP_Thumb {
 		$crop = array( 'x' => 0, 'y' => 0, 'width' => $size['width'], 'height' => $size['height'] );
 
 		if ( $width < $size['width'] ) {
-			$crop['x']     = intval( ( $size['width'] - $width ) / 2 );
+			$crop['x'] = intval( ( $size['width'] - $width ) / 2 );
 			$crop['width'] = $width;
 		}
 
 		if ( $height < $size['height'] ) {
-			$crop['y']      = intval( ( $size['height'] - $height ) / 2 );
+			$crop['y'] = intval( ( $size['height'] - $height ) / 2 );
 			$crop['height'] = $height;
 		}
 
@@ -493,11 +493,11 @@ class WP_Thumb {
 			$ratio2 = $width / $height;
 
 			if ( $ratio1 < $ratio2 ) {
-				$_width  = $width;
+				$_width = $width;
 				$_height = $width / $ratio1;
 			} else {
 				$_height = $height;
-				$_width  = $height * $ratio1;
+				$_width = $height * $ratio1;
 			}
 
 			$editor->resize( $_width, $_height );
@@ -667,7 +667,7 @@ function wpthumb_post_image( $null, $id, $args ) {
 
 		if ( ! $image->errored() && $image_meta = @getimagesize( $image->getCacheFilePath() ) ) :
 
-			$html_width  = $image_meta[0];
+			$html_width = $image_meta[0];
 			$html_height = $image_meta[1];
 
 		else :
