@@ -506,15 +506,23 @@ class WP_Thumb {
 		$size = $editor->get_size();
 		$crop = array( 'x' => 0, 'y' => 0 );
 
-		if ( $position[0] == 'right' )
+		if ( $position[0] == 'right' ) {
 			$crop['x'] = absint( $size['width'] - $width );
-		else if ( $position[0] == 'center' )
+		} elseif ( $position[0] == 'center' ) {
 			$crop['x'] = intval( absint( $size['width'] - $width ) / 2 );
+		} elseif ( is_numeric( $position[0] ) && 1 >= $position[0] && 0 < $position[0] ) {
+			// crop by primary point of interest given in percent/ratio
+			$crop['x'] = intval( ( $size['width'] * $position[0] ) - ( $width * $position[0] ) );
+		}
 
-		if ( $position[1] == 'bottom' )
+		if ( $position[1] == 'bottom' ) {
 			$crop['y'] = absint( $size['height'] - $height );
-		else if ( $position[1] == 'center' )
+		} elseif ( $position[1] == 'center' ) {
 			$crop['y'] = intval( absint( $size['height'] - $height ) / 2 );
+		} elseif ( is_numeric( $position[1] ) && 1 >= $position[1] && 0 < $position[1] ) {
+			// crop by primary point of interest given in percent/ratio
+			$crop['y'] = intval( ( $size['height'] * $position[1] ) - ( $height * $position[1] ) );
+		}
 
 
 		return $editor->crop( $crop['x'], $crop['y'], $width, $height );
