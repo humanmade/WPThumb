@@ -638,7 +638,7 @@ function wpthumb_post_image( $null, $id, $args ) {
 
 	$args = wp_parse_args( $args );
 
-	if ( empty( $args[0] ) )
+	if ( ! empty( $args[0] ) )
 		$args['width'] = $args[0];
 
 	if ( ! empty( $args[1] ) )
