@@ -132,4 +132,68 @@ class WPThumbCropFromPositionTestCase extends WP_Thumb_UnitTestCase {
 		$this->assertImageRGBAtPoint( $file, array(9,1), array(255,255,255) );
 		$this->assertImageRGBAtPoint( $file, array(1,1), array(0,0,0) );
 	}
+
+	function testCropFromTopCenterWithResizeUsingRatio() {
+		
+		// 20x10 image
+		$path = dirname( __FILE__ ) . '/images/boxed-rectangle.png';
+				
+		$image = new WP_Thumb( $path, array( 
+			'width' => 10, 
+			'height' => 4, 
+			'cache' => false, 
+			'return' => 'path',
+			'crop' => true,
+			'crop_from_position' => '0.5,0.5',
+			'resize' => true ) );
+		
+		$file = $image->returnImage();
+
+		$this->assertImageRGBAtPoint( $file, array(0,0), array(255,255,255) );
+		$this->assertImageRGBAtPoint( $file, array(0,1), array(255,255,255) );
+		$this->assertImageRGBAtPoint( $file, array(9,0), array(255,255,255) );
+		$this->assertImageRGBAtPoint( $file, array(9,1), array(255,255,255) );
+		$this->assertImageRGBAtPoint( $file, array(1,1), array(0,0,0) );
+	}
+
+	function testCropFromTopLeftWithResizeUsingRatio() {
+		
+		// 10x10 image
+		$path = dirname( __FILE__ ) . '/images/boxed-rectangle.png';
+				
+		$image = new WP_Thumb( $path, array( 
+			'width' => 5, 
+			'height' => 5, 
+			'cache' => false, 
+			'return' => 'path',
+			'crop' => true,
+			'crop_from_position' => '0,0',
+			'resize' => true ) );
+		
+		$file = $image->returnImage();
+
+		$this->assertImageRGBAtPoint( $file, array(0,0), array(255,255,255) );
+		$this->assertImageRGBAtPoint( $file, array(0,4), array(255,255,255) );
+		$this->assertImageRGBAtPoint( $file, array(1,1), array(0,0,0) );
+	}
+
+	function testCropFromBottomRightNoResizeUsingRatio() {
+		
+		// 20x10 image
+		$path = dirname( __FILE__ ) . '/images/boxed.png';
+				
+		$image = new WP_Thumb( $path, array( 
+			'width' => 5, 
+			'height' => 5, 
+			'cache' => false, 
+			'return' => 'path',
+			'crop' => true,
+			'crop_from_position' => '1,1',
+			'resize' => false ) );
+		
+		$file = $image->returnImage();
+		$this->assertImageRGBAtPoint( $file, array(0,0), array(0,0,0) );
+		$this->assertImageRGBAtPoint( $file, array(4,4), array(255,255,255) );
+		$this->assertImageRGBAtPoint( $file, array(0,1), array(0,0,0) );
+	}
 }
