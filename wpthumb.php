@@ -437,7 +437,7 @@ class WP_Thumb {
 
 		apply_filters( 'wpthumb_image_pre', $editor, $this->args );
 
-		extract( $this->args );
+		if (is_array($this->args)) extract( $this->args );
 
 		// Cropping
 		if ( $crop && $crop_from_position && $crop_from_position !== array( 'center', 'center' ) ) :
