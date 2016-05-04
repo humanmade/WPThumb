@@ -1,3 +1,5 @@
+_**This project is unmaintained.**_
+
 <table width="100%">
 	<tr>
 		<td align="left" width="70">
