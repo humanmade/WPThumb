@@ -14,7 +14,7 @@ _**This project is unmaintained.**_
 	</tr>
 	<tr>
 		<td>
-			A <strong><a href="https://hmn.md/">Human Made</a></strong> project. Maintained by @joehoyle.
+			A <strong><a href="https://hmn.md/">Human Made</a></strong> project.
 		</td>
 		<td align="center">
 			<img src="https://hmn.md/content/themes/hmnmd/assets/images/hm-logo.svg" width="100" />
